@@ -25,6 +25,9 @@ android {
     }
 
     buildTypes {
+        getByName(ConfigData.BuildType.DEBUG) {
+            isMinifyEnabled = false
+        }
         getByName(ConfigData.BuildType.RELEASE) {
             isMinifyEnabled = true
             proguardFiles(
