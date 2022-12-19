@@ -4,6 +4,7 @@ object Dependencies {
     object Plugins {
         const val LIBRARY = "com.android.library"
         const val DETEKT = "io.gitlab.arturbosch.detekt"
+        const val HILT = "dagger.hilt.android.plugin"
         const val PUBLISH = "maven-publish"
     }
 
@@ -34,6 +35,12 @@ object Dependencies {
         const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.AndroidX.LIFECYCLE}"
     }
 
+    object Google {
+        const val GSON = "com.google.code.gson:gson:${Versions.Google.GSON}"
+        const val HILT = "com.google.dagger:hilt-android:${Versions.Google.HILT}"
+        const val HILT_COMPILER = "com.google.dagger:hilt-android-compiler:${Versions.Google.HILT}"
+    }
+
     object Parsers {
         const val MOSHI = "com.squareup.moshi:moshi-kotlin:${Versions.Parsers.MOSHI}"
     }
@@ -41,7 +48,6 @@ object Dependencies {
     object Lavego {
         const val COMMONS_CODEC = "commons-codec:commons-codec:${Versions.Lavego.COMMONS_CODEC}"
         const val SIMPLE_XML = "org.simpleframework:simple-xml:${Versions.Lavego.SIMPLE_XML}"
-        const val GSON = "com.google.code.gson:gson:${Versions.Lavego.GSON}"
     }
 
     object Testing {
@@ -68,8 +74,10 @@ object Dependencies {
 
         val CORE = arrayListOf<Dependency>().apply {
             add(Dependency.Implementation(AndroidX.CORE_KTX))
-            add(Dependency.Implementation(AndroidX.APP_COMPAT))
+            add(Dependency.Implementation(Google.HILT))
+            add(Dependency.Kapt(Google.HILT_COMPILER))
             add(Dependency.Implementation(Kotlin.COROUTINES))
+            add(Dependency.Implementation(AndroidX.APP_COMPAT))
         }
 
         val LIFECYCLE = arrayListOf<Dependency>().apply {
@@ -87,7 +95,7 @@ object Dependencies {
         val LAVEGO = arrayListOf<Dependency>().apply {
             add(Dependency.Implementation(Lavego.COMMONS_CODEC))
             add(Dependency.Implementation(Lavego.SIMPLE_XML))
-            add(Dependency.Implementation(Lavego.GSON))
+            add(Dependency.Implementation(Google.GSON))
         }
 
         val TEST_LIBRARIES = arrayListOf<Dependency>().apply {

@@ -27,11 +27,11 @@ object Versions {
     object Lavego {
         const val COMMONS_CODEC = "1.15"
         const val SIMPLE_XML = "2.7.1"
-        const val GSON = "2.10"
     }
 
     object Google {
         const val HILT = "2.38.1"
+        const val GSON = "2.10"
     }
 
     object Testing {

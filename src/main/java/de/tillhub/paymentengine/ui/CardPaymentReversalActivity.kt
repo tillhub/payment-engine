@@ -3,10 +3,12 @@ package de.tillhub.paymentengine.ui
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import de.lavego.sdk.PaymentProtocol
 import de.tillhub.paymentengine.data.LavegoTerminalOperation
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentReversalBinding
 
+@AndroidEntryPoint
 class CardPaymentReversalActivity : CardTerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentReversalBinding::inflate)

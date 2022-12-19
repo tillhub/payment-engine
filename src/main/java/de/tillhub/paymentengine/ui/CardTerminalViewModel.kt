@@ -3,8 +3,11 @@ package de.tillhub.paymentengine.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class CardTerminalViewModel : ViewModel() {
+@HiltViewModel
+class CardTerminalViewModel @Inject constructor() : ViewModel() {
 
     private val _terminalOperationState: MutableLiveData<TerminalOperationState> =
         MutableLiveData(TerminalOperationState.Idle)

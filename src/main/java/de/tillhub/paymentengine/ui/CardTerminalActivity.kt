@@ -22,11 +22,13 @@ import de.tillhub.paymentengine.CardPaymentManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import javax.inject.Inject
 
 abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private val viewModel by viewModels<CardTerminalViewModel>()
 
+    @Inject
     lateinit var cardPaymentManager: CardPaymentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
