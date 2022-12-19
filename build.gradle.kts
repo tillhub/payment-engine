@@ -75,11 +75,11 @@ dependencies {
 
     // Lavego
     implementDependencyGroup(Dependencies.Groups.LAVEGO)
-    debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-debug"))
-    debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-debug"))
+    debugApi(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-debug"))
+    debugApi(project(Dependencies.Modules.LAVEGO, configuration = "utils-debug"))
 
-    releaseImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-release"))
-    releaseImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-release"))
+    releaseApi(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-release"))
+    releaseApi(project(Dependencies.Modules.LAVEGO, configuration = "utils-release"))
 
     // Unit tests
     implementDependencyGroup(Dependencies.Groups.TEST_LIBRARIES)
