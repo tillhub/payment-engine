@@ -85,16 +85,16 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>(ConfigData.artifactIdDebug) {
+            create<MavenPublication>(ConfigData.ArtifactId.DEBUG) {
                 groupId = ConfigData.applicationId
-                artifactId = ConfigData.artifactId
+                artifactId = ConfigData.ArtifactId.DEBUG
                 version = ConfigData.versionName
 
                 from(components.getByName(ConfigData.BuildType.DEBUG))
             }
-            create<MavenPublication>(ConfigData.artifactId) {
+            create<MavenPublication>(ConfigData.ArtifactId.RELEASE) {
                 groupId = ConfigData.applicationId
-                artifactId = ConfigData.artifactId
+                artifactId = ConfigData.ArtifactId.RELEASE
                 version = ConfigData.versionName
 
                 from(components.getByName(ConfigData.BuildType.RELEASE))

@@ -1,8 +1,6 @@
 import org.gradle.api.JavaVersion
 
 object ConfigData {
-    const val artifactId = "payment-engine"
-    const val artifactIdDebug = "payment-engine-debug"
     const val applicationId = "de.tillhub.paymentengine"
     const val minSdkVersion = 21
     const val targetSdkVersion = 32
@@ -11,6 +9,11 @@ object ConfigData {
 
     val JAVA_VERSION = JavaVersion.VERSION_11
     val JVM_TARGET = JavaVersion.VERSION_11.toString()
+
+    object ArtifactId {
+        const val DEBUG = "payment-engine-debug"
+        const val RELEASE = "payment-engine"
+    }
 
     object BuildType {
         const val DEBUG = "debug"
