@@ -5,4 +5,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-include(":lavego")
+include(":lavego-sale")
+include(":lavego-utils")
