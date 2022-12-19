@@ -3,7 +3,6 @@ plugins {
     kotlin(Dependencies.KotlinPlugins.KAPT)
     id(Dependencies.Plugins.LIBRARY)
     id(Dependencies.Plugins.DETEKT) version Versions.Plugins.DETEKT
-    id(Dependencies.Plugins.HILT)
     id(Dependencies.Plugins.PUBLISH)
 }
 
@@ -75,11 +74,11 @@ dependencies {
 
     // Lavego
     implementDependencyGroup(Dependencies.Groups.LAVEGO)
-    debugApi(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-debug"))
-    debugApi(project(Dependencies.Modules.LAVEGO, configuration = "utils-debug"))
+    debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-debug"))
+    debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-debug"))
 
-    releaseApi(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-release"))
-    releaseApi(project(Dependencies.Modules.LAVEGO, configuration = "utils-release"))
+    releaseImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-release"))
+    releaseImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-release"))
 
     // Unit tests
     implementDependencyGroup(Dependencies.Groups.TEST_LIBRARIES)

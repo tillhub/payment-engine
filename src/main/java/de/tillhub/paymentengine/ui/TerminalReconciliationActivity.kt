@@ -3,11 +3,9 @@ package de.tillhub.paymentengine.ui
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import dagger.hilt.android.AndroidEntryPoint
 import de.tillhub.paymentengine.data.LavegoTerminalOperation
 import de.tillhub.paymentengine.databinding.ActivityTerminalReconciliationBinding
 
-@AndroidEntryPoint
 class TerminalReconciliationActivity : CardTerminalActivity() {
 
     private val binding by viewBinding(ActivityTerminalReconciliationBinding::inflate)

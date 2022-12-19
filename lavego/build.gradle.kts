@@ -1,6 +1,3 @@
-plugins {
-    base //allows IDE clean to trigger clean on this module too
-}
 configurations.maybeCreate("saleSdk-debug")
 configurations.maybeCreate("saleSdk-release")
 configurations.maybeCreate("utils-debug")

@@ -4,7 +4,6 @@ object Dependencies {
     object Plugins {
         const val LIBRARY = "com.android.library"
         const val DETEKT = "io.gitlab.arturbosch.detekt"
-        const val HILT = "dagger.hilt.android.plugin"
         const val PUBLISH = "maven-publish"
     }
 
@@ -37,8 +36,6 @@ object Dependencies {
 
     object Google {
         const val GSON = "com.google.code.gson:gson:${Versions.Google.GSON}"
-        const val HILT = "com.google.dagger:hilt-android:${Versions.Google.HILT}"
-        const val HILT_COMPILER = "com.google.dagger:hilt-android-compiler:${Versions.Google.HILT}"
     }
 
     object Parsers {
@@ -74,8 +71,6 @@ object Dependencies {
 
         val CORE = arrayListOf<Dependency>().apply {
             add(Dependency.Implementation(AndroidX.CORE_KTX))
-            add(Dependency.Implementation(Google.HILT))
-            add(Dependency.Kapt(Google.HILT_COMPILER))
             add(Dependency.Implementation(Kotlin.COROUTINES))
             add(Dependency.Implementation(AndroidX.APP_COMPAT))
         }
