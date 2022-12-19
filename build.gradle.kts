@@ -57,12 +57,25 @@ android {
 }
 
 dependencies {
+
     // Core Dependencies
     implementDependencyGroup(Dependencies.Groups.CORE)
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementDependencyGroup(Dependencies.Groups.LIFECYCLE)
+
+    // Module Specific dependencies
+    implementation(Dependencies.AndroidX.CONSTRAINT_LAYOUT)
 
     // Utils
+    implementDependencyGroup(Dependencies.Groups.PARSERS)
     implementation(Dependencies.Tools.TIMBER)
+
+    // Lavego
+    implementDependencyGroup(Dependencies.Groups.LAVEGO)
+    debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-debug"))
+    debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-debug"))
+
+    releaseImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-release"))
+    releaseImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-release"))
 
     // Unit tests
     implementDependencyGroup(Dependencies.Groups.TEST_LIBRARIES)
@@ -72,12 +85,19 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
+            create<MavenPublication>(ConfigData.artifactIdDebug) {
+                groupId = ConfigData.applicationId
+                artifactId = ConfigData.artifactId
+                version = ConfigData.versionName
+
+                from(components.getByName(ConfigData.BuildType.DEBUG))
+            }
             create<MavenPublication>(ConfigData.artifactId) {
                 groupId = ConfigData.applicationId
                 artifactId = ConfigData.artifactId
                 version = ConfigData.versionName
 
-                from(components.getByName("release"))
+                from(components.getByName(ConfigData.BuildType.RELEASE))
             }
         }
     }

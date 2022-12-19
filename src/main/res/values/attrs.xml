@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="badgeTextColor" format="reference" />
+    <attr name="pageMarginCards" format="dimension" />
+    <attr name="widgetGutter" format="dimension" />
+    <attr name="widgetGutterLarge" format="dimension" />
+    <attr name="textAppearanceH1" format="reference" />
+</resources>

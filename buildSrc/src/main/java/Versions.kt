@@ -14,6 +14,20 @@ object Versions {
 
     object AndroidX {
         const val CORE_KTX = "1.7.0"
+        const val APP_COMPAT = "1.5.1"
+        const val ACTIVITY = "1.6.1"
+        const val LIFECYCLE = "2.5.1"
+        const val CONSTRAINT_LAYOUT = "2.1.4"
+    }
+
+    object Parsers {
+        const val MOSHI = "1.14.0"
+    }
+
+    object Lavego {
+        const val COMMONS_CODEC = "1.15"
+        const val SIMPLE_XML = "2.7.1"
+        const val GSON = "2.10"
     }
 
     object Google {

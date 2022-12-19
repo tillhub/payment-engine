@@ -23,6 +23,25 @@ object Dependencies {
 
     object AndroidX {
         const val CORE_KTX = "androidx.core:core-ktx:${Versions.AndroidX.CORE_KTX}"
+        const val APP_COMPAT = "androidx.appcompat:appcompat:${Versions.AndroidX.APP_COMPAT}"
+        const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:${Versions.AndroidX.CONSTRAINT_LAYOUT}"
+
+        const val ACTIVITY = "androidx.activity:activity-ktx:${Versions.AndroidX.ACTIVITY}"
+
+        const val VIEW_MODEL = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.AndroidX.LIFECYCLE}"
+        const val LIVE_DATA = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.AndroidX.LIFECYCLE}"
+        const val LIFECYCLE_COMPILER = "androidx.lifecycle:lifecycle-compiler:${Versions.AndroidX.LIFECYCLE}"
+        const val LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.AndroidX.LIFECYCLE}"
+    }
+
+    object Parsers {
+        const val MOSHI = "com.squareup.moshi:moshi-kotlin:${Versions.Parsers.MOSHI}"
+    }
+
+    object Lavego {
+        const val COMMONS_CODEC = "commons-codec:commons-codec:${Versions.Lavego.COMMONS_CODEC}"
+        const val SIMPLE_XML = "org.simpleframework:simple-xml:${Versions.Lavego.SIMPLE_XML}"
+        const val GSON = "com.google.code.gson:gson:${Versions.Lavego.GSON}"
     }
 
     object Testing {
@@ -41,10 +60,34 @@ object Dependencies {
         const val CORE = "androidx.test:core-ktx:${Versions.AndroidTest.CORE}"
     }
 
+    object Modules {
+        const val LAVEGO = ":lavego"
+    }
+
     object Groups {
+
         val CORE = arrayListOf<Dependency>().apply {
             add(Dependency.Implementation(AndroidX.CORE_KTX))
+            add(Dependency.Implementation(AndroidX.APP_COMPAT))
             add(Dependency.Implementation(Kotlin.COROUTINES))
+        }
+
+        val LIFECYCLE = arrayListOf<Dependency>().apply {
+            add(Dependency.Implementation(AndroidX.ACTIVITY))
+            add(Dependency.Implementation(AndroidX.VIEW_MODEL))
+            add(Dependency.Implementation(AndroidX.LIVE_DATA))
+            add(Dependency.Implementation(AndroidX.LIFECYCLE_RUNTIME))
+            add(Dependency.Kapt(AndroidX.LIFECYCLE_COMPILER))
+        }
+
+        val PARSERS = arrayListOf<Dependency>().apply {
+            add(Dependency.Implementation(Parsers.MOSHI))
+        }
+
+        val LAVEGO = arrayListOf<Dependency>().apply {
+            add(Dependency.Implementation(Lavego.COMMONS_CODEC))
+            add(Dependency.Implementation(Lavego.SIMPLE_XML))
+            add(Dependency.Implementation(Lavego.GSON))
         }
 
         val TEST_LIBRARIES = arrayListOf<Dependency>().apply {
