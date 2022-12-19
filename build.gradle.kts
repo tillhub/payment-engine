@@ -61,6 +61,8 @@ android {
 
 dependencies {
 
+    implementation(fileTree(mapOf("dir" to "lavego", "include" to listOf("*.aar"))))
+
     // Core Dependencies
     implementDependencyGroup(Dependencies.Groups.CORE)
     implementDependencyGroup(Dependencies.Groups.LIFECYCLE)
@@ -74,6 +76,7 @@ dependencies {
 
     // Lavego
     implementDependencyGroup(Dependencies.Groups.LAVEGO)
+
     debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "saleSdk-debug"))
     debugImplementation(project(Dependencies.Modules.LAVEGO, configuration = "utils-debug"))
 
