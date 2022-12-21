@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import dagger.hilt.android.EntryPointAccessors
 import de.lavego.sdk.Constants
 import de.lavego.sdk.Payment
 import de.lavego.sdk.PaymentProtocol
@@ -19,17 +20,30 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.CardPaymentManager
+import de.tillhub.paymentengine.di.DaggerPaymentComponent
+import de.tillhub.paymentengine.di.PaymentModuleDependencies
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import javax.inject.Inject
 
 abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private val viewModel by viewModels<CardTerminalViewModel>()
 
+    @Inject
     lateinit var cardPaymentManager: CardPaymentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        DaggerPaymentComponent.builder()
+            .context(this)
+            .appDependencies(
+                EntryPointAccessors.fromApplication(
+                    applicationContext, PaymentModuleDependencies::class.java
+                )
+            )
+            .build()
+            .inject(this)
         super.onCreate(savedInstanceState)
 
         viewModel.terminalOperationState.observe(this) { state ->

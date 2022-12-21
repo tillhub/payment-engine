@@ -1,34 +1,46 @@
 package de.tillhub.paymentengine.di
 
 import android.content.Context
-import com.squareup.moshi.Moshi
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import de.tillhub.paymentengine.CardPaymentConfig
 import de.tillhub.paymentengine.CardPaymentManager
 import de.tillhub.paymentengine.CardPaymentManagerImpl
 import de.tillhub.paymentengine.CardSaleConfig
 import de.tillhub.paymentengine.data.LavegoTransactionDataConverter
 import de.tillhub.paymentengine.providers.PaymentTime
+import kotlinx.coroutines.CoroutineScope
 
+@Module
+@DisableInstallInCheck
+class PaymentModule {
 
-object PaymentModule {
+    @Provides
+    @PaymentScope
+    fun provideCardPaymentConfig(): CardPaymentConfig =  CardPaymentConfig()
 
+    @Provides
+    @PaymentScope
+    fun provideCardSaleConfig(): CardSaleConfig = CardSaleConfig()
+
+    @Provides
+    @PaymentScope
     fun provideCardPaymentManager(
         context: Context,
-        moshi: Moshi,
-        paymentTime: PaymentTime,
+        lavegoTransactionDataConverter: LavegoTransactionDataConverter,
+        paymentTime:PaymentTime,
         cardPaymentConfig: CardPaymentConfig,
-        cardSaleConfig: CardSaleConfig
+        cardSaleConfig: CardSaleConfig,
+        coroutineScope: CoroutineScope
     ): CardPaymentManager {
         return CardPaymentManagerImpl(
-            appContext = context,
-            lavegoTransactionDataConverter = LavegoTransactionDataConverter(moshi),
-            paymentTime = paymentTime,
-            cardPaymentConfig = cardPaymentConfig,
-            cardSaleConfig = cardSaleConfig
+            context,
+            lavegoTransactionDataConverter,
+            paymentTime,
+            cardPaymentConfig,
+            cardSaleConfig,
+            coroutineScope
         )
     }
-
-    fun provideCardPaymentConfig() = CardPaymentConfig()
-
-    fun provideCardSaleConfig() = CardSaleConfig()
 }

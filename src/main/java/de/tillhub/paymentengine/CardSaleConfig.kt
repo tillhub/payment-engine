@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine
 
+
 class CardSaleConfig {
 
     var applicationName: String = DEFAULT_APPLICATION_NAME

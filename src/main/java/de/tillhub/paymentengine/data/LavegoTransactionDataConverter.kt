@@ -9,8 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.math.BigInteger
+import javax.inject.Inject
 
-class LavegoTransactionDataConverter(private val moshi: Moshi) {
+class LavegoTransactionDataConverter @Inject constructor(private val moshi: Moshi) {
 
     private fun createJsonAdapter(): JsonAdapter<TransactionDataDto> =
         moshi.adapter(TransactionDataDto::class.java)

@@ -17,8 +17,6 @@ import de.tillhub.paymentengine.ui.CardPaymentPartialRefundActivity
 import de.tillhub.paymentengine.ui.CardPaymentReversalActivity
 import de.tillhub.paymentengine.ui.TerminalReconciliationActivity
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import java.math.BigInteger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +29,7 @@ class CardPaymentManagerImpl(
     private val paymentTime: PaymentTime,
     private val cardPaymentConfig: CardPaymentConfig,
     private val cardSaleConfig: CardSaleConfig,
-    private val applicationScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val applicationScope: CoroutineScope
 ) : CardPaymentManager {
 
     @VisibleForTesting

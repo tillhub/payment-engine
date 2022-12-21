@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine
 
+
 class CardPaymentConfig {
 
     var integrationType: IntegrationType = DEFAULT_INTEGRATION_TYPE

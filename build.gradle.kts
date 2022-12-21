@@ -1,14 +1,20 @@
+import java.net.URI
+
 plugins {
     kotlin(Dependencies.KotlinPlugins.ANDROID)
     kotlin(Dependencies.KotlinPlugins.KAPT)
     id(Dependencies.Plugins.LIBRARY)
     id(Dependencies.Plugins.DETEKT) version Versions.Plugins.DETEKT
+    id(Dependencies.Plugins.HILT)
     id(Dependencies.Plugins.PUBLISH)
 }
 
 repositories {
     google()
     mavenCentral()
+    maven {
+        url = URI.create("https://jitpack.io")
+    }
     gradlePluginPortal()
 }
 
@@ -75,8 +81,8 @@ dependencies {
     // Lavego
     implementDependencyGroup(Dependencies.Groups.LAVEGO)
 
-    api(project(":lavego-sale"))
-    api(project(":lavego-utils"))
+    implementation("com.github.lavego.sales-sdk:saleSdk:1.0.0")
+    implementation("com.github.lavego.sales-sdk:utils:1.0.0")
 
     // Unit tests
     implementDependencyGroup(Dependencies.Groups.TEST_LIBRARIES)
