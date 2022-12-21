@@ -10,7 +10,9 @@ import de.tillhub.paymentengine.ui.CardTerminalActivity
 
 @PaymentScope
 @Component(
-    dependencies = [PaymentModuleDependencies::class],
+    dependencies = [
+        PaymentModuleDependencies::class
+    ],
     modules = [
         PaymentModule::class
     ]
