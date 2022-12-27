@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.providers
+package de.tillhub.paymentengine.di
 
 import java.time.Instant
 

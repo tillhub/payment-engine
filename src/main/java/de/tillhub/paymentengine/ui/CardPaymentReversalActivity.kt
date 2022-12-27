@@ -26,7 +26,7 @@ class CardPaymentReversalActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
-        when (cardPaymentManager.getTransportConfiguration().paymentProtocol) {
+        when (cardPaymentManager.getTransportConfiguration(cardPaymentConfig).paymentProtocol) {
             PaymentProtocol.Nexo -> {
                 binding.instructions.isGone = true
                 binding.nexoError.isVisible = true

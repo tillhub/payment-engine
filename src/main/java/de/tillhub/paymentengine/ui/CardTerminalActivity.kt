@@ -20,6 +20,10 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.CardPaymentManager
+import de.tillhub.paymentengine.CardPaymentManager.Companion.EXTRA_CARD_PAYMENT_CONFIG
+import de.tillhub.paymentengine.CardPaymentManager.Companion.EXTRA_CARD_SALE_CONFIG
+import de.tillhub.paymentengine.data.CardPaymentConfig
+import de.tillhub.paymentengine.data.CardSaleConfig
 import de.tillhub.paymentengine.di.DaggerPaymentComponent
 import de.tillhub.paymentengine.di.PaymentModuleDependencies
 import kotlinx.coroutines.delay
@@ -30,6 +34,9 @@ import javax.inject.Inject
 abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private val viewModel by viewModels<CardTerminalViewModel>()
+
+    lateinit var cardPaymentConfig: CardPaymentConfig
+    lateinit var cardSaleConfig: CardSaleConfig
 
     @Inject
     lateinit var cardPaymentManager: CardPaymentManager
@@ -45,6 +52,11 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
             .build()
             .inject(this)
         super.onCreate(savedInstanceState)
+
+        cardPaymentConfig = intent.getParcelableExtra(EXTRA_CARD_PAYMENT_CONFIG)
+            ?: throw IllegalArgumentException("Missing argument $EXTRA_CARD_PAYMENT_CONFIG")
+        cardSaleConfig = intent.getParcelableExtra(EXTRA_CARD_SALE_CONFIG)
+            ?: throw IllegalArgumentException("Missing argument $EXTRA_CARD_SALE_CONFIG")
 
         viewModel.terminalOperationState.observe(this) { state ->
             when (state) {
@@ -67,7 +79,7 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
     }
 
     fun doPayment(paymentAmount: BigDecimal) {
-        when (cardPaymentManager.getTransportConfiguration().paymentProtocol) {
+        when (cardPaymentManager.getTransportConfiguration(cardPaymentConfig).paymentProtocol) {
             PaymentProtocol.Nexo -> {
                 doPayment(Payment().apply {
                     amount = paymentAmount.divide(BigDecimal.valueOf(100))
@@ -89,7 +101,7 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
      */
     fun doCancellation(receiptNo: String) {
         val cancellation = Apdu(Commons.Command.CMD_0630).apply {
-            val password = cardPaymentManager.getSaleConfiguration().pin
+            val password = cardPaymentManager.getSaleConfiguration(cardSaleConfig).pin
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
             add(Bmp(0x87.toByte(), Commons.NumberToBCD(receiptNo.toLong(), RECEIPT_NO_BYTE_COUNT)))
         }
@@ -104,8 +116,8 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
      */
     fun doPartialRefund(amount: BigDecimal) {
         val partialRefund = Apdu(Commons.Command.CMD_0631).apply {
-            val password = cardPaymentManager.getSaleConfiguration().pin
-            val currency = cardPaymentManager.getSaleConfiguration().zvtFlags.isoCurrencyRegister()
+            val password = cardPaymentManager.getSaleConfiguration(cardSaleConfig).pin
+            val currency = cardPaymentManager.getSaleConfiguration(cardSaleConfig).zvtFlags.isoCurrencyRegister()
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
             add(Bmp(0x04.toByte(), Commons.NumberToBCD(amount.toLong(), AMOUNT_BYTE_COUNT)))
             add(Bmp(0x49.toByte(), Commons.StringNumberToBCD(currency, CC_BYTE_COUNT)))
@@ -116,8 +128,8 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private fun doZVTRegister() {
         val register = Apdu(Commons.Command.CMD_0600).apply {
-            val password = cardPaymentManager.getSaleConfiguration().pin
-            val currency = cardPaymentManager.getSaleConfiguration().zvtFlags.isoCurrencyRegister()
+            val password = cardPaymentManager.getSaleConfiguration(cardSaleConfig).pin
+            val currency = cardPaymentManager.getSaleConfiguration(cardSaleConfig).zvtFlags.isoCurrencyRegister()
 
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
             add(TERMINAL_CONFIG_BYTE)
@@ -134,7 +146,7 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
     }
 
     private fun doSetup() {
-        if (cardPaymentManager.getTransportConfiguration().paymentProtocol == PaymentProtocol.Nexo) {
+        if (cardPaymentManager.getTransportConfiguration(cardPaymentConfig).paymentProtocol == PaymentProtocol.Nexo) {
             doNexoLogin()
         } else {
             doZVTRegister()
@@ -147,11 +159,11 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
     abstract fun startOperation()
 
     override fun transportConfiguration(): TransportConfiguration {
-        return cardPaymentManager.getTransportConfiguration()
+        return cardPaymentManager.getTransportConfiguration(cardPaymentConfig)
     }
 
     override fun saleConfiguration(): SaleConfiguration {
-        return cardPaymentManager.getSaleConfiguration()
+        return cardPaymentManager.getSaleConfiguration(cardSaleConfig)
     }
 
     override fun launchSelf(delay: Int) {

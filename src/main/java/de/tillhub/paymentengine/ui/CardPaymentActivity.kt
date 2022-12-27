@@ -31,8 +31,16 @@ class CardPaymentActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
+        when (cardPaymentManager.transactionState) {
+            is LavegoTerminalOperation.Success -> finish()
+            is LavegoTerminalOperation.Failed -> finish()
+            is LavegoTerminalOperation.Pending.Payment -> TODO()
+
+            LavegoTerminalOperation.Waiting -> TODO()
+        }
+
         if (cardPaymentManager.transactionState is LavegoTerminalOperation.Success ||
-            cardPaymentManager.transactionState is LavegoTerminalOperation.Waiting) {
+            cardPaymentManager.transactionState is LavegoTerminalOperation.Failed) {
             finish()
         } else {
             (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.Payment)?.amount?.let { amount ->

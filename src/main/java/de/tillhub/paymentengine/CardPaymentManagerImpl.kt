@@ -11,7 +11,7 @@ import de.lavego.sdk.TransactionData
 import de.lavego.sdk.TransportConfiguration
 import de.lavego.zvt.ZvtResponseCallback
 import de.tillhub.paymentengine.data.*
-import de.tillhub.paymentengine.providers.PaymentTime
+import de.tillhub.paymentengine.di.PaymentTime
 import de.tillhub.paymentengine.ui.CardPaymentActivity
 import de.tillhub.paymentengine.ui.CardPaymentPartialRefundActivity
 import de.tillhub.paymentengine.ui.CardPaymentReversalActivity
@@ -27,8 +27,6 @@ class CardPaymentManagerImpl(
     private val appContext: Context,
     private val lavegoTransactionDataConverter: LavegoTransactionDataConverter,
     private val paymentTime: PaymentTime,
-    private val cardPaymentConfig: CardPaymentConfig,
-    private val cardSaleConfig: CardSaleConfig,
     private val applicationScope: CoroutineScope
 ) : CardPaymentManager {
 
@@ -194,7 +192,7 @@ class CardPaymentManagerImpl(
     override fun getZvtResponseCallback(): ZvtResponseCallback = zvtResponseCallback
 
     @Suppress("MagicNumber")
-    override fun getTransportConfiguration(): TransportConfiguration =
+    override fun getTransportConfiguration(cardPaymentConfig: CardPaymentConfig): TransportConfiguration =
         TransportConfiguration().apply {
             when (cardPaymentConfig.integrationType) {
                 IntegrationType.ZVT -> {
@@ -210,7 +208,7 @@ class CardPaymentManagerImpl(
             }
         }
 
-    override fun getSaleConfiguration(): SaleConfiguration {
+    override fun getSaleConfiguration(cardSaleConfig: CardSaleConfig): SaleConfiguration {
         return SaleConfiguration().apply {
             applicationName = cardSaleConfig.applicationName
             operatorId = cardSaleConfig.operatorId

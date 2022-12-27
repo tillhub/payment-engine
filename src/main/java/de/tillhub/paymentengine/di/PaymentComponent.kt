@@ -3,9 +3,6 @@ package de.tillhub.paymentengine.di
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
-import de.tillhub.paymentengine.CardPaymentConfig
-import de.tillhub.paymentengine.CardPaymentManager
-import de.tillhub.paymentengine.CardSaleConfig
 import de.tillhub.paymentengine.ui.CardTerminalActivity
 
 @PaymentScope
@@ -27,10 +24,4 @@ interface PaymentComponent {
         fun appDependencies(paymentModuleDependencies: PaymentModuleDependencies): Builder
         fun build(): PaymentComponent
     }
-
-    fun cardPaymentManager(): CardPaymentManager
-
-    fun cardPaymentConfig(): CardPaymentConfig
-
-    fun cardSaleConfig(): CardSaleConfig
 }

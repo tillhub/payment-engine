@@ -5,11 +5,20 @@ import de.lavego.sdk.SaleConfiguration
 import de.lavego.sdk.TransactionData
 import de.lavego.sdk.TransportConfiguration
 import de.lavego.zvt.ZvtResponseCallback
+import de.tillhub.paymentengine.data.CardPaymentConfig
+import de.tillhub.paymentengine.data.CardSaleConfig
 import de.tillhub.paymentengine.data.LavegoTerminalOperation
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 
 interface CardPaymentManager {
+
+    companion object {
+        const val EXTRA_CARD_PAYMENT_CONFIG = "card_payment_config"
+        const val EXTRA_CARD_SALE_CONFIG = "card_sale_config"
+        const val EXTRA_PAYMENT_AMOUNT = "card_payment_amount"
+    }
+
     val transactionStateFlow: StateFlow<LavegoTerminalOperation>
     val transactionState: LavegoTerminalOperation
     val zvtConnectionStateFlow: StateFlow<Boolean>
@@ -55,8 +64,8 @@ interface CardPaymentManager {
     fun setNexoResponse(txData: TransactionData)
 
     fun getZvtResponseCallback(): ZvtResponseCallback
-    fun getTransportConfiguration(): TransportConfiguration
-    fun getSaleConfiguration(): SaleConfiguration
+    fun getTransportConfiguration(cardPaymentConfig: CardPaymentConfig): TransportConfiguration
+    fun getSaleConfiguration(cardSaleConfig: CardSaleConfig): SaleConfiguration
 }
 
 @Suppress("UnnecessaryAbstractClass")
