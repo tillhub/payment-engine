@@ -12,7 +12,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
-import dagger.hilt.android.EntryPointAccessors
 import de.lavego.sdk.*
 import de.tillhub.paymentengine.TerminalManager.Companion.EXTRA_CARD_PAYMENT_CONFIG
 import de.tillhub.paymentengine.TerminalManager.Companion.EXTRA_CARD_SALE_CONFIG
@@ -20,8 +19,6 @@ import de.tillhub.paymentengine.TerminalManager.Companion.RESULT_DATA
 import de.tillhub.paymentengine.SetupProtocol
 import de.tillhub.paymentengine.data.CardPaymentConfig
 import de.tillhub.paymentengine.data.CardSaleConfig
-import de.tillhub.paymentengine.di.DaggerPaymentComponent
-import de.tillhub.paymentengine.di.PaymentModuleDependencies
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -33,16 +30,6 @@ abstract class TerminalActivity : PaymentTerminalActivity() {
     private lateinit var cardSaleConfig: CardSaleConfig
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        DaggerPaymentComponent.builder()
-            .context(this)
-            .appDependencies(
-                EntryPointAccessors.fromApplication(
-                    applicationContext,
-                    PaymentModuleDependencies::class.java
-                )
-            )
-            .build()
-            .inject(this)
         super.onCreate(savedInstanceState)
 
         cardPaymentConfig = intent.getParcelableExtra(EXTRA_CARD_PAYMENT_CONFIG)
