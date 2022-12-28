@@ -67,10 +67,6 @@ object Dependencies {
         const val CORE = "androidx.test:core-ktx:${Versions.AndroidTest.CORE}"
     }
 
-    object Modules {
-        const val LAVEGO = ":lavego"
-    }
-
     object Groups {
 
         val CORE = arrayListOf<Dependency>().apply {

@@ -15,7 +15,7 @@ object Versions {
     object AndroidX {
         const val CORE_KTX = "1.7.0"
         const val APP_COMPAT = "1.5.1"
-        const val ACTIVITY = "1.6.1"
+        const val ACTIVITY = "1.5.1"
         const val LIFECYCLE = "2.5.1"
         const val CONSTRAINT_LAYOUT = "2.1.4"
     }
