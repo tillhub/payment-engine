@@ -57,10 +57,14 @@ class PaymentViewModel @Inject constructor(
     }
 
     fun onCompletion(completion: String) {
-        viewModelScope.launch {
-            _transactionState.value = PaymentState.Outcome(
-                paymentManager.onCompletion(completion)
-            )
+        if (transactionState.value is PaymentState.Setup) {
+            _transactionState.value = PaymentState.Ready
+        } else {
+            viewModelScope.launch {
+                _transactionState.value = PaymentState.Outcome(
+                    paymentManager.onCompletion(completion)
+                )
+            }
         }
     }
 
