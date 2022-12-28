@@ -4,29 +4,45 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewbinding.ViewBinding
+import dagger.hilt.android.EntryPointAccessors
 import de.lavego.sdk.*
-import de.tillhub.paymentengine.CardPaymentManager.Companion.EXTRA_CARD_PAYMENT_CONFIG
-import de.tillhub.paymentengine.CardPaymentManager.Companion.EXTRA_CARD_SALE_CONFIG
+import de.tillhub.paymentengine.TerminalManager.Companion.EXTRA_CARD_PAYMENT_CONFIG
+import de.tillhub.paymentengine.TerminalManager.Companion.EXTRA_CARD_SALE_CONFIG
+import de.tillhub.paymentengine.TerminalManager.Companion.RESULT_DATA
 import de.tillhub.paymentengine.SetupProtocol
 import de.tillhub.paymentengine.data.CardPaymentConfig
 import de.tillhub.paymentengine.data.CardSaleConfig
+import de.tillhub.paymentengine.di.DaggerPaymentComponent
+import de.tillhub.paymentengine.di.PaymentModuleDependencies
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
-abstract class PaymentActivity : PaymentTerminalActivity() {
+abstract class TerminalActivity : PaymentTerminalActivity() {
 
-    private val viewModel by viewModels<PaymentViewModel>()
+    protected val viewModel by viewModels<PaymentViewModel>()
 
     private lateinit var cardPaymentConfig: CardPaymentConfig
     private lateinit var cardSaleConfig: CardSaleConfig
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        DaggerPaymentComponent.builder()
+            .context(this)
+            .appDependencies(
+                EntryPointAccessors.fromApplication(
+                    applicationContext,
+                    PaymentModuleDependencies::class.java
+                )
+            )
+            .build()
+            .inject(this)
         super.onCreate(savedInstanceState)
 
         cardPaymentConfig = intent.getParcelableExtra(EXTRA_CARD_PAYMENT_CONFIG)
@@ -57,9 +73,14 @@ abstract class PaymentActivity : PaymentTerminalActivity() {
                                 is SetupProtocol.ZVT -> doZVTSetup(state.protocol)
                             }
                         }
-                        PaymentState.Ready -> TODO()
-                        is PaymentState.Success -> {
-                            setResult(RESULT_OK, Intent())
+                        PaymentState.Ready -> startOperation()
+                        is PaymentState.DoPayment -> doPayment(state.payment).also {
+                            showInstructions()
+                        }
+                        is PaymentState.Outcome -> {
+                            setResult(RESULT_OK, Intent().apply {
+                                putExtra(RESULT_DATA, state.response)
+                            })
                         }
                     }
                 }
@@ -129,8 +150,14 @@ abstract class PaymentActivity : PaymentTerminalActivity() {
     }
 
     abstract fun showIntermediateStatus(status: String)
+    abstract fun startOperation()
+    abstract fun showInstructions()
 
     companion object {
         private const val SERVICE_START_DELAY: Long = 500
     }
 }
+
+inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
+    crossinline bindingInflater: (LayoutInflater) -> T,
+) = lazy(LazyThreadSafetyMode.NONE) { bindingInflater.invoke(layoutInflater) }

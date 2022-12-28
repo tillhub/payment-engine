@@ -9,9 +9,14 @@ import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.data.*
 import de.tillhub.paymentengine.di.PaymentTime
 
-class PaymentManagerImpl(
-    private val paymentTime: PaymentTime
-) : PaymentManager {
+class TerminalManagerImpl(
+    private val paymentTime: PaymentTime,
+    private val lavegoTransactionDataConverter: LavegoTransactionDataConverter
+) : TerminalManager {
+
+    private var lastReceipt: LavegoReceiptBuilder? = null
+    private var lastData: String? = null
+
     override fun getTransportConfiguration(cardPaymentConfig: CardPaymentConfig): TransportConfiguration =
         TransportConfiguration().apply {
             when (cardPaymentConfig.integrationType) {
@@ -61,6 +66,45 @@ class PaymentManagerImpl(
             )
             else -> throw IllegalArgumentException("Not supported payment protocol: $protocol")
         }
+    }
+
+    override fun onStatus(status: String) {
+        this.lastData = status
+    }
+
+    override fun onReceipt(receipt: String) {
+        if (lastReceipt == null) {
+            lastReceipt = LavegoReceiptBuilder()
+        }
+        if (receipt.contains('\n')) {
+            lastReceipt!!.addBlock(receipt)
+        } else {
+            lastReceipt!!.addLine(receipt)
+        }
+    }
+
+    override suspend fun onCompletion(completion: String): LavegoTerminalOperation.Success {
+        return LavegoTerminalOperation.Success(
+            date = paymentTime.now(),
+            customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
+            merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
+            rawData = lastData.orEmpty(),
+            data = lastData?.let {
+                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+            },
+        )
+    }
+
+    override suspend fun onError(error: String): LavegoTerminalOperation.Failed {
+        return LavegoTerminalOperation.Failed(
+            date = paymentTime.now(),
+            customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
+            merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
+            rawData = lastData.orEmpty(),
+            data = lastData?.let {
+                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+            },
+        )
     }
 
     companion object {

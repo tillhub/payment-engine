@@ -1,31 +1,31 @@
 package de.tillhub.paymentengine.data
 
-import java.math.BigDecimal
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
 
-sealed class LavegoTerminalOperation {
-    object Waiting : LavegoTerminalOperation()
+@Parcelize
+sealed class LavegoTerminalOperation : Parcelable {
 
-    sealed class Pending : LavegoTerminalOperation() {
-        data class Payment(val amount: BigDecimal) : Pending()
-        data class Reversal(val receiptNo: String) : Pending()
-        data class PartialRefund(val amount: BigDecimal) : Pending()
-        object Reconciliation : Pending()
-    }
+    abstract val date: Instant
+    abstract val customerReceipt: String
+    abstract val merchantReceipt: String
+    abstract val rawData: String
+    abstract val data: LavegoTransactionData?
 
     data class Failed(
-        val date: Instant,
-        val customerReceipt: String,
-        val merchantReceipt: String,
-        val rawData: String,
-        val data: LavegoTransactionData?,
+        override val date: Instant,
+        override val customerReceipt: String,
+        override val merchantReceipt: String,
+        override val rawData: String,
+        override val data: LavegoTransactionData?,
     ) : LavegoTerminalOperation()
 
     data class Success(
-        val date: Instant,
-        val customerReceipt: String,
-        val merchantReceipt: String,
-        val rawData: String,
-        val data: LavegoTransactionData?,
+        override val date: Instant,
+        override val customerReceipt: String,
+        override val merchantReceipt: String,
+        override val rawData: String,
+        override val data: LavegoTransactionData?,
     ) : LavegoTerminalOperation()
 }

@@ -3,7 +3,8 @@ package de.tillhub.paymentengine.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.tillhub.paymentengine.PaymentManager
+import de.lavego.sdk.Payment
+import de.tillhub.paymentengine.TerminalManager
 import de.tillhub.paymentengine.SetupProtocol
 import de.tillhub.paymentengine.data.CardPaymentConfig
 import de.tillhub.paymentengine.data.CardSaleConfig
@@ -12,11 +13,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
 class PaymentViewModel @Inject constructor(
-    private val paymentManager: PaymentManager
+    private val paymentManager: TerminalManager
 ) : ViewModel() {
 
     private val _transactionState: MutableStateFlow<PaymentState> =
@@ -35,6 +38,14 @@ class PaymentViewModel @Inject constructor(
         }
     }
 
+    fun doPayment(amountToPay: String) {
+        _transactionState.value = PaymentState.DoPayment(
+            Payment().apply {
+                amount = BigDecimal(amountToPay)
+            }
+        )
+    }
+
     fun transportConfiguration(cardPaymentConfig: CardPaymentConfig) =
         paymentManager.getTransportConfiguration(cardPaymentConfig)
 
@@ -42,19 +53,27 @@ class PaymentViewModel @Inject constructor(
         paymentManager.getSaleConfiguration(cardSaleConfig)
 
     fun onStatus(status: String) {
-        TODO("Not yet implemented")
+        paymentManager.onStatus(status)
     }
 
     fun onCompletion(completion: String) {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            _transactionState.value = PaymentState.Outcome(
+                paymentManager.onCompletion(completion)
+            )
+        }
     }
 
     fun onReceipt(receipt: String) {
-        TODO("Not yet implemented")
+        paymentManager.onReceipt(receipt)
     }
 
     fun onError(error: String) {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            _transactionState.value = PaymentState.Outcome(
+                paymentManager.onError(error)
+            )
+        }
     }
 }
 
@@ -62,5 +81,6 @@ sealed class PaymentState {
     object Idle : PaymentState()
     data class Setup(val protocol: SetupProtocol) : PaymentState()
     object Ready : PaymentState()
-    data class Success(val response: LavegoTerminalOperation) : PaymentState()
+    data class DoPayment(val payment: Payment) : PaymentState()
+    data class Outcome(val response: LavegoTerminalOperation) : PaymentState()
 }

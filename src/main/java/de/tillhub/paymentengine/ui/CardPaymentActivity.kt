@@ -3,22 +3,26 @@ package de.tillhub.paymentengine.ui
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import de.tillhub.paymentengine.data.LavegoTerminalOperation
+import de.tillhub.paymentengine.TerminalManager.Companion.EXTRA_PAYMENT_AMOUNT
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 
-class CardPaymentActivity : CardTerminalActivity() {
+class CardPaymentActivity : TerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
+
+    private lateinit var amount: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+
+        amount = intent.getStringExtra(EXTRA_PAYMENT_AMOUNT)
+            ?: throw IllegalArgumentException("Missing argument: $EXTRA_PAYMENT_AMOUNT")
     }
 
-    override fun showLoader() {
-        binding.loader.isVisible = true
-        binding.instructions.isGone = true
+    override fun showIntermediateStatus(status: String) {
+        binding.message.text = status
     }
 
     override fun showInstructions() {
@@ -26,26 +30,7 @@ class CardPaymentActivity : CardTerminalActivity() {
         binding.loader.isGone = true
     }
 
-    override fun showIntermediateStatus(status: String) {
-        binding.message.text = status
-    }
-
     override fun startOperation() {
-        when (cardPaymentManager.transactionState) {
-            is LavegoTerminalOperation.Success -> finish()
-            is LavegoTerminalOperation.Failed -> finish()
-            is LavegoTerminalOperation.Pending.Payment -> TODO()
-
-            LavegoTerminalOperation.Waiting -> TODO()
-        }
-
-        if (cardPaymentManager.transactionState is LavegoTerminalOperation.Success ||
-            cardPaymentManager.transactionState is LavegoTerminalOperation.Failed) {
-            finish()
-        } else {
-            (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.Payment)?.amount?.let { amount ->
-                doPayment(amount)
-            } ?: finish()
-        }
+        viewModel.doPayment(amount)
     }
 }

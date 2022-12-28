@@ -1,7 +1,10 @@
 package de.tillhub.paymentengine.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
+@Parcelize
 data class LavegoTransactionData(
     val additionalText: String,
     val aid: String,
@@ -26,4 +29,4 @@ data class LavegoTransactionData(
     val track2: String,
     val track3: String,
     val vu: String,
-)
+) : Parcelable

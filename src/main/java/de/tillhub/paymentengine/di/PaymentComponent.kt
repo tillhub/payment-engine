@@ -1,9 +1,10 @@
 package de.tillhub.paymentengine.di
 
+
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
-import de.tillhub.paymentengine.ui.CardTerminalActivity
+import de.tillhub.paymentengine.ui.TerminalActivity
 
 @PaymentScope
 @Component(
@@ -16,7 +17,7 @@ import de.tillhub.paymentengine.ui.CardTerminalActivity
 )
 interface PaymentComponent {
 
-    fun inject(activity: CardTerminalActivity)
+    fun inject(activity: TerminalActivity)
 
     @Component.Builder
     interface Builder {
