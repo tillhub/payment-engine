@@ -5,12 +5,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import de.tillhub.paymentengine.data.LavegoTerminalOperation
-import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
+import de.tillhub.paymentengine.databinding.ActivityTerminalReconciliationBinding
 
 @AndroidEntryPoint
-class CardPaymentActivity : CardTerminalActivity() {
+class TerminalReconciliationActivity : CardTerminalActivity() {
 
-    private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
+    private val binding by viewBinding(ActivityTerminalReconciliationBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +33,10 @@ class CardPaymentActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
-        if (cardPaymentManager.transactionState is LavegoTerminalOperation.Success ||
-            cardPaymentManager.transactionState is LavegoTerminalOperation.Waiting) {
-            finish()
+        if (cardPaymentManager.transactionState is LavegoTerminalOperation.Pending.Reconciliation) {
+            doReconciliation()
         } else {
-            (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.Payment)?.amount?.let { amount ->
-                doPayment(amount)
-            } ?: finish()
+            finish()
         }
     }
 }

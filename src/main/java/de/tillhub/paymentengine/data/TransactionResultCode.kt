@@ -1,3 +1,5 @@
+package de.tillhub.paymentengine.data
+
 import androidx.annotation.StringRes
 import de.tillhub.paymentengine.R
 
@@ -16,24 +18,28 @@ sealed class ResultCodeSets constructor(
         Pair(156, TransactionResultCode(
             errorMessage = R.string.common_result_code_156_please_wait,
             recoveryMessages = emptyList()
-        )),
+        )
+        ),
         Pair(177, TransactionResultCode(
             errorMessage = R.string.common_result_code_177_memory_full,
             recoveryMessages = listOf(
                 R.string.recovery_message_end_of_day,
                 R.string.recovery_message_service_technician_fix
             )
-        )),
+        )
+        ),
         Pair(178, TransactionResultCode(
             errorMessage = R.string.common_result_code_178_journal_full,
             recoveryMessages = listOf(
                 R.string.recovery_message_read_file,
                 R.string.recovery_message_delete_file
             )
-        )),
+        )
+        ),
         Pair(191, TransactionResultCode(
             errorMessage = R.string.common_result_code_191_voltage_low
-        )),
+        )
+        ),
         Pair(192, TransactionResultCode(errorMessage = R.string.common_result_code_192_mechanism_defect)),
         Pair(193, TransactionResultCode(
             errorMessage = R.string.common_result_code_193_merchant_card_locked,
@@ -42,37 +48,46 @@ sealed class ResultCodeSets constructor(
                 R.string.recovery_message_diagnosis,
                 R.string.recovery_message_service_technician_fix
             )
-        )),
+        )
+        ),
         Pair(194, TransactionResultCode(
             errorMessage = R.string.common_result_code_194_diagnosis_required,
             recoveryMessages = listOf(R.string.recovery_message_diagnosis)
-        )),
+        )
+        ),
         Pair(204, TransactionResultCode(
             errorMessage = R.string.common_result_code_204_printer_not_ready
-        )),
+        )
+        ),
         Pair(220, TransactionResultCode(
             errorMessage = R.string.common_result_code_220_card_inserted,
             recoveryMessages = listOf(R.string.recovery_message_proceed_or_abort)
-        )),
+        )
+        ),
         Pair(223, TransactionResultCode(errorMessage = R.string.common_result_code_223_out_of_order)),
         Pair(224, TransactionResultCode(
             errorMessage = R.string.common_result_code_224_remote_maintenance
-        )),
+        )
+        ),
         Pair(225, TransactionResultCode(
             errorMessage = R.string.common_result_code_225_card_not_removed,
             recoveryMessages = listOf(R.string.recovery_message_extract_card)
-        )),
+        )
+        ),
         Pair(226, TransactionResultCode(
             errorMessage = R.string.common_result_code_226_card_reader_defective
-        )),
+        )
+        ),
         Pair(227, TransactionResultCode(errorMessage = R.string.common_result_code_227_shutter_closed)),
         Pair(228, TransactionResultCode(
             errorMessage = R.string.common_result_code_228_terminal_activation_required
-        )),
+        )
+        ),
         Pair(240, TransactionResultCode(errorMessage = R.string.common_result_code_240_reconciliation_required)),
         Pair(246, TransactionResultCode(
             errorMessage = R.string.common_result_code_246_opt_not_available
-        )),
+        )
+        ),
     ))
 
     sealed class ProviderSpecificResultCodes constructor(
@@ -112,7 +127,8 @@ sealed class ResultCodeSets constructor(
             Pair(81, TransactionResultCode(
                 errorMessage = R.string.lavego_result_code_81_initialisation_required,
                 recoveryMessages = listOf(R.string.recovery_message_initialisation)
-            )),
+            )
+            ),
             Pair(84, TransactionResultCode(R.string.lavego_result_code_84_pin_not_active)),
             Pair(85, TransactionResultCode(R.string.lavego_result_code_85_cashback_not_possible)),
             Pair(91, TransactionResultCode(R.string.lavego_result_code_91_card_issuer_inoperative)),
@@ -124,7 +140,8 @@ sealed class ResultCodeSets constructor(
                     R.string.recovery_message_set_date_time,
                     R.string.recovery_message_diagnosis,
                 )
-            )),
+            )
+            ),
         ))
     }
 }

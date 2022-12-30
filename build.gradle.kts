@@ -82,8 +82,8 @@ dependencies {
     // Lavego
     implementDependencyGroup(Dependencies.Groups.LAVEGO)
 
-    implementation("com.github.lavego.sales-sdk:saleSdk:1.0.0")
-    implementation("com.github.lavego.sales-sdk:utils:1.0.0")
+    api("com.github.lavego.sales-sdk:saleSdk:1.0.0")
+    api("com.github.lavego.sales-sdk:utils:1.0.0")
 
     // Unit tests
     implementDependencyGroup(Dependencies.Groups.TEST_LIBRARIES)

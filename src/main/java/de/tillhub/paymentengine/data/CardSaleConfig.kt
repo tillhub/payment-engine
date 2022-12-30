@@ -1,9 +1,5 @@
 package de.tillhub.paymentengine.data
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
 data class CardSaleConfig(
     val applicationName: String = DEFAULT_APPLICATION_NAME,
     val operatorId: String = DEFAULT_OPERATOR_ID,
@@ -12,8 +8,8 @@ data class CardSaleConfig(
     val poiId: String = DEFAULT_POI_ID, // Unique terminal ID
     val poiSerialNumber: String = DEFAULT_POI_SERIAL, // Unique terminal serial
     val isoCurrencyNumber: String = DEFAULT_CURRENCY_CODE,
-    val trainingMode: Boolean = DEFAULT_TRAINING_MODE
-) : Parcelable {
+    val trainingMode: Boolean = DEFAULT_TRAINING_MODE,
+) {
     companion object {
         private const val DEFAULT_APPLICATION_NAME = "Tillhub GO"
         private const val DEFAULT_OPERATOR_ID = "ah"

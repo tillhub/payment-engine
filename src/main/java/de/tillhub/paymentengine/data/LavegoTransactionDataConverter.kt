@@ -5,14 +5,15 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.math.BigInteger
-import javax.inject.Inject
 
-class LavegoTransactionDataConverter @Inject constructor(private val moshi: Moshi) {
-
+class LavegoTransactionDataConverter(
+    private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+) {
     private fun createJsonAdapter(): JsonAdapter<TransactionDataDto> =
         moshi.adapter(TransactionDataDto::class.java)
 

@@ -16,6 +16,24 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.CardPaymentReversalActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.CardPaymentPartialRefundActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.TerminalReconciliationActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false"/>
     </application>
 
 
