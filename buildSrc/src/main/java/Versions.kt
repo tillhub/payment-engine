@@ -27,6 +27,8 @@ object Versions {
     object Lavego {
         const val COMMONS_CODEC = "1.15"
         const val SIMPLE_XML = "2.7.1"
+        const val SALE_SDK = "1.0.0"
+        const val UTILS = "1.0.0"
     }
 
     object Google {

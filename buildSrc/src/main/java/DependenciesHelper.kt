@@ -10,39 +10,25 @@ sealed class Dependency {
         override val configurationName: String
             get() = IMPLEMENTATION
     }
-    data class DebugImplementation(override val dependencyNotation: String): Dependency() {
+    data class Api(override val dependencyNotation: String): Dependency() {
         override val configurationName: String
-            get() = DEBUG_IMPLEMENTATION
+            get() = API
     }
     data class Kapt(override val dependencyNotation: String): Dependency() {
         override val configurationName: String
             get() = KAPT
     }
-    data class KaptTest(override val dependencyNotation: String): Dependency() {
-        override val configurationName: String
-            get() = KAPT_TEST
-    }
-    data class KaptAndroidTest(override val dependencyNotation: String): Dependency() {
-        override val configurationName: String
-            get() = KAPT_ANDROID_TEST
-    }
+
     data class TestImplementation(override val dependencyNotation: String): Dependency() {
         override val configurationName: String
             get() = TEST_IMPLEMENTATION
     }
-    data class AndroidTestImplementation(override val dependencyNotation: String): Dependency() {
-        override val configurationName: String
-            get() = ANDROID_TEST_IMPLEMENTATION
-    }
 
     companion object {
         private const val KAPT = "kapt"
-        private const val KAPT_TEST = "kaptTest"
-        private const val KAPT_ANDROID_TEST = "kaptAndroidTest"
         private const val IMPLEMENTATION = "implementation"
-        private const val DEBUG_IMPLEMENTATION = "implementation"
+        private const val API = "api"
         private const val TEST_IMPLEMENTATION = "testImplementation"
-        private const val ANDROID_TEST_IMPLEMENTATION = "androidTestImplementation"
     }
 }
 

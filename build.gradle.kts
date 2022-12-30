@@ -36,7 +36,7 @@ android {
             isMinifyEnabled = false
         }
         getByName(ConfigData.BuildType.RELEASE) {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -81,9 +81,6 @@ dependencies {
 
     // Lavego
     implementDependencyGroup(Dependencies.Groups.LAVEGO)
-
-    api("com.github.lavego.sales-sdk:saleSdk:1.0.0")
-    api("com.github.lavego.sales-sdk:utils:1.0.0")
 
     // Unit tests
     implementDependencyGroup(Dependencies.Groups.TEST_LIBRARIES)

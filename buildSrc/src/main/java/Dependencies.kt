@@ -49,6 +49,8 @@ object Dependencies {
     object Lavego {
         const val COMMONS_CODEC = "commons-codec:commons-codec:${Versions.Lavego.COMMONS_CODEC}"
         const val SIMPLE_XML = "org.simpleframework:simple-xml:${Versions.Lavego.SIMPLE_XML}"
+        const val SALE_SDK = "com.github.lavego.sales-sdk:saleSdk:${Versions.Lavego.SALE_SDK}"
+        const val UTILS = "com.github.lavego.sales-sdk:utils:${Versions.Lavego.UTILS}"
     }
 
     object Testing {
@@ -90,6 +92,8 @@ object Dependencies {
         }
 
         val LAVEGO = arrayListOf<Dependency>().apply {
+            add(Dependency.Api(Lavego.SALE_SDK))
+            add(Dependency.Api(Lavego.UTILS))
             add(Dependency.Implementation(Lavego.COMMONS_CODEC))
             add(Dependency.Implementation(Lavego.SIMPLE_XML))
             add(Dependency.Implementation(Google.GSON))
