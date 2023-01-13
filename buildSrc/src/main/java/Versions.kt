@@ -1,9 +1,5 @@
 object Versions {
 
-    object Plugins {
-        const val DETEKT = "1.18.1"
-    }
-
     object Tools {
         const val TIMBER = "5.0.1"
     }

@@ -3,7 +3,6 @@ object Dependencies {
 
     object Plugins {
         const val LIBRARY = "com.android.library"
-        const val DETEKT = "io.gitlab.arturbosch.detekt"
         const val HILT = "dagger.hilt.android.plugin"
         const val PARCELIZE = "kotlin-parcelize"
         const val PUBLISH = "maven-publish"
