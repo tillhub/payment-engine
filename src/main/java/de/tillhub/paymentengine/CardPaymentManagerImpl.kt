@@ -11,6 +11,7 @@ import de.lavego.sdk.TransportConfiguration
 import de.tillhub.paymentengine.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,7 +21,7 @@ class CardPaymentManagerImpl(
     private val appContext: Context,
     private val cardPaymentConfigRepository: CardPaymentConfigRepository,
     private val cardSaleConfigRepository: CardSaleConfigRepository,
-    private val terminalTime: TerminalTime,
+    private val terminalConfig: TerminalConfig,
     private val lavegoTransactionDataConverter: LavegoTransactionDataConverter
 ) : CardPaymentManager {
 
@@ -29,8 +30,14 @@ class CardPaymentManagerImpl(
         @ApplicationContext appContext: Context,
         cardPaymentConfigRepository: CardPaymentConfigRepository,
         cardSaleConfigRepository: CardSaleConfigRepository,
-        terminalTime: TerminalTime
-    ) : this(appContext, cardPaymentConfigRepository, cardSaleConfigRepository, terminalTime, LavegoTransactionDataConverter())
+        terminalConfig: TerminalConfig
+    ) : this(
+        appContext,
+        cardPaymentConfigRepository,
+        cardSaleConfigRepository,
+        terminalConfig,
+        LavegoTransactionDataConverter()
+    )
 
     @VisibleForTesting
     var activeTerminalConnection: LavegoConnection? = null
@@ -137,27 +144,31 @@ class CardPaymentManagerImpl(
         }
     }
 
-    override suspend fun onCompletion(completion: String) {
-        _transactionState.value = LavegoTerminalOperation.Success(
-            date = terminalTime.now(),
-            customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
-            merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
-            rawData = lastData.orEmpty(),
-            data = lastData?.let {
-                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
-            },
-        )
+    override fun onCompletion(completion: String) {
+        terminalConfig.terminalScope.launch {
+            _transactionState.value = LavegoTerminalOperation.Success(
+                date = terminalConfig.timeNow(),
+                customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
+                merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
+                rawData = lastData.orEmpty(),
+                data = lastData?.let {
+                    lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+                },
+            )
+        }
     }
 
-    override suspend fun onError(error: String) {
-        _transactionState.value = LavegoTerminalOperation.Failed(
-            date = terminalTime.now(),
-            customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
-            merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
-            rawData = lastData.orEmpty(),
-            data = lastData?.let {
-                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
-            },
-        )
+    override fun onError(error: String) {
+        terminalConfig.terminalScope.launch {
+            _transactionState.value = LavegoTerminalOperation.Failed(
+                date = terminalConfig.timeNow(),
+                customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
+                merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
+                rawData = lastData.orEmpty(),
+                data = lastData?.let {
+                    lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+                },
+            )
+        }
     }
 }

@@ -50,6 +50,6 @@ interface CardPaymentManager {
 
     fun onStatus(status: String)
     fun onReceipt(receipt: String)
-    suspend fun onCompletion(completion: String)
-    suspend fun onError(error: String)
+    fun onCompletion(completion: String)
+    fun onError(error: String)
 }

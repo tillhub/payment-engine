@@ -4,7 +4,6 @@ plugins {
     kotlin(Dependencies.KotlinPlugins.ANDROID)
     kotlin(Dependencies.KotlinPlugins.KAPT)
     id(Dependencies.Plugins.LIBRARY)
-    id(Dependencies.Plugins.DETEKT) version Versions.Plugins.DETEKT
     id(Dependencies.Plugins.HILT)
     id(Dependencies.Plugins.PARCELIZE)
     id(Dependencies.Plugins.PUBLISH)

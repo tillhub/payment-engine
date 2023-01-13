@@ -8,14 +8,18 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.ZoneOffset
 
+@ExperimentalCoroutinesApi
 class CardPaymentManagerTest : FunSpec({
 
     lateinit var lavegoTransactionDataConverter: LavegoTransactionDataConverter
-    lateinit var terminalTime: TerminalTime
+    lateinit var terminalConfig: TerminalConfig
     lateinit var cardPaymentConfigRepository: CardPaymentConfigRepository
     lateinit var cardSaleConfigRepository: CardSaleConfigRepository
     lateinit var appContext: Context
@@ -29,8 +33,9 @@ class CardPaymentManagerTest : FunSpec({
             coEvery { convertFromJson(any()) } returns Payment.Success(LAVEGO_TRANSACTION_DATA)
         }
 
-        terminalTime = mockk {
-            every { now() } returns LocalDate.of(2021, 1, 3).atTime(20, 12).toInstant(ZoneOffset.UTC)
+        terminalConfig = mockk {
+            every { timeNow() } returns LocalDate.of(2021, 1, 3).atTime(20, 12).toInstant(ZoneOffset.UTC)
+            every { terminalScope } returns TestScope(UnconfinedTestDispatcher())
         }
 
         appContext = mockk()
@@ -43,7 +48,7 @@ class CardPaymentManagerTest : FunSpec({
             appContext,
             cardPaymentConfigRepository,
             cardSaleConfigRepository,
-            terminalTime,
+            terminalConfig,
             lavegoTransactionDataConverter)
     }
 
