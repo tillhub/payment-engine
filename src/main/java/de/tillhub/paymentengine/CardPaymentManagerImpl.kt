@@ -8,9 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.lavego.sdk.PaymentProtocol
 import de.lavego.sdk.SaleConfiguration
 import de.lavego.sdk.TransportConfiguration
-import de.tillhub.paymentengine.coroutines.TerminalCoroutineScopeProvider
 import de.tillhub.paymentengine.data.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,8 +21,7 @@ class CardPaymentManagerImpl(
     private val appContext: Context,
     private val cardPaymentConfigRepository: CardPaymentConfigRepository,
     private val cardSaleConfigRepository: CardSaleConfigRepository,
-    private val terminalTime: TerminalTime,
-    private val terminalScope: CoroutineScope,
+    private val terminalConfig: TerminalConfig,
     private val lavegoTransactionDataConverter: LavegoTransactionDataConverter
 ) : CardPaymentManager {
 
@@ -33,14 +30,12 @@ class CardPaymentManagerImpl(
         @ApplicationContext appContext: Context,
         cardPaymentConfigRepository: CardPaymentConfigRepository,
         cardSaleConfigRepository: CardSaleConfigRepository,
-        terminalTime: TerminalTime,
-        scopeProvider: TerminalCoroutineScopeProvider
+        terminalConfig: TerminalConfig
     ) : this(
         appContext,
         cardPaymentConfigRepository,
         cardSaleConfigRepository,
-        terminalTime,
-        scopeProvider.terminalScope,
+        terminalConfig,
         LavegoTransactionDataConverter()
     )
 
@@ -150,9 +145,9 @@ class CardPaymentManagerImpl(
     }
 
     override fun onCompletion(completion: String) {
-        terminalScope.launch {
+        terminalConfig.terminalScope.launch {
             _transactionState.value = LavegoTerminalOperation.Success(
-                date = terminalTime.now(),
+                date = terminalConfig.timeNow(),
                 customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
                 merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
                 rawData = lastData.orEmpty(),
@@ -164,9 +159,9 @@ class CardPaymentManagerImpl(
     }
 
     override fun onError(error: String) {
-        terminalScope.launch {
+        terminalConfig.terminalScope.launch {
             _transactionState.value = LavegoTerminalOperation.Failed(
-                date = terminalTime.now(),
+                date = terminalConfig.timeNow(),
                 customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
                 merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
                 rawData = lastData.orEmpty(),
