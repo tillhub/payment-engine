@@ -152,11 +152,9 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
     override fun onCompletion(completion: String) {
         super.onCompletion(completion)
         if (viewModel.terminalOperationState.value == TerminalOperationState.Operation) {
-            lifecycleScope.launch {
-                cardPaymentManager.onCompletion(completion)
-                viewModel.onOperationCompleted()
-            }
-        } else viewModel.onOperationCompleted()
+            cardPaymentManager.onCompletion(completion)
+        }
+        viewModel.onOperationCompleted()
     }
 
     override fun onReceipt(receipt: String) {
@@ -166,10 +164,8 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onError(error: String) {
         super.onError(error)
-        lifecycleScope.launch {
-            cardPaymentManager.onError(error)
-            finish()
-        }
+        cardPaymentManager.onError(error)
+        finish()
     }
 
     companion object {
