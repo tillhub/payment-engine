@@ -1,12 +1,13 @@
 package de.tillhub.paymentengine
 
+
 import de.tillhub.paymentengine.data.CardPaymentConfig
 import de.tillhub.paymentengine.data.IntegrationType
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface CardPaymentConfigRepository {
-    val configFlow: Flow<CardPaymentConfig>
-    fun config(): CardPaymentConfig
+    val configStateFlow: StateFlow<CardPaymentConfig>
+    val config: CardPaymentConfig
 
     suspend fun setIpAddress(address: String)
     suspend fun setProtocol(protocol: IntegrationType)

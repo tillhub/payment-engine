@@ -100,11 +100,11 @@ class CardPaymentManagerImpl(
     @Suppress("MagicNumber")
     override fun getTransportConfiguration(): TransportConfiguration =
         TransportConfiguration().apply {
-            when (cardPaymentConfigRepository.config().integrationType) {
+            when (cardPaymentConfigRepository.config.integrationType) {
                 IntegrationType.ZVT -> {
                     paymentProtocol = PaymentProtocol.Zvt
-                    host = cardPaymentConfigRepository.config().ipAddress
-                    port = cardPaymentConfigRepository.config().port
+                    host = cardPaymentConfigRepository.config.ipAddress
+                    port = cardPaymentConfigRepository.config.port
                 }
                 IntegrationType.NEXO -> {
                     paymentProtocol = PaymentProtocol.Nexo
@@ -115,7 +115,7 @@ class CardPaymentManagerImpl(
         }
 
     override fun getSaleConfiguration(): SaleConfiguration {
-        return cardSaleConfigRepository.config().let { config ->
+        return cardSaleConfigRepository.config.let { config ->
             SaleConfiguration().apply {
                 applicationName = config.applicationName
                 operatorId = config.operatorId
