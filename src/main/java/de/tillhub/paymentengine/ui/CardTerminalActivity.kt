@@ -54,14 +54,9 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     fun doPayment(paymentAmount: BigDecimal) {
         showInstructions()
-        val payment = Apdu(Commons.Command.CMD_0601).apply {
-            val currency = cardPaymentManager.getSaleConfiguration().zvtFlags.isoCurrencyRegister()
-            add(Bmp(0x04.toByte(), Commons.NumberToBCD(paymentAmount.toLong(), AMOUNT_BYTE_COUNT)))
-            add(Bmp(0x49.toByte(), Commons.StringNumberToBCD(currency, CC_BYTE_COUNT)))
-            add(Bmp("19 40"))
-        }
-
-        doCustom(payment.apdu())
+        doPayment(Payment().apply {
+            amount = paymentAmount
+        })
     }
 
     /**

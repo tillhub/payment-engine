@@ -97,7 +97,6 @@ class CardPaymentManagerImpl(
         lastData = null
     }
 
-    @Suppress("MagicNumber")
     override fun getTransportConfiguration(): TransportConfiguration =
         TransportConfiguration().apply {
             when (cardPaymentConfigRepository.config.integrationType) {
@@ -124,7 +123,15 @@ class CardPaymentManagerImpl(
                 poiId = config.poiId
                 poiSerialnumber = config.poiSerialNumber
                 trainingMode = config.trainingMode
-                zvtFlags.isoCurrencyRegister(config.isoCurrencyNumber)
+
+                with (zvtFlags) {
+                    isoCurrencyRegister(config.zvtConfig.isoCurrencyNumber)
+                    paymentType(if (config.zvtConfig.terminalPrinterAvailable) {
+                        0b1000100.toByte() // terminal supports the printer ready bit (3)
+                    } else {
+                        0b1000000.toByte() // terminal does NOT support the printer ready bit (3)
+                    })
+                }
             }
         }
     }
