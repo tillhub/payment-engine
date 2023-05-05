@@ -22,10 +22,11 @@ data class CardSaleConfig(
 }
 
 data class ZVTConfig(
-    val terminalPrinterAvailable: Boolean = true,
+    val terminalPrinterAvailable: Boolean = DEFAULT_PRINTER_AVAILABLE,
     val isoCurrencyNumber: String = DEFAULT_CURRENCY_CODE,
 ) {
     companion object {
         private const val DEFAULT_CURRENCY_CODE = "0978"
+        private const val DEFAULT_PRINTER_AVAILABLE = true
     }
 }

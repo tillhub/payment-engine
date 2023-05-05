@@ -10,4 +10,5 @@ interface CardSaleConfigRepository {
     suspend fun setPoiId(poiId: String)
     suspend fun setPoiSerial(poiSerial: String)
     suspend fun setTerminalPin(pin: String)
+    suspend fun setTerminalPrinterAvailable(terminalPrinterAvailable: Boolean)
 }
