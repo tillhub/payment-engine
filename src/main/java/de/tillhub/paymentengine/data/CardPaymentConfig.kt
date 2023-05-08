@@ -4,7 +4,7 @@ data class CardPaymentConfig(
     val integrationType: IntegrationType = DEFAULT_INTEGRATION_TYPE,
     val ipAddress: String = DEFAULT_IP,
     val port: Int = DEFAULT_PORT,
-    val providerSpecificResultCodes: ResultCodeSets.ProviderSpecificResultCodes = DEFAULT_RESULT_CODES
+    val providerSpecificResultCodes: ResultCodeSets.ProviderSpecificResultCodes = DEFAULT_RESULT_CODES,
 ) {
     companion object {
         const val DEFAULT_IP = "127.0.0.1"
