@@ -323,6 +323,7 @@ class CardPaymentManagerTest : FunSpec({
         result.poiId shouldBe "66000001"
         result.poiSerialnumber shouldBe ""
         result.trainingMode shouldBe true
+        result.zvtFlags.paymentType() shouldBe 0x44.toByte()
     }
 }) {
     companion object {
