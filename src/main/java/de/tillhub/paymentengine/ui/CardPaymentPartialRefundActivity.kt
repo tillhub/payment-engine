@@ -39,7 +39,10 @@ class CardPaymentPartialRefundActivity : CardTerminalActivity() {
                     finish()
                 } else {
                     (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.PartialRefund)?.let {
-                        doPartialRefund(it.amount)
+                        doPartialRefund(
+                            amount = it.amount,
+                            currency = it.currency
+                        )
                     } ?: finish()
                 }
             }

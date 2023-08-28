@@ -67,7 +67,7 @@ class CardPaymentManagerImpl(
     private var lastReceipt: LavegoReceiptBuilder? = null
     private var lastData: String? = null
 
-    override fun startPaymentTransaction(amount: BigDecimal, currency: String) {
+    override fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency) {
         _transactionState.value = LavegoTerminalOperation.Pending.Payment(amount, currency)
 
         activeTerminalConnection?.startPaymentTransaction()
@@ -79,8 +79,8 @@ class CardPaymentManagerImpl(
         activeTerminalConnection?.startPaymentReversal()
     }
 
-    override fun startPartialRefundTransaction(amount: BigDecimal) {
-        _transactionState.value = LavegoTerminalOperation.Pending.PartialRefund(amount)
+    override fun startPartialRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency) {
+        _transactionState.value = LavegoTerminalOperation.Pending.PartialRefund(amount, currency)
 
         activeTerminalConnection?.startPartialRefund()
     }

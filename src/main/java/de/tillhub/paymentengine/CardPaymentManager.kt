@@ -3,6 +3,7 @@ package de.tillhub.paymentengine
 import android.app.Activity
 import de.lavego.sdk.SaleConfiguration
 import de.lavego.sdk.TransportConfiguration
+import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.LavegoTerminalOperation
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
@@ -19,7 +20,7 @@ interface CardPaymentManager {
      * This method is called to start of a card payment transaction,
      * it sets up the manager so the data from the transaction is collected correctly.
      */
-    fun startPaymentTransaction(amount: BigDecimal, currency: String)
+    fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency)
 
     /**
      * This method is called to start of a card payment reversal,
@@ -31,7 +32,7 @@ interface CardPaymentManager {
      * This method is called to start of a partial card payment refund,
      * it sets up the manager so the data from the transaction is collected correctly.
      */
-    fun startPartialRefundTransaction(amount: BigDecimal)
+    fun startPartialRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency)
 
     /**
      * This method is called to start of a terminal reconciliation,
