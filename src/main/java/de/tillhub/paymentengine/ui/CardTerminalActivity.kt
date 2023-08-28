@@ -52,11 +52,9 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
         }
     }
 
-    fun doPayment(paymentAmount: BigDecimal) {
+    fun doPayment(paymentAmount: BigDecimal, currency: String) {
         showInstructions()
-        doPayment(Payment().apply {
-            amount = paymentAmount
-        })
+        doPayment(Payment(paymentAmount, currency))
     }
 
     /**

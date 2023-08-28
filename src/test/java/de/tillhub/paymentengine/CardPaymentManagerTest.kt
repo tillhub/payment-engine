@@ -75,10 +75,10 @@ class CardPaymentManagerTest : FunSpec({
         target.transactionState shouldBe LavegoTerminalOperation.Waiting
         target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Waiting
 
-        target.startPaymentTransaction(BigDecimal(1000))
-        target.transactionState shouldBe LavegoTerminalOperation.Pending.Payment(BigDecimal(1000))
+        target.startPaymentTransaction(BigDecimal(1000), "EUR")
+        target.transactionState shouldBe LavegoTerminalOperation.Pending.Payment(BigDecimal(1000), "EUR")
         target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Pending.Payment(
-            BigDecimal(1000)
+            BigDecimal(1000), "EUR"
         )
 
         target.onStatus("status_json")

@@ -67,8 +67,8 @@ class CardPaymentManagerImpl(
     private var lastReceipt: LavegoReceiptBuilder? = null
     private var lastData: String? = null
 
-    override fun startPaymentTransaction(amount: BigDecimal) {
-        _transactionState.value = LavegoTerminalOperation.Pending.Payment(amount)
+    override fun startPaymentTransaction(amount: BigDecimal, currency: String) {
+        _transactionState.value = LavegoTerminalOperation.Pending.Payment(amount, currency)
 
         activeTerminalConnection?.startPaymentTransaction()
     }

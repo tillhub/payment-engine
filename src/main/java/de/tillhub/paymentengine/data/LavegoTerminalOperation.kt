@@ -7,7 +7,7 @@ sealed class LavegoTerminalOperation {
     object Waiting : LavegoTerminalOperation()
 
     sealed class Pending : LavegoTerminalOperation() {
-        data class Payment(val amount: BigDecimal) : Pending()
+        data class Payment(val amount: BigDecimal, val currency: String) : Pending()
         data class Reversal(val receiptNo: String) : Pending()
         data class PartialRefund(val amount: BigDecimal) : Pending()
         object Reconciliation : Pending()

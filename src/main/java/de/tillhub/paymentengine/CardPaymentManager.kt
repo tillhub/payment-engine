@@ -19,7 +19,7 @@ interface CardPaymentManager {
      * This method is called to start of a card payment transaction,
      * it sets up the manager so the data from the transaction is collected correctly.
      */
-    fun startPaymentTransaction(amount: BigDecimal)
+    fun startPaymentTransaction(amount: BigDecimal, currency: String)
 
     /**
      * This method is called to start of a card payment reversal,
