@@ -37,8 +37,11 @@ class CardPaymentActivity : CardTerminalActivity() {
             cardPaymentManager.transactionState is LavegoTerminalOperation.Waiting) {
             finish()
         } else {
-            (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.Payment)?.amount?.let { amount ->
-                doPayment(amount)
+            (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.Payment)?.let { payment ->
+                doPayment(
+                    paymentAmount = payment.amount,
+                    currency = payment.currency
+                )
             } ?: finish()
         }
     }

@@ -9,10 +9,10 @@ object Versions {
     }
 
     object AndroidX {
-        const val CORE_KTX = "1.7.0"
-        const val APP_COMPAT = "1.5.1"
-        const val ACTIVITY = "1.5.1"
-        const val LIFECYCLE = "2.5.1"
+        const val CORE_KTX = "1.10.0"
+        const val APP_COMPAT = "1.6.1"
+        const val ACTIVITY = "1.7.1"
+        const val LIFECYCLE = "2.6.1"
         const val CONSTRAINT_LAYOUT = "2.1.4"
     }
 
@@ -28,13 +28,13 @@ object Versions {
     }
 
     object Google {
-        const val HILT = "2.38.1"
+        const val HILT = "2.45"
         const val GSON = "2.10"
     }
 
     object Testing {
         const val JUNIT = "4.13.2"
-        const val MOCKK = "1.12.0"
+        const val MOCKK = "1.13.7"
         const val ROBOLECTRIC = "4.9"
         const val KOTEST = "4.6.3"
         const val KOTEST_ROBOLECTRIC = "0.4.0"

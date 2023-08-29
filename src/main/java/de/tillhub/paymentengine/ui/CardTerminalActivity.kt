@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import de.lavego.ISO4217.ISOCurrency
 import de.lavego.sdk.Payment
 import de.lavego.sdk.PaymentProtocol
 import de.lavego.sdk.PaymentTerminalActivity
@@ -17,6 +18,7 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.CardPaymentManager
+import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -52,11 +54,9 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
         }
     }
 
-    fun doPayment(paymentAmount: BigDecimal) {
+    fun doPayment(paymentAmount: BigDecimal, currency: ISOAlphaCurrency) {
         showInstructions()
-        doPayment(Payment().apply {
-            amount = paymentAmount
-        })
+        doPayment(Payment(paymentAmount, currency.value))
     }
 
     /**
@@ -79,13 +79,13 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
      *
      * @param amount the amount to be refunded
      */
-    fun doPartialRefund(amount: BigDecimal) {
+    fun doPartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) {
         val partialRefund = Apdu(Commons.Command.CMD_0631).apply {
             val password = cardPaymentManager.getSaleConfiguration().pin
-            val currency = cardPaymentManager.getSaleConfiguration().zvtFlags.isoCurrencyRegister()
+            val currencyAsTwoByteHex = ISOCurrency.byAlpha(currency.value).codeAsTwoByteHex()
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
             add(Bmp(0x04.toByte(), Commons.NumberToBCD(amount.toLong(), AMOUNT_BYTE_COUNT)))
-            add(Bmp(0x49.toByte(), Commons.StringNumberToBCD(currency, CC_BYTE_COUNT)))
+            add(Bmp(0x49.toByte(), Commons.StringNumberToBCD(currencyAsTwoByteHex, CC_BYTE_COUNT)))
         }
 
         doCustom(partialRefund.apdu())
