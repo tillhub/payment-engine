@@ -75,10 +75,10 @@ class CardPaymentManagerTest : FunSpec({
         target.transactionState shouldBe LavegoTerminalOperation.Waiting
         target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Waiting
 
-        target.startPaymentTransaction(BigDecimal(1000))
-        target.transactionState shouldBe LavegoTerminalOperation.Pending.Payment(BigDecimal(1000))
+        target.startPaymentTransaction(BigDecimal(1000), ISOAlphaCurrency("EUR"))
+        target.transactionState shouldBe LavegoTerminalOperation.Pending.Payment(BigDecimal(1000), ISOAlphaCurrency("EUR"))
         target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Pending.Payment(
-            BigDecimal(1000)
+            BigDecimal(1000), ISOAlphaCurrency("EUR")
         )
 
         target.onStatus("status_json")
@@ -193,9 +193,9 @@ class CardPaymentManagerTest : FunSpec({
         target.transactionState shouldBe LavegoTerminalOperation.Waiting
         target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Waiting
 
-        target.startPartialRefundTransaction(BigDecimal(1000))
-        target.transactionState shouldBe LavegoTerminalOperation.Pending.PartialRefund(BigDecimal(1000))
-        target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Pending.PartialRefund(BigDecimal(1000))
+        target.startPartialRefundTransaction(BigDecimal(1000), ISOAlphaCurrency("EUR"))
+        target.transactionState shouldBe LavegoTerminalOperation.Pending.PartialRefund(BigDecimal(1000), ISOAlphaCurrency("EUR"))
+        target.transactionStateFlow.value shouldBe LavegoTerminalOperation.Pending.PartialRefund(BigDecimal(1000), ISOAlphaCurrency("EUR"))
 
         target.onStatus("status_json")
         target.onReceipt("merchantReceipt")
