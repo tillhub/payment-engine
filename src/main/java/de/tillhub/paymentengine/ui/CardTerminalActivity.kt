@@ -153,7 +153,6 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
     override fun onIntermediateStatus(status: String) {
         super.onIntermediateStatus(status)
         showIntermediateStatus(status)
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
     }
 
     override fun onCompletion(completion: String) {
