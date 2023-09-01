@@ -8,7 +8,7 @@ object ConfigData {
     const val versionCode = 4
     const val versionName = "1.1.1"
 
-    val JAVA_VERSION = JavaVersion.VERSION_17
+    val JAVA_VERSION = JavaVersion.VERSION_11
     val JVM_TARGET = JAVA_VERSION.toString()
 
     object BuildType {
