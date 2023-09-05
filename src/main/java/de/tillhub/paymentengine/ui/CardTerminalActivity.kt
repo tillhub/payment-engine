@@ -1,5 +1,7 @@
 package de.tillhub.paymentengine.ui
 
+import android.app.ActivityManager
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Toast
@@ -30,6 +32,10 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     @Inject
     lateinit var cardPaymentManager: CardPaymentManager
+
+    private val activityManager: ActivityManager by lazy {
+        applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,6 +157,7 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onCompletion(completion: String) {
         super.onCompletion(completion)
+        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         if (viewModel.terminalOperationState.value == TerminalOperationState.Operation) {
             cardPaymentManager.onCompletion(completion)
         }
@@ -164,6 +171,7 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onError(error: String) {
         super.onError(error)
+        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         cardPaymentManager.onError(error)
         finish()
     }
