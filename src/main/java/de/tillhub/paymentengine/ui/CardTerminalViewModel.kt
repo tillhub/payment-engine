@@ -14,7 +14,9 @@ class CardTerminalViewModel @Inject constructor() : ViewModel() {
     val terminalOperationState: LiveData<TerminalOperationState> = _terminalOperationState
 
     fun init() {
-        _terminalOperationState.value = TerminalOperationState.Setup
+        if (_terminalOperationState.value == TerminalOperationState.Idle) {
+            _terminalOperationState.value = TerminalOperationState.Setup
+        }
     }
 
     fun onOperationCompleted() {
