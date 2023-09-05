@@ -160,7 +160,6 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         if (viewModel.terminalOperationState.value == TerminalOperationState.Operation) {
             cardPaymentManager.onCompletion(completion)
-            Toast.makeText(applicationContext, "onCompletion", Toast.LENGTH_SHORT).show()
         }
         viewModel.onOperationCompleted()
     }
@@ -173,7 +172,6 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
     override fun onError(error: String) {
         super.onError(error)
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        Toast.makeText(applicationContext, "onCompletion", Toast.LENGTH_SHORT).show()
         cardPaymentManager.onError(error)
         finish()
     }
