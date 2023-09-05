@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,6 +39,7 @@ class CardPaymentActivity : CardTerminalActivity() {
             finish()
         } else {
             (cardPaymentManager.transactionState as? LavegoTerminalOperation.Pending.Payment)?.let { payment ->
+                Toast.makeText(applicationContext, "Initiate payment", Toast.LENGTH_SHORT).show()
                 doPayment(
                     paymentAmount = payment.amount,
                     currency = payment.currency
