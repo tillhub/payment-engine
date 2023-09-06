@@ -157,8 +157,8 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onCompletion(completion: String) {
         super.onCompletion(completion)
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         if (viewModel.terminalOperationState.value == TerminalOperationState.Operation) {
+            activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
             cardPaymentManager.onCompletion(completion)
         }
         viewModel.onOperationCompleted()
