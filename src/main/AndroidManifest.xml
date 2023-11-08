@@ -5,7 +5,8 @@
 
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 
-    <application>
+    <application
+        android:networkSecurityConfig="@xml/network_security_config">
         <service
             android:name="de.lavego.zvt.ZvtPOIService"
             android:exported="false"
@@ -35,6 +36,4 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="false"/>
     </application>
-
-
 </manifest>

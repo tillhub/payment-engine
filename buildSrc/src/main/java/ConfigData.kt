@@ -5,8 +5,8 @@ object ConfigData {
     const val applicationId = "de.tillhub.paymentengine"
     const val minSdkVersion = 21
     const val targetSdkVersion = 33
-    const val versionCode = 5
-    const val versionName = "1.2.0"
+    const val versionCode = 6
+    const val versionName = "1.2.1"
 
     val JAVA_VERSION = JavaVersion.VERSION_11
     val JVM_TARGET = JAVA_VERSION.toString()
