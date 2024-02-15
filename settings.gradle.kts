@@ -18,7 +18,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DemoPayment"
+rootProject.name = "payment-engine"
 include(":sample")
 include(":payment-engine")
  
