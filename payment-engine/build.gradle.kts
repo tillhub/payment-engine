@@ -66,9 +66,6 @@ dependencies {
     implementation(libs.bundles.lavego)
 
     // Unit tests
-    debugImplementation(libs.androidx.test.junit)
-    debugImplementation(libs.androidx.test.core)
-    debugImplementation(libs.androidx.test.rules)
     testImplementation(libs.bundles.testing)
 }
 
