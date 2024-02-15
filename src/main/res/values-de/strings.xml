@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resources>
-    <string name="checkout_card_payment_follow_instructions">Anweisungen im Terminal befolgen</string>
-    <string name="transaction_cancel_card_partial_refund_error_title">Fehler bei der Teilerstattung von Zahlungen</string>
-    <string name="transaction_cancel_card_partial_refund_nexo_error">Bei Kartenzahlung wird derzeit keine Teilerstattung  unterstützt.</string>
-    <string name="transaction_cancel_card_reversal_error_title">Zahlungsfehler</string>
-    <string name="transaction_cancel_card_reversal_follow_instructions">Anweisungen im Terminal befolgen</string>
-    <string name="transaction_cancel_card_reversal_nexo_error">NexoFAST unterstützt derzeit nicht die Zahlungsstornierung</string>
-</resources>
