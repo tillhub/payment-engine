@@ -19,6 +19,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "DemoPayment"
-include(":app")
+include(":sample")
 include(":payment-engine")
  
