@@ -27,11 +27,12 @@ sealed class Terminal : Parcelable {
         }
     }
 
-    data class OPI(
-        override val name: String,
-        override val ipAddress: String,
-        override val port: Int,
-        override val saleConfig: CardSaleConfig,
-        val port2: Int
-    ) : Terminal()
+    // TODO("To be implemented in future")
+//    data class OPI(
+//        override val name: String,
+//        override val ipAddress: String,
+//        override val port: Int,
+//        override val saleConfig: CardSaleConfig,
+//        val port2: Int
+//    ) : Terminal()
 }

@@ -32,12 +32,13 @@ sealed class TerminalOperationStatus : Parcelable {
             override val rawData: String,
             val data: LavegoTransactionData?
         ) : Success()
-        data class OPI(
-            override val date: Instant,
-            override val customerReceipt: String,
-            override val merchantReceipt: String,
-            override val rawData: String
-        ) : Success()
+        // TODO("To be implemented in future")
+//        data class OPI(
+//            override val date: Instant,
+//            override val customerReceipt: String,
+//            override val merchantReceipt: String,
+//            override val rawData: String
+//        ) : Success()
     }
 
     @Parcelize
@@ -55,11 +56,12 @@ sealed class TerminalOperationStatus : Parcelable {
             val data: LavegoTransactionData?,
             val resultCode: TransactionResultCode
         ) : Error()
-        data class OPI(
-            override val date: Instant,
-            override val customerReceipt: String,
-            override val merchantReceipt: String,
-            override val rawData: String
-        ) : Error()
+        // TODO("To be implemented in future")
+//        data class OPI(
+//            override val date: Instant,
+//            override val customerReceipt: String,
+//            override val merchantReceipt: String,
+//            override val rawData: String
+//        ) : Error()
     }
 }
