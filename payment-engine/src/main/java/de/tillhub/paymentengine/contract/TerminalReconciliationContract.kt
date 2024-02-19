@@ -12,7 +12,6 @@ import de.tillhub.paymentengine.ui.TerminalReconciliationActivity
 class TerminalReconciliationContract : ActivityResultContract<Terminal, TerminalOperationStatus>() {
     override fun createIntent(context: Context, input: Terminal): Intent {
         return when (input) {
-            is Terminal.OPI -> TODO("Not supported yet")
             is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }

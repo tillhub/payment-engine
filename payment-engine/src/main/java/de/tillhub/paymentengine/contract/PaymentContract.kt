@@ -15,7 +15,6 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
 
     override fun createIntent(context: Context, input: PaymentRequest): Intent {
         return when (input.config) {
-            is Terminal.OPI -> TODO("Not supported yet")
             is Terminal.ZVT -> Intent(context, CardPaymentActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)

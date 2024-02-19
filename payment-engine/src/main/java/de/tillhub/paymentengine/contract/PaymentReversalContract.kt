@@ -13,7 +13,6 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
 
     override fun createIntent(context: Context, input: ReversalRequest): Intent {
         return when (input.config) {
-            is Terminal.OPI -> TODO("Not supported yet")
             is Terminal.ZVT -> Intent(context, CardPaymentReversalActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)

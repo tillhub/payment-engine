@@ -15,7 +15,6 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
 
     override fun createIntent(context: Context, input: RefundRequest): Intent {
         return when (input.config) {
-            is Terminal.OPI -> TODO("Not supported yet")
             is Terminal.ZVT -> Intent(context, CardPaymentPartialRefundActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
