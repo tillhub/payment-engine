@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.arch.core.executor.ArchTaskExecutor
 import androidx.arch.core.executor.TaskExecutor
 
-
 @SuppressLint("RestrictedApi")
 class InstantTaskExecutor {
 

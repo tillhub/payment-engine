@@ -33,7 +33,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.init(paymentEngine.cardPaymentManager)
+        viewModel.initPaymentManager(paymentEngine.newPaymentManager().build(lifecycle))
+        viewModel.initRefundManager(paymentEngine.newRefundManager().build(lifecycle))
+        viewModel.initReversalManager(paymentEngine.newReversalManager().build(lifecycle))
+        viewModel.initReconciliationManager(paymentEngine.newReconciliationManager().build(lifecycle))
 
         setContent {
             DemoPaymentTheme {
@@ -47,7 +50,7 @@ class MainActivity : ComponentActivity() {
                             .padding(16.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        Greeting(viewModel.state.collectAsState(TerminalOperationStatus.Waiting))
+                        Greeting(viewModel.cardManagerState.collectAsState(TerminalOperationStatus.Waiting))
                         ActionButton("Payment") {
                             viewModel.startPayment()
                         }

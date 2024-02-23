@@ -2,37 +2,74 @@ package de.tillhub.paymentengine.demo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.tillhub.paymentengine.CardPaymentManager
+import de.tillhub.paymentengine.CardManager
+import de.tillhub.paymentengine.PaymentManager
+import de.tillhub.paymentengine.ReconciliationManager
+import de.tillhub.paymentengine.RefundManager
+import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 
 class MainViewModel : ViewModel() {
 
-    private lateinit var paymentManager: CardPaymentManager
-    lateinit var state: StateFlow<TerminalOperationStatus>
+    private lateinit var paymentManager: PaymentManager
+    private lateinit var refundManager: RefundManager
+    private lateinit var reversalManager: ReversalManager
+    private lateinit var reconciliationManager: ReconciliationManager
 
-    fun init(paymentManager: CardPaymentManager) {
-        this.paymentManager = paymentManager
-        paymentManager.putTerminalConfig(Terminal.ZVT(
+    val cardManagerState: StateFlow<TerminalOperationStatus> by lazy {
+        merge(
+            paymentManager.observePaymentState(),
+            refundManager.observePaymentState(),
+            reversalManager.observePaymentState(),
+            reconciliationManager.observePaymentState()
+        ).stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                TerminalOperationStatus.Waiting
+        )
+    }
+
+    fun initPaymentManager(paymentManager: PaymentManager) {
+        this.paymentManager = paymentManager.apply {
+            setupTerminalConfigs(this)
+        }
+    }
+
+    fun initRefundManager(refundManager: RefundManager) {
+        this.refundManager = refundManager.apply {
+            setupTerminalConfigs(this)
+        }
+    }
+
+    fun initReversalManager(reversalManager: ReversalManager) {
+        this.reversalManager = reversalManager.apply {
+            setupTerminalConfigs(this)
+        }
+    }
+
+    fun initReconciliationManager(reconciliationManager: ReconciliationManager) {
+        this.reconciliationManager = reconciliationManager.apply {
+            setupTerminalConfigs(this)
+        }
+    }
+
+    private fun setupTerminalConfigs(cardManager: CardManager) {
+        cardManager.putTerminalConfig(Terminal.ZVT(
             name = "zvt",
             ipAddress = "192.168.178.109",
             port = 20007
         ))
-        paymentManager.putTerminalConfig(Terminal.ZVT(
+        cardManager.putTerminalConfig(Terminal.ZVT(
             name = "zvt-local",
             ipAddress = "127.0.0.1",
             port = 40007
         ))
-        state = paymentManager.observePaymentState()
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                TerminalOperationStatus.Waiting
-            )
     }
 
     fun startPayment() {
@@ -40,14 +77,14 @@ class MainViewModel : ViewModel() {
     }
 
     fun startRefund() {
-        paymentManager.startRefundTransaction(600.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt-local")
+        refundManager.startRefundTransaction(600.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt-local")
     }
 
     fun startReversal() {
-        paymentManager.startReversalTransaction("244", "zvt-local")
+        reversalManager.startReversalTransaction("244", "zvt-local")
     }
 
     fun startReconciliation() {
-        paymentManager.startReconciliation("zvt-local")
+        reconciliationManager.startReconciliation("zvt-local")
     }
 }
