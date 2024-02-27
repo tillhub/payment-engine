@@ -15,45 +15,125 @@ data class TransactionResultCode(
 
 @SuppressWarnings("MagicNumber")
 sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
-    data object CommonResultCodes : ResultCodeSets(
+    data object ZvtResultCodes : ResultCodeSets(
         mapOf(
             Pair(
-                156, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_156_please_wait,
-                    recoveryMessages = emptyList()
+                0,
+                TransactionResultCode(
+                    R.string.zvt_error_code_00,
+                    listOf(R.string.recovery_message_no_action)
                 )
             ),
             Pair(
-                177, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_177_memory_full,
-                    recoveryMessages = listOf(
+                81,
+                TransactionResultCode(
+                    R.string.zvt_error_code_81,
+                    listOf(R.string.recovery_message_initialisation)
+                )
+            ),
+            Pair(
+                98,
+                TransactionResultCode(
+                    R.string.zvt_error_code_98,
+                    listOf(
+                        R.string.recovery_message_set_date_time,
+                        R.string.recovery_message_diagnosis
+                    )
+                )
+            ),
+            Pair(
+                100,
+                TransactionResultCode(
+                    R.string.zvt_error_code_100,
+                    listOf(R.string.recovery_message_repeat_card_insertion)
+                )
+            ),
+            Pair(
+                101,
+                TransactionResultCode(
+                    R.string.zvt_error_code_101,
+                    listOf(R.string.recovery_message_start_otp)
+                )
+            ),
+            Pair(102, TransactionResultCode(R.string.zvt_error_code_102)),
+            Pair(103, TransactionResultCode(R.string.zvt_error_code_103)),
+            Pair(104, TransactionResultCode(R.string.zvt_error_code_104)),
+            Pair(106, TransactionResultCode(R.string.zvt_error_code_106)),
+            Pair(107, TransactionResultCode(R.string.zvt_error_code_107)),
+            Pair(108, TransactionResultCode(R.string.zvt_error_code_108)),
+            Pair(110, TransactionResultCode(R.string.zvt_error_code_110)),
+            Pair(111, TransactionResultCode(R.string.zvt_error_code_111)),
+            Pair(113, TransactionResultCode(R.string.zvt_error_code_113)),
+            Pair(114, TransactionResultCode(R.string.zvt_error_code_114)),
+            Pair(115, TransactionResultCode(R.string.zvt_error_code_115)),
+            Pair(119, TransactionResultCode(R.string.zvt_error_code_119)),
+            Pair(120, TransactionResultCode(R.string.zvt_error_code_120)),
+            Pair(121, TransactionResultCode(R.string.zvt_error_code_121)),
+            Pair(122, TransactionResultCode(R.string.zvt_error_code_122)),
+            Pair(123, TransactionResultCode(R.string.zvt_error_code_123)),
+            Pair(124, TransactionResultCode(R.string.zvt_error_code_124)),
+            Pair(125, TransactionResultCode(R.string.zvt_error_code_125)),
+            Pair(126, TransactionResultCode(R.string.zvt_error_code_126)),
+            Pair(131, TransactionResultCode(R.string.zvt_error_code_131)),
+            Pair(133, TransactionResultCode(R.string.zvt_error_code_133)),
+            Pair(137, TransactionResultCode(R.string.zvt_error_code_137)),
+            Pair(154, TransactionResultCode(R.string.zvt_error_code_154)),
+            Pair(155, TransactionResultCode(R.string.zvt_error_code_155)),
+            Pair(
+                156,
+                TransactionResultCode(
+                    R.string.zvt_error_code_156,
+                    listOf(R.string.recovery_message_wait, R.string.recovery_message_no_action)
+                )
+            ),
+            Pair(157, TransactionResultCode(R.string.zvt_error_code_157)),
+            Pair(160, TransactionResultCode(R.string.zvt_error_code_160)),
+            Pair(161, TransactionResultCode(R.string.zvt_error_code_161)),
+            Pair(163, TransactionResultCode(R.string.zvt_error_code_163)),
+            Pair(164, TransactionResultCode(R.string.zvt_error_code_164)),
+            Pair(
+                177,
+                TransactionResultCode(
+                    R.string.zvt_error_code_177,
+                    listOf(
                         R.string.recovery_message_end_of_day,
                         R.string.recovery_message_service_technician_fix
                     )
                 )
             ),
             Pair(
-                178, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_178_journal_full,
-                    recoveryMessages = listOf(
+                178,
+                TransactionResultCode(
+                    R.string.zvt_error_code_178,
+                    listOf(
                         R.string.recovery_message_read_file,
                         R.string.recovery_message_delete_file
                     )
                 )
             ),
+            Pair(180, TransactionResultCode(R.string.zvt_error_code_180)),
+            Pair(181, TransactionResultCode(R.string.zvt_error_code_181)),
+            Pair(183, TransactionResultCode(R.string.zvt_error_code_183)),
+            Pair(184, TransactionResultCode(R.string.zvt_error_code_184)),
             Pair(
-                191, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_191_voltage_low
+                191,
+                TransactionResultCode(
+                    R.string.zvt_error_code_191,
+                    listOf(R.string.recovery_message_service_technician_fix)
                 )
             ),
             Pair(
                 192,
-                TransactionResultCode(errorMessage = R.string.common_result_code_192_mechanism_defect)
+                TransactionResultCode(
+                    R.string.zvt_error_code_192,
+                    listOf(R.string.recovery_message_service_technician_fix)
+                )
             ),
             Pair(
-                193, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_193_merchant_card_locked,
-                    recoveryMessages = listOf(
+                193,
+                TransactionResultCode(
+                    R.string.zvt_error_code_193,
+                    listOf(
                         R.string.recovery_message_set_date_time,
                         R.string.recovery_message_diagnosis,
                         R.string.recovery_message_service_technician_fix
@@ -61,60 +141,99 @@ sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
                 )
             ),
             Pair(
-                194, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_194_diagnosis_required,
-                    recoveryMessages = listOf(R.string.recovery_message_diagnosis)
+                194,
+                TransactionResultCode(
+                    R.string.zvt_error_code_194,
+                    listOf(R.string.recovery_message_diagnosis)
                 )
             ),
+            Pair(195, TransactionResultCode(R.string.zvt_error_code_195)),
             Pair(
-                204, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_204_printer_not_ready
+                196,
+                TransactionResultCode(
+                    R.string.zvt_error_code_196,
+                    listOf(
+                        R.string.recovery_message_software_update,
+                        R.string.recovery_message_service_technician_fix
+                    )
                 )
             ),
+            Pair(197, TransactionResultCode(R.string.zvt_error_code_197)),
+            Pair(198, TransactionResultCode(R.string.zvt_error_code_198)),
+            Pair(200, TransactionResultCode(R.string.zvt_error_code_200)),
+            Pair(201, TransactionResultCode(R.string.zvt_error_code_201)),
+            Pair(203, TransactionResultCode(R.string.zvt_error_code_203)),
             Pair(
-                220, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_220_card_inserted,
-                    recoveryMessages = listOf(R.string.recovery_message_proceed_or_abort)
+                204,
+                TransactionResultCode(
+                    R.string.zvt_error_code_204,
+                    listOf(R.string.recovery_message_service_technician_fix)
                 )
             ),
+            Pair(205, TransactionResultCode(R.string.zvt_error_code_205)),
+            Pair(210, TransactionResultCode(R.string.zvt_error_code_210)),
+            Pair(
+                220,
+                TransactionResultCode(
+                    R.string.zvt_error_code_220,
+                    listOf(R.string.recovery_message_proceed_or_abort)
+                )
+            ),
+            Pair(221, TransactionResultCode(R.string.zvt_error_code_221)),
+            Pair(222, TransactionResultCode(R.string.zvt_error_code_222)),
             Pair(
                 223,
-                TransactionResultCode(errorMessage = R.string.common_result_code_223_out_of_order)
-            ),
-            Pair(
-                224, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_224_remote_maintenance
+                TransactionResultCode(
+                    R.string.zvt_error_code_223,
+                    listOf(R.string.recovery_message_service_technician_fix)
                 )
             ),
             Pair(
-                225, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_225_card_not_removed,
-                    recoveryMessages = listOf(R.string.recovery_message_extract_card)
+                224,
+                TransactionResultCode(
+                    R.string.zvt_error_code_224,
+                    listOf(R.string.recovery_message_service_technician_fix)
                 )
             ),
             Pair(
-                226, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_226_card_reader_defective
+                225,
+                TransactionResultCode(
+                    R.string.zvt_error_code_225,
+                    listOf(R.string.recovery_message_extract_card)
                 )
             ),
             Pair(
-                227,
-                TransactionResultCode(errorMessage = R.string.common_result_code_227_shutter_closed)
-            ),
-            Pair(
-                228, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_228_terminal_activation_required
+                226,
+                TransactionResultCode(
+                    R.string.zvt_error_code_226,
+                    listOf(R.string.recovery_message_service_technician_fix)
                 )
             ),
+            Pair(227, TransactionResultCode(R.string.zvt_error_code_227)),
             Pair(
-                240,
-                TransactionResultCode(errorMessage = R.string.common_result_code_240_reconciliation_required)
-            ),
-            Pair(
-                246, TransactionResultCode(
-                    errorMessage = R.string.common_result_code_246_opt_not_available
+                228,
+                TransactionResultCode(
+                    R.string.zvt_error_code_228,
+                    listOf(R.string.recovery_message_service_technician_fix)
                 )
             ),
+            Pair(231, TransactionResultCode(R.string.zvt_error_code_231)),
+            Pair(232, TransactionResultCode(R.string.zvt_error_code_232)),
+            Pair(233, TransactionResultCode(R.string.zvt_error_code_233)),
+            Pair(234, TransactionResultCode(R.string.zvt_error_code_234)),
+            Pair(235, TransactionResultCode(R.string.zvt_error_code_235)),
+            Pair(236, TransactionResultCode(R.string.zvt_error_code_236)),
+            Pair(237, TransactionResultCode(R.string.zvt_error_code_237)),
+            Pair(240, TransactionResultCode(R.string.zvt_error_code_240)),
+            Pair(241, TransactionResultCode(R.string.zvt_error_code_241)),
+            Pair(245, TransactionResultCode(R.string.zvt_error_code_245)),
+            Pair(246, TransactionResultCode(R.string.zvt_error_code_246)),
+            Pair(250, TransactionResultCode(R.string.zvt_error_code_250)),
+            Pair(251, TransactionResultCode(R.string.zvt_error_code_251)),
+            Pair(252, TransactionResultCode(R.string.zvt_error_code_252)),
+            Pair(253, TransactionResultCode(R.string.zvt_error_code_253)),
+            Pair(254, TransactionResultCode(R.string.zvt_error_code_254)),
+            Pair(255, TransactionResultCode(R.string.zvt_error_code_255))
         )
     )
 
@@ -163,25 +282,16 @@ sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
             Pair(85, TransactionResultCode(R.string.lavego_result_code_85_cashback_not_possible)),
             Pair(91, TransactionResultCode(R.string.lavego_result_code_91_card_issuer_inoperative)),
             Pair(92, TransactionResultCode(R.string.lavego_result_code_92_invalid_card_type)),
-            Pair(96, TransactionResultCode(R.string.lavego_result_code_96_system_inoperative)),
-            Pair(
-                98, TransactionResultCode(
-                    errorMessage = R.string.lavego_result_code_98_invalid_date_time,
-                    recoveryMessages = listOf(
-                        R.string.recovery_message_set_date_time,
-                        R.string.recovery_message_diagnosis,
-                    )
-                )
-            ),
+            Pair(96, TransactionResultCode(R.string.lavego_result_code_96_system_inoperative))
         )
     )
 
     companion object {
         fun get(resultCode: Int?): TransactionResultCode {
             return LavegoResultCodes.mapping.getOrDefault(
-                resultCode, CommonResultCodes.mapping.getOrDefault(
+                resultCode, ZvtResultCodes.mapping.getOrDefault(
                     resultCode, TransactionResultCode(
-                        errorMessage = R.string.common_result_code_156_please_wait,
+                        errorMessage = R.string.zvt_error_code_unknown,
                         recoveryMessages = emptyList()
                     )
                 )
