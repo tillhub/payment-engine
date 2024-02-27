@@ -10,7 +10,7 @@ data class TransactionResultCode(
     @StringRes
     val errorMessage: Int,
     @StringRes
-    val recoveryMessages: List<Int> = listOf(R.string.recovery_message_service_technician_fix)
+    val recoveryMessages: List<Int> = listOf()
 ) : Parcelable
 
 @SuppressWarnings("MagicNumber")
