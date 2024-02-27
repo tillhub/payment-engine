@@ -10,25 +10,6 @@
     <string name="transaction_cancel_card_partial_refund_error_title">Payment partial refund error</string>
     <string name="transaction_cancel_card_partial_refund_nexo_error">NexoFAST currently does not support payment partial refund</string>
 
-    <string name="common_result_code_156_please_wait">Please wait - terminal busy</string>
-    <string name="common_result_code_157_partial_issue_of_goods">Partial issue of goods</string>
-    <string name="common_result_code_177_memory_full">Memory full</string>
-    <string name="common_result_code_178_journal_full">Merchant-journal full</string>
-    <string name="common_result_code_191_voltage_low">Voltage supply too low (external power supply)</string>
-    <string name="common_result_code_192_mechanism_defect">Card locking mechanism defect</string>
-    <string name="common_result_code_193_merchant_card_locked">Merchant card locked</string>
-    <string name="common_result_code_194_diagnosis_required">Diagnosis required</string>
-    <string name="common_result_code_196_card_profile_invalid">Card-profile invalid. New card-profiles must be loaded.</string>
-    <string name="common_result_code_204_printer_not_ready">Printer not ready</string>
-    <string name="common_result_code_220_card_inserted">Card inserted</string>
-    <string name="common_result_code_223_out_of_order">Out-of-order</string>
-    <string name="common_result_code_224_remote_maintenance">Remote-maintenance activated</string>
-    <string name="common_result_code_225_card_not_removed">Card not completely removed</string>
-    <string name="common_result_code_226_card_reader_defective">Card-reader does not answer / card-reader defective</string>
-    <string name="common_result_code_227_shutter_closed">Shutter closed</string>
-    <string name="common_result_code_228_terminal_activation_required">Terminal activation required</string>
-    <string name="common_result_code_240_reconciliation_required">Reconciliation required</string>
-    <string name="common_result_code_246_opt_not_available">OPT-data not available (= OPT-Personalisation required)</string>
     <string name="common_result_code_system_malfunction">System malfunction</string>
 
     <string name="lavego_result_code_2_call_merchant">Call merchant service</string>
@@ -67,8 +48,92 @@
     <string name="lavego_result_code_91_card_issuer_inoperative">Card issuer inoperative</string>
     <string name="lavego_result_code_92_invalid_card_type">Invalid card type</string>
     <string name="lavego_result_code_96_system_inoperative">System inoperative</string>
-    <string name="lavego_result_code_98_invalid_date_time">Invalid date or time</string>
 
+    <!-- ZVT Error-Messages -->
+    <string name="zvt_error_code_00">PT ready</string>
+    <string name="zvt_error_code_81">Initialisation required</string>
+    <string name="zvt_error_code_98">Date/time incorrect</string>
+    <string name="zvt_error_code_100">Card not readable (LRC-/parity-error)</string>
+    <string name="zvt_error_code_101">Card-data not present (neither track-data nor chip found)</string>
+    <string name="zvt_error_code_102">Processing-error (also for problems with card-reader mechanism)</string>
+    <string name="zvt_error_code_103">Function not permitted for ec- and Maestro-cards</string>
+    <string name="zvt_error_code_104">Function not permitted for credit- and tank-cards </string>
+    <string name="zvt_error_code_106">Turnover-file full</string>
+    <string name="zvt_error_code_107">Function deactivated (PT not registered)</string>
+    <string name="zvt_error_code_108">Payment canceled</string>
+    <string name="zvt_error_code_110">Card in blocked-list (response to command 06 E4)</string>
+    <string name="zvt_error_code_111">Wrong currency</string>
+    <string name="zvt_error_code_113">Credit not sufficient (chip-card)</string>
+    <string name="zvt_error_code_114">Chip error</string>
+    <string name="zvt_error_code_115">Card-data incorrect (e.g. country-key check, checksum-error)</string>
+    <string name="zvt_error_code_119">End-of-day batch not possible</string>
+    <string name="zvt_error_code_120">Card expired</string>
+    <string name="zvt_error_code_121">Card not yet valid</string>
+    <string name="zvt_error_code_122">Card unknown</string>
+    <string name="zvt_error_code_123">Fallback to magnetic stripe for Girocard not possible</string>
+    <string name="zvt_error_code_124">Fallback to magnetic stripe not possible (used for non girocard cards)</string>
+    <string name="zvt_error_code_125">Communication error (communication module does not answer or is not present)</string>
+    <string name="zvt_error_code_126">Fallback to magnetic stripe not possible, debit advice possible (used only for girocard)</string>
+    <string name="zvt_error_code_131">Function not possible</string>
+    <string name="zvt_error_code_133">Key missing</string>
+    <string name="zvt_error_code_137">PIN-pad defective</string>
+    <string name="zvt_error_code_154">ZVT protocol error</string>
+    <string name="zvt_error_code_155">Error from dial-up/communication fault</string>
+    <string name="zvt_error_code_156">Please wait - terminal busy</string>
+    <string name="zvt_error_code_157">Partial issue of goods</string>
+    <string name="zvt_error_code_160">Receiver not ready</string>
+    <string name="zvt_error_code_161">Remote station does not respond</string>
+    <string name="zvt_error_code_163">No connection</string>
+    <string name="zvt_error_code_164">Submission of Geldkarte not possible</string>
+    <string name="zvt_error_code_177">Memory full</string>
+    <string name="zvt_error_code_178">Merchant-journal full</string>
+    <string name="zvt_error_code_180">Already reversed</string>
+    <string name="zvt_error_code_181">Reversal not possible</string>
+    <string name="zvt_error_code_183">Pre-authorisation incorrect (amount too high) or amount wrong</string>
+    <string name="zvt_error_code_184">Error pre-authorisation</string>
+    <string name="zvt_error_code_191">Voltage supply to low (external power supply)</string>
+    <string name="zvt_error_code_192">Card locking mechanism defective</string>
+    <string name="zvt_error_code_193">Merchant-card locked</string>
+    <string name="zvt_error_code_194">Diagnosis required</string>
+    <string name="zvt_error_code_195">Maximum amount exceeded</string>
+    <string name="zvt_error_code_196">Card-profile invalid. New card-profiles must be loaded.</string>
+    <string name="zvt_error_code_197">Payment method not supported</string>
+    <string name="zvt_error_code_198">Currency not applicable</string>
+    <string name="zvt_error_code_200">Amount too small</string>
+    <string name="zvt_error_code_201">Max. transaction-amount too small</string>
+    <string name="zvt_error_code_203">Function only allowed in EURO</string>
+    <string name="zvt_error_code_204">Printer not ready</string>
+    <string name="zvt_error_code_205">Cashback not possible</string>
+    <string name="zvt_error_code_210">Function not permitted for service-cards/bank-customer-cards</string>
+    <string name="zvt_error_code_220">Card inserted</string>
+    <string name="zvt_error_code_221">Error during card-eject (for motor-insertion reader)</string>
+    <string name="zvt_error_code_222">Error during card-insertion (for motor-insertion reader)</string>
+    <string name="zvt_error_code_223">Out-of-order</string>
+    <string name="zvt_error_code_224">Remote-maintenance activated</string>
+    <string name="zvt_error_code_225">Card not completely removed</string>
+    <string name="zvt_error_code_226">Card-reader does not answer / card-reader defective</string>
+    <string name="zvt_error_code_227">Shutter closed</string>
+    <string name="zvt_error_code_228">Terminal activation required</string>
+    <string name="zvt_error_code_231">Min. one goods-group not found</string>
+    <string name="zvt_error_code_232">No goods-groups-table loaded</string>
+    <string name="zvt_error_code_233">Restriction-code not permitted</string>
+    <string name="zvt_error_code_234">Card-code not permitted</string>
+    <string name="zvt_error_code_235">Function not executable (PIN-algorithm unknown)</string>
+    <string name="zvt_error_code_236">PIN-processing not possible</string>
+    <string name="zvt_error_code_237">PIN-pad defective</string>
+    <string name="zvt_error_code_240">Reconciliation required</string>
+    <string name="zvt_error_code_241">Ec-cash/Maestro offline error</string>
+    <string name="zvt_error_code_245">OPT-error</string>
+    <string name="zvt_error_code_246">OPT-data not available (= OPT personalisation required)</string>
+    <string name="zvt_error_code_250">Error transmitting offline-transactions (clearing error)</string>
+    <string name="zvt_error_code_251">Turnover data-set defective </string>
+    <string name="zvt_error_code_252">Necessary device not present or defective</string>
+    <string name="zvt_error_code_253">Baud rate not supported</string>
+    <string name="zvt_error_code_254">Register unknown</string>
+    <string name="zvt_error_code_255">System error (= other/unknown error), See TLV tags 1F16 and 1F17</string>
+    <string name="zvt_error_code_unknown">Unknown error</string>
+
+    <string name="recovery_message_no_action">No action required</string>
     <string name="recovery_message_initialisation">Initialize the payment terminal.</string>
     <string name="recovery_message_set_date_time">Set date and time in the payment terminal.</string>
     <string name="recovery_message_repeat_card_insertion">Repeat card insertion.</string>
@@ -81,4 +146,5 @@
     <string name="recovery_message_software_update">Perform a software update on the payment terminal.</string>
     <string name="recovery_message_extract_card">Card must be fully extracted.</string>
     <string name="recovery_message_proceed_or_abort">Card can be processed or via "Abort" ejected.</string>
+    <string name="recovery_message_wait">Terminal needs more time</string>
 </resources>
