@@ -114,7 +114,4 @@ In case you do not provide terminal configuration default one will be used (ZVT,
 - [Martin Širok](https://github.com/SloInfinity)
 - [Chandrashekar Allam](https://github.com/shekar-allam)
 
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
 
