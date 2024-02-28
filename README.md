@@ -107,9 +107,14 @@ interface PaymentManager {
 }
 ```
 In case you do not provide terminal configuration default one will be used (ZVT, ip:*127.0.0.1*, port:*40007*)
-## Authors
+
+## Credits
 
 - [Đorđe Hrnjez](https://github.com/djordjeh)
 - [Martin Širok](https://github.com/SloInfinity)
 - [Chandrashekar Allam](https://github.com/shekar-allam)
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
 
