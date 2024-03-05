@@ -29,10 +29,6 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
                 ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
         } ?: TerminalOperationStatus.Canceled
     }
-
-    companion object {
-        const val REGISTER_KEY = "refund_register_key"
-    }
 }
 
 data class RefundRequest(

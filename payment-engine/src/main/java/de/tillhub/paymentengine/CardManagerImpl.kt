@@ -3,19 +3,21 @@ package de.tillhub.paymentengine
 import androidx.lifecycle.LifecycleOwner
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-abstract class CardManagerImpl : CardManager {
-
-    protected val configs: MutableMap<String, Terminal> = mutableMapOf()
-    protected val transactionState = MutableSharedFlow<TerminalOperationStatus>(extraBufferCapacity = 1)
+abstract class CardManagerImpl(
+    protected val configs: MutableMap<String, Terminal> = mutableMapOf(),
+    protected val terminalState: MutableStateFlow<TerminalOperationStatus> = MutableStateFlow(
+        TerminalOperationStatus.Waiting
+    )
+) : CardManager {
 
     override fun putTerminalConfig(config: Terminal) {
         configs[config.name] = config
     }
 
-    override fun observePaymentState(): SharedFlow<TerminalOperationStatus> = transactionState
+    override fun observePaymentState(): StateFlow<TerminalOperationStatus> = terminalState
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)

@@ -8,7 +8,10 @@ import de.tillhub.paymentengine.contract.PaymentResultContract
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
+import java.util.Random
+import java.util.UUID
 
 /**
  * This is called to start of a card payment transaction,
@@ -21,17 +24,23 @@ interface PaymentManager : CardManager {
 }
 
 class PaymentManagerImpl(
+    configs: MutableMap<String, Terminal>,
+    terminalState: MutableStateFlow<TerminalOperationStatus>,
     private val registry: ActivityResultRegistry,
     private val defaultConfig: Terminal = Terminal.ZVT()
-) : CardManagerImpl(), PaymentManager {
+) : CardManagerImpl(configs, terminalState), PaymentManager {
 
     private lateinit var paymentResultContract: ActivityResultLauncher<PaymentRequest>
 
+    private val activityResultKey: String by lazy {
+        "payment_" + UUID.randomUUID().toString() + "_rq#" + Random().nextInt()
+    }
+
     override fun registerResultRegistry(owner: LifecycleOwner) {
         paymentResultContract = registry.register(
-            PaymentResultContract.REGISTER_KEY, owner, PaymentResultContract()
+            activityResultKey, owner, PaymentResultContract()
         ) { result ->
-            transactionState.tryEmit(result)
+            terminalState.tryEmit(result)
         }
     }
 
@@ -54,7 +63,7 @@ class PaymentManagerImpl(
         currency: ISOAlphaCurrency,
         config: Terminal
     ) {
-        transactionState.tryEmit(TerminalOperationStatus.Pending.Payment(amount, currency))
+        terminalState.tryEmit(TerminalOperationStatus.Pending.Payment(amount, currency))
         paymentResultContract.launch(
             PaymentRequest(config, amount, currency)
         )
