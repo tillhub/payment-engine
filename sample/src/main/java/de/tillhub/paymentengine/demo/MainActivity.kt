@@ -28,15 +28,15 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
     private val paymentEngine: PaymentEngine by lazy {
-        PaymentEngine.getInstance(this)
+        PaymentEngine.getInstance()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.initPaymentManager(paymentEngine.newPaymentManager().build(lifecycle))
-        viewModel.initRefundManager(paymentEngine.newRefundManager().build(lifecycle))
-        viewModel.initReversalManager(paymentEngine.newReversalManager().build(lifecycle))
-        viewModel.initReconciliationManager(paymentEngine.newReconciliationManager().build(lifecycle))
+        viewModel.initPaymentManager(paymentEngine.newPaymentManager(activityResultRegistry).build(lifecycle))
+        viewModel.initRefundManager(paymentEngine.newRefundManager(activityResultRegistry).build(lifecycle))
+        viewModel.initReversalManager(paymentEngine.newReversalManager(activityResultRegistry).build(lifecycle))
+        viewModel.initReconciliationManager(paymentEngine.newReconciliationManager(activityResultRegistry).build(lifecycle))
 
         setContent {
             DemoPaymentTheme {

@@ -22,7 +22,7 @@ dependencyResolutionManagement {
 **Step 2.** Add the dependency to your app `build.gradle`:
 ```groovy
 dependencies {
-    implementation 'com.github.tillhub:payment-engine:1.3.3'
+    implementation 'com.github.tillhub:payment-engine:x.x.x'
 }
 ```
 # Usage

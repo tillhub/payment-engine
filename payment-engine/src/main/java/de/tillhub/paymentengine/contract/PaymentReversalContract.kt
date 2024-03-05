@@ -25,10 +25,6 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
             BundleCompat.getParcelable(it, ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
         } ?: TerminalOperationStatus.Canceled
     }
-
-    companion object {
-        const val REGISTER_KEY = "reversal_register_key"
-    }
 }
 
 data class ReversalRequest(

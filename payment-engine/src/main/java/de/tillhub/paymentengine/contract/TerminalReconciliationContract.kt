@@ -23,8 +23,4 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
             BundleCompat.getParcelable(it, ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
         } ?: TerminalOperationStatus.Canceled
     }
-
-    companion object {
-        const val REGISTER_KEY = "reconciliation_register_key"
-    }
 }

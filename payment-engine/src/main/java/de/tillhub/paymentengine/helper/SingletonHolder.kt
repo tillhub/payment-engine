@@ -1,27 +1,26 @@
 package de.tillhub.paymentengine.helper
 
 import androidx.annotation.Keep
-import java.lang.ref.WeakReference
 
-open class SingletonHolder<out T : Any, in A>(private val creator: (A) -> T) {
-    private var currentActivity: WeakReference<A>? = null
+open class SingletonHolder<out T : Any>(creator: () -> T) {
+    private var creator: (() -> T)? = creator
     @Volatile private var instance: T? = null
 
     @Keep
-    fun getInstance(arg: A): T {
+    fun getInstance(): T {
         val checkInstance = instance
-        if (checkInstance != null && currentActivity?.get() == arg) {
+        if (checkInstance != null) {
             return checkInstance
         }
 
         return synchronized(this) {
             val checkInstanceAgain = instance
-            if (checkInstanceAgain != null && currentActivity?.get() == arg) {
+            if (checkInstanceAgain != null) {
                 checkInstanceAgain
             } else {
-                currentActivity = WeakReference(arg)
-                val created = creator(arg)
+                val created = creator!!()
                 instance = created
+                creator = null
                 created
             }
         }

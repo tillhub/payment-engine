@@ -28,10 +28,6 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
             BundleCompat.getParcelable(it, ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
         } ?: TerminalOperationStatus.Canceled
     }
-
-    companion object {
-        const val REGISTER_KEY = "payment_register_key"
-    }
 }
 
 data class PaymentRequest(

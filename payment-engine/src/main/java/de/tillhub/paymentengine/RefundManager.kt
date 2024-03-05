@@ -8,7 +8,10 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
+import java.util.Random
+import java.util.UUID
 
 /**
  * This is called to start of a partial card payment refund,
@@ -21,17 +24,23 @@ interface RefundManager : CardManager {
 }
 
 class RefundManagerImpl(
+    configs: MutableMap<String, Terminal>,
+    terminalState: MutableStateFlow<TerminalOperationStatus>,
     private val registry: ActivityResultRegistry,
     private val defaultConfig: Terminal = Terminal.ZVT()
-) : CardManagerImpl(), RefundManager {
+) : CardManagerImpl(configs, terminalState), RefundManager {
 
     private lateinit var refundContract: ActivityResultLauncher<RefundRequest>
 
+    private val activityResultKey: String by lazy {
+        "refund_" + UUID.randomUUID().toString() + "_rq#" + Random().nextInt()
+    }
+
     override fun registerResultRegistry(owner: LifecycleOwner) {
         refundContract = registry.register(
-            PaymentRefundContract.REGISTER_KEY, owner, PaymentRefundContract()
+            activityResultKey, owner, PaymentRefundContract()
         ) { result ->
-            transactionState.tryEmit(result)
+            terminalState.tryEmit(result)
         }
     }
 
@@ -54,7 +63,7 @@ class RefundManagerImpl(
         currency: ISOAlphaCurrency,
         config: Terminal
     ) {
-        transactionState.tryEmit(TerminalOperationStatus.Pending.Refund(amount, currency))
+        terminalState.tryEmit(TerminalOperationStatus.Pending.Refund(amount, currency))
         refundContract.launch(
             RefundRequest(config, amount, currency)
         )

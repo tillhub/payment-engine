@@ -7,6 +7,9 @@ import de.tillhub.paymentengine.contract.PaymentReversalContract
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.Random
+import java.util.UUID
 
 /**
  * This is called to start of a card payment reversal,
@@ -19,17 +22,23 @@ interface ReversalManager : CardManager {
 }
 
 class ReversalManagerImpl(
+    configs: MutableMap<String, Terminal>,
+    transactionState: MutableStateFlow<TerminalOperationStatus>,
     private val registry: ActivityResultRegistry,
     private val defaultConfig: Terminal = Terminal.ZVT()
-) : CardManagerImpl(), ReversalManager {
+) : CardManagerImpl(configs, transactionState), ReversalManager {
 
     private lateinit var reversalContract: ActivityResultLauncher<ReversalRequest>
 
+    private val activityResultKey: String by lazy {
+        "reversal_" + UUID.randomUUID().toString() + "_rq#" + Random().nextInt()
+    }
+
     override fun registerResultRegistry(owner: LifecycleOwner) {
         reversalContract = registry.register(
-            PaymentReversalContract.REGISTER_KEY, owner, PaymentReversalContract()
+            activityResultKey, owner, PaymentReversalContract()
         ) { result ->
-            transactionState.tryEmit(result)
+            terminalState.tryEmit(result)
         }
     }
 
@@ -44,7 +53,7 @@ class ReversalManagerImpl(
     }
 
     override fun startReversalTransaction(receiptNo: String, config: Terminal) {
-        transactionState.tryEmit(TerminalOperationStatus.Pending.Reversal(receiptNo))
+        terminalState.tryEmit(TerminalOperationStatus.Pending.Reversal(receiptNo))
         reversalContract.launch(
             ReversalRequest(config, receiptNo)
         )
