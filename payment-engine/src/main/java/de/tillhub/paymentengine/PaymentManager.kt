@@ -1,8 +1,7 @@
 package de.tillhub.paymentengine
 
+import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
-import androidx.lifecycle.LifecycleOwner
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.PaymentResultContract
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
@@ -10,8 +9,6 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
-import java.util.Random
-import java.util.UUID
 
 /**
  * This is called to start of a card payment transaction,
@@ -26,23 +23,13 @@ interface PaymentManager : CardManager {
 class PaymentManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
-    private val registry: ActivityResultRegistry,
-    private val defaultConfig: Terminal = Terminal.ZVT()
+    resultCaller: ActivityResultCaller
 ) : CardManagerImpl(configs, terminalState), PaymentManager {
 
-    private lateinit var paymentResultContract: ActivityResultLauncher<PaymentRequest>
-
-    private val activityResultKey: String by lazy {
-        "payment_" + UUID.randomUUID().toString() + "_rq#" + Random().nextInt()
-    }
-
-    override fun registerResultRegistry(owner: LifecycleOwner) {
-        paymentResultContract = registry.register(
-            activityResultKey, owner, PaymentResultContract()
-        ) { result ->
+    private val paymentResultContract: ActivityResultLauncher<PaymentRequest> =
+        resultCaller.registerForActivityResult(PaymentResultContract()) { result ->
             terminalState.tryEmit(result)
         }
-    }
 
     override fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency) {
         val configName = configs.values.firstOrNull()?.name.orEmpty()

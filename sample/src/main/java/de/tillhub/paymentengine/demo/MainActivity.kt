@@ -33,10 +33,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.initPaymentManager(paymentEngine.newPaymentManager(activityResultRegistry).build(lifecycle))
-        viewModel.initRefundManager(paymentEngine.newRefundManager(activityResultRegistry).build(lifecycle))
-        viewModel.initReversalManager(paymentEngine.newReversalManager(activityResultRegistry).build(lifecycle))
-        viewModel.initReconciliationManager(paymentEngine.newReconciliationManager(activityResultRegistry).build(lifecycle))
+        viewModel.initPaymentManager(paymentEngine.newPaymentManager(this))
+        viewModel.initRefundManager(paymentEngine.newRefundManager(this))
+        viewModel.initReversalManager(paymentEngine.newReversalManager(this))
+        viewModel.initReconciliationManager(paymentEngine.newReconciliationManager(this))
 
         setContent {
             DemoPaymentTheme {

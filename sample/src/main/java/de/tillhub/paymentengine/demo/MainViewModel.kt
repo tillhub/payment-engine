@@ -73,11 +73,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun startPayment() {
-        paymentManager.startPaymentTransaction(500.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt-local")
+        paymentManager.startPaymentTransaction(500.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt")
     }
 
     fun startRefund() {
-        refundManager.startRefundTransaction(600.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt-local")
+        refundManager.startRefundTransaction(600.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt")
     }
 
     fun startReversal() {
