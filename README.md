@@ -58,24 +58,24 @@ override fun onCreate(savedInstanceState: Bundle?) {
 
 ### 2. Usage of PaymentEngine
 
-`PaymentEngine.kt` is per Activity singlton helper class which tries to simplify the process of implementation and it gives you access to all library available actions (managers).
+`PaymentEngine.kt` is singlton helper class which tries to simplify the process of implementation and it gives you access to all library available actions (managers).
 
 * `PaymentManager` is used to start of a card payment transaction
 * `RefundManager` is used to start of a partial card payment refund
 * `ReversalManager` is used to start of a card payment reversal
 * `ReconciliationManager` is used to start of a terminal reconciliation
 
-It also gives you more flexibility setting up terminal configuration, observing result through SharedFlow and triggering actions with multiple methods. 
+It also gives you more flexibility setting up terminal configuration, observing result through singleton Flow and triggering actions with multiple methods. 
 
 ```kotlin
 private val paymentEngine: PaymentEngine by lazy {
-    PaymentEngine.getInstance(this)
+    PaymentEngine.getInstance()
 }
 
 override fun onCreate(savedInstanceState: Bundle?) {
     // ...
 
-    val paymentManager = paymentEngine.newPaymentManager().build(lifecycle)
+    val paymentManager = paymentEngine.newPaymentManager(this)
 
     ...
 
