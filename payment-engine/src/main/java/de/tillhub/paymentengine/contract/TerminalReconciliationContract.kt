@@ -15,6 +15,8 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
             is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
+
+            is Terminal.OPI -> TODO()
         }
     }
 

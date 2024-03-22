@@ -65,6 +65,15 @@ dependencies {
     // Lavego
     implementation(libs.bundles.lavego)
 
+    // OPI
+    implementation(platform(libs.okhttp3.bom))
+    implementation(libs.okhttp3)
+    implementation(libs.retrofit.simplexml) {
+        exclude(module = "stax")
+        exclude(module = "stax-api")
+        exclude(module = "xpp3")
+    }
+
     // Unit tests
     testImplementation(libs.bundles.testing)
 }

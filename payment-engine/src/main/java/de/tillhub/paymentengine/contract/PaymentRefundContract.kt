@@ -20,6 +20,8 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
+
+            is Terminal.OPI -> TODO()
         }
     }
 
