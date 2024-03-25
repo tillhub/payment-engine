@@ -10,34 +10,20 @@ import java.util.concurrent.atomic.AtomicBoolean
 class OPIChannel0(
     socketIp: String,
     socketPort: Int,
-    private val client: OkHttpClient = OkHttpClient(),
-    private val onMessage: (String) -> Unit,
-    private val onError: (Throwable, String) -> Unit,
-) : OPIChannel {
+    private val client: OkHttpClient = OkHttpClient()
+) {
 
     private var webSocket: okhttp3.WebSocket? = null
     private var shouldReconnect: AtomicBoolean = AtomicBoolean(false)
     private val socketUrl = "$socketIp:$socketPort"
 
-    override val isConnected: Boolean
+    private var onMessage: ((String) -> Unit)? = null
+    private var onError: (Throwable, String) -> Unit = {_,_ -> }
+
+    val isConnected: Boolean
         get() = webSocket != null
 
-    override suspend fun open() {
-        openInternal()
-    }
-
-    override fun close() {
-        shouldReconnect.set(false)
-
-        webSocket?.close(CLOSING_CODE, "Do not need connection anymore.")
-        webSocket = null
-    }
-
-    override fun sendMessage(message: String) {
-        webSocket?.send(message)
-    }
-
-    private fun openInternal() {
+    fun open() {
         shouldReconnect.set(true)
 
         val request = Request.Builder().url(url = socketUrl).build()
@@ -46,9 +32,25 @@ class OPIChannel0(
         client.dispatcher.executorService.shutdown()
     }
 
+    fun close() {
+        shouldReconnect.set(false)
+
+        webSocket?.close(CLOSING_CODE, "Do not need connection anymore.")
+        webSocket = null
+    }
+
+    fun sendMessage(message: String, onResponse: (String) -> Unit) {
+        onMessage = onResponse
+        webSocket?.send(message)
+    }
+
+    fun setOnError(onError: (Throwable, String) -> Unit) {
+        this.onError = onError
+    }
+
     private fun reconnect() {
         close()
-        openInternal()
+        open()
     }
 
     private val webSocketListener = object : WebSocketListener() {
@@ -57,7 +59,8 @@ class OPIChannel0(
         }
 
         override fun onMessage(webSocket: okhttp3.WebSocket, text: String) {
-            onMessage(text)
+            onMessage?.let { it(text) }
+            onMessage = null
         }
 
         override fun onClosing(webSocket: okhttp3.WebSocket, code: Int, reason: String) {

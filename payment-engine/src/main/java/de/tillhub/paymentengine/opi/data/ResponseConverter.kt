@@ -1,10 +1,8 @@
 package de.tillhub.paymentengine.opi.data
 
-
 import org.simpleframework.xml.Serializer
 import retrofit2.Converter
 import java.io.IOException
-
 
 class ResponseConverter<T>(
     private val clazz: Class<T>,

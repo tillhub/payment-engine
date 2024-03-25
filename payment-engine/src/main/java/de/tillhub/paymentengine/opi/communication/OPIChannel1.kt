@@ -13,19 +13,20 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
     private val socketPort: Int,
-    private val onMessage: (String) -> Unit,
-    private val onError: (Throwable, String) -> Unit,
-) : OPIChannel {
+) {
 
     private var webSocket: ServerSocket? = null
     private var working: AtomicBoolean = AtomicBoolean(false)
 
     private val dataOutputStreams = mutableListOf<DataOutputStream>()
 
-    override val isConnected: Boolean
+    private var onMessage: (String) -> Unit = {}
+    private var onError: (Throwable, String) -> Unit = {_,_ -> }
+
+    val isConnected: Boolean
         get() = webSocket != null && (webSocket?.isClosed?.not() ?: false)
 
-    override suspend fun open() = withContext(Dispatchers.IO) {
+    suspend fun open() = withContext(Dispatchers.IO) {
         if (working.get()) return@withContext
 
         working.set(true)
@@ -47,15 +48,23 @@ class OPIChannel1(
         }
     }
 
-    override fun close() {
+    fun close() {
         working.set(false)
 
         webSocket?.close()
         webSocket = null
     }
 
-    override fun sendMessage(message: String) {
+    fun sendMessage(message: String) {
         dataOutputStreams.forEach { it.writeUTF(message) }
+    }
+
+    fun setOnMessage(onMessage: (String) -> Unit) {
+        this.onMessage = onMessage
+    }
+
+    fun setOnError(onError: (Throwable, String) -> Unit) {
+        this.onError = onError
     }
 
     private suspend fun handleOpenConnection(socket: Socket) = withContext(Dispatchers.IO) {
