@@ -1,6 +1,8 @@
 package de.tillhub.paymentengine.data
 
 import android.os.Parcelable
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
+import de.tillhub.paymentengine.zvt.data.TransactionResultCode
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.time.Instant

@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import android.app.Activity
 import android.app.ActivityManager
@@ -172,7 +172,3 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
         private const val TERMINAL_CONFIG_BYTE: Byte = 0b11000110.toByte()
     }
 }
-
-inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
-    crossinline bindingInflater: (LayoutInflater) -> T,
-) = lazy(LazyThreadSafetyMode.NONE) { bindingInflater.invoke(layoutInflater) }

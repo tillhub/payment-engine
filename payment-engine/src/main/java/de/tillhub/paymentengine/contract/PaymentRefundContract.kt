@@ -8,7 +8,7 @@ import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.ui.CardPaymentPartialRefundActivity
+import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 
 class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOperationStatus>() {

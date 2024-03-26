@@ -1,15 +1,15 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.tillhub.paymentengine.data.LavegoReceiptBuilder
-import de.tillhub.paymentengine.data.LavegoTransactionData
-import de.tillhub.paymentengine.data.LavegoTransactionDataConverter
-import de.tillhub.paymentengine.data.ResultCodeSets
+import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
+import de.tillhub.paymentengine.zvt.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.data.TransactionResultCode
+import de.tillhub.paymentengine.zvt.data.TransactionResultCode
 import de.tillhub.paymentengine.data.getOrNull
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl

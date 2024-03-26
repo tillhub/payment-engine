@@ -7,7 +7,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.ui.CardPaymentReversalActivity
+import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 
 class PaymentReversalContract : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
 

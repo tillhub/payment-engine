@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.data
+package de.tillhub.paymentengine.zvt.data
 
 import androidx.annotation.Keep
 import com.squareup.moshi.Json
@@ -6,6 +6,8 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import de.tillhub.paymentengine.data.Payment
+import de.tillhub.paymentengine.data.errorIfNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber

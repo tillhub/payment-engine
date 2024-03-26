@@ -134,3 +134,21 @@ data class ValueElement(
     @param:Text
     var value: String,
 )
+
+enum class OverallResult(val value: String) {
+    SUCCESS("Success"),
+    PARTIAL_FAILURE("PartialFailure"),
+    FAILURE("Failure"),
+    DEVICE_UNAVAILABLE("DeviceUnavailable"),
+    BUSY("Busy"),
+    LOGGED_OUT("Loggedout"),
+    ABORTED("Aborted"),
+    TIMED_OUT("TimedOut"),
+    FORMAT_ERROR("FormatError"),
+    PARSING_ERROR("ParsingError"),
+    COMMUNICATION_ERROR("CommunicationError"),
+    VALIDATION_ERROR("ValidationError"),
+    MISSING_MANDATORY_DATA("MissingMandatoryData"),
+    UNKNOWN_CARD("UnknownCard"),
+    UNKNOWN("Unknown"),
+}
