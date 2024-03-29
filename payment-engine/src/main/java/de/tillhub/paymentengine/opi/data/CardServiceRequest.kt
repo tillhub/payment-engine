@@ -49,6 +49,7 @@ data class PosData(
     var timestamp: String
 )
 
+@Root(name = "TotalAmount", strict = false)
 data class TotalAmount(
     @field:Text
     @param:Text
@@ -68,7 +69,7 @@ data class OriginalTransaction(
     var stan: String,
 )
 
-enum class ServiceRequestType(val value: String) {
+enum class CardServiceRequestType(val value: String) {
     CARD_PAYMENT("CardPayment"),
     PAYMENT_REVERSAL("PaymentReversal"),
     PAYMENT_REFUND("PaymentRefund"),

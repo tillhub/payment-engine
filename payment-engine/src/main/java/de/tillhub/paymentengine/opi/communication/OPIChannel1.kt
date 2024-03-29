@@ -1,6 +1,9 @@
 package de.tillhub.paymentengine.opi.communication
 
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,23 +29,26 @@ class OPIChannel1(
     val isConnected: Boolean
         get() = webSocket != null && (webSocket?.isClosed?.not() ?: false)
 
-    suspend fun open() = withContext(Dispatchers.IO) {
-        if (working.get()) return@withContext
+    fun open() {
+        if (working.get()) return
 
         working.set(true)
-        webSocket = ServerSocket(socketPort)
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            webSocket = ServerSocket(socketPort)
+            Log.d("OPI_CHANNEL_1", "channel opened")
 
-        while (working.get()) {
-            webSocket?.let {
-                try {
-                    it.accept().use {
-                        launch {
-                            handleOpenConnection(it)
+            while (working.get()) {
+                webSocket?.let {
+                    try {
+                        it.accept().use {
+                            launch {
+                                handleOpenConnection(it)
+                            }
                         }
+                        delay(DEFAULT_DELAY)
+                    } catch (e: IOException) {
+                        onError(e, "Socket accept failed")
                     }
-                    delay(DEFAULT_DELAY)
-                } catch (e: IOException) {
-                    onError(e, "Socket accept failed")
                 }
             }
         }
@@ -56,7 +62,10 @@ class OPIChannel1(
     }
 
     fun sendMessage(message: String) {
-        dataOutputStreams.forEach { it.writeUTF(message) }
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            Log.d("OPI_CHANNEL_1", "SENT:\n$message")
+            dataOutputStreams.forEach { it.writeUTF(message) }
+        }
     }
 
     fun setOnMessage(onMessage: (String) -> Unit) {
@@ -77,6 +86,7 @@ class OPIChannel1(
             try {
                 if (dataInputStream.available() > 0) {
                     val message = dataInputStream.readUTF()
+                    Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
                     onMessage(message)
                 }
             } catch (e: IOException) {

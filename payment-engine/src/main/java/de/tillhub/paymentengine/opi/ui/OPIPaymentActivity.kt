@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.opi.ui
 
+import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -23,6 +24,11 @@ class OPIPaymentActivity: OPITerminalActivity() {
             BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency::class.java)
                 ?: throw IllegalArgumentException("$TAG: Argument currency is missing")
         } ?: throw IllegalArgumentException("$TAG: Extras are missing")
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
     }
 
     override fun showLoader() {

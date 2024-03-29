@@ -1,84 +1,90 @@
 package de.tillhub.paymentengine.opi.communication
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.WebSocketListener
-import timber.log.Timber
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel0(
-    socketIp: String,
-    socketPort: Int,
-    private val client: OkHttpClient = OkHttpClient()
+    private val socketIp: String,
+    private val socketPort: Int,
 ) {
 
-    private var webSocket: okhttp3.WebSocket? = null
-    private var shouldReconnect: AtomicBoolean = AtomicBoolean(false)
-    private val socketUrl = "$socketIp:$socketPort"
+    private var webSocket: Socket? = null
+    private var working: AtomicBoolean = AtomicBoolean(false)
 
     private var onMessage: ((String) -> Unit)? = null
     private var onError: (Throwable, String) -> Unit = {_,_ -> }
 
+    private var dataOutputStream: DataOutputStream? = null
+    private var dataInputStream: DataInputStream? = null
+
     val isConnected: Boolean
-        get() = webSocket != null
+        get() = webSocket != null && (webSocket?.isConnected ?: false)
 
     fun open() {
-        shouldReconnect.set(true)
+        if (working.get()) return
 
-        val request = Request.Builder().url(url = socketUrl).build()
-        webSocket = client.newWebSocket(request, webSocketListener)
+        working.set(true)
 
-        client.dispatcher.executorService.shutdown()
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            webSocket = Socket(socketIp, socketPort)
+            Log.d("OPI_CHANNEL_0", "channel opened")
+            handleOpenConnection(webSocket!!)
+        }
     }
 
     fun close() {
-        shouldReconnect.set(false)
+        working.set(false)
 
-        webSocket?.close(CLOSING_CODE, "Do not need connection anymore.")
+        webSocket?.close()
         webSocket = null
     }
 
     fun sendMessage(message: String, onResponse: (String) -> Unit) {
         onMessage = onResponse
-        webSocket?.send(message)
+        Log.d("OPI_CHANNEL_0", "SENT:\n$message")
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            Log.d("OPI_CHANNEL_0", "str: ${dataOutputStream?.toString()}")
+            dataOutputStream?.writeUTF(message)
+        }
     }
 
     fun setOnError(onError: (Throwable, String) -> Unit) {
         this.onError = onError
     }
 
-    private fun reconnect() {
-        close()
-        open()
-    }
+    private suspend fun handleOpenConnection(socket: Socket) = withContext(Dispatchers.IO) {
+        dataInputStream = DataInputStream(socket.getInputStream())
+        dataOutputStream = DataOutputStream(socket.getOutputStream())
 
-    private val webSocketListener = object : WebSocketListener() {
-        override fun onOpen(webSocket: okhttp3.WebSocket, response: Response) {
-            Timber.d("OPI_CHANNEL", "Channel $socketUrl connected")
+        while (working.get() && !socket.isClosed) {
+            try {
+                if (dataInputStream!!.available() > 0) {
+                    val message = dataInputStream!!.readUTF()
+                    Log.d("OPI_CHANNEL_0", "MSG RECEIVED:\n$message")
+                    onMessage?.invoke(message)
+                }
+            } catch (e: IOException) {
+                Log.d("OPI_CHANNEL_0", "channel closed ${e.message}")
+                dataInputStream!!.close()
+                dataOutputStream!!.close()
+                onError(e, "Socket message read failed")
+                return@withContext
+            }
         }
 
-        override fun onMessage(webSocket: okhttp3.WebSocket, text: String) {
-            onMessage?.let { it(text) }
-            onMessage = null
-        }
+        dataInputStream!!.close()
+        dataOutputStream!!.close()
 
-        override fun onClosing(webSocket: okhttp3.WebSocket, code: Int, reason: String) {
-            Timber.d("OPI_CHANNEL", "Channel $socketUrl closing")
-        }
-
-        override fun onClosed(webSocket: okhttp3.WebSocket, code: Int, reason: String) {
-            Timber.d("OPI_CHANNEL", "Channel $socketUrl closed\n $code: $reason")
-            if (shouldReconnect.get()) reconnect()
-        }
-
-        override fun onFailure(webSocket: okhttp3.WebSocket, t: Throwable, response: Response?) {
-            Timber.e("OPI_CHANNEL", "Channel $socketUrl failure\n $response", t)
-            onError(t, response.toString())
-            if (shouldReconnect.get()) reconnect()
-        }
-    }
-    companion object {
-        private const val CLOSING_CODE = 1000
+        dataInputStream = null
+        dataOutputStream = null
     }
 }
