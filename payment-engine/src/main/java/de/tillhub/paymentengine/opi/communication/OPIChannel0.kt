@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class OPIChannel0(
     private val socketIp: String,
     private val socketPort: Int,
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) {
 
     private var webSocket: Socket? = null
@@ -34,9 +35,9 @@ class OPIChannel0(
 
         working.set(true)
 
-        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+        coroutineScope.launch {
             webSocket = Socket(socketIp, socketPort)
-            Log.d("OPI_CHANNEL_0", "channel opened")
+            Log.d("OPI_CHANNEL_0", "channel opened ${webSocket!!.isConnected}")
             handleOpenConnection(webSocket!!)
         }
     }
@@ -51,7 +52,7 @@ class OPIChannel0(
     fun sendMessage(message: String, onResponse: (String) -> Unit) {
         onMessage = onResponse
         Log.d("OPI_CHANNEL_0", "SENT:\n$message")
-        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+        coroutineScope.launch {
             Log.d("OPI_CHANNEL_0", "str: ${dataOutputStream?.toString()}")
             dataOutputStream?.writeUTF(message)
         }

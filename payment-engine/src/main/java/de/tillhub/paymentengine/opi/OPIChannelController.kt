@@ -19,17 +19,12 @@ import de.tillhub.paymentengine.opi.data.CardServiceRequestType
 import de.tillhub.paymentengine.opi.data.DeviceResponse
 import de.tillhub.paymentengine.opi.data.TotalAmount
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.coroutineContext
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.util.UUID
 import kotlin.coroutines.CoroutineContext
@@ -42,6 +37,7 @@ interface OPIChannelController {
         currency: ISOAlphaCurrency
     ): Flow<OPIOperationStatus>
 
+    fun close()
     // TODO implement other methods
 }
 
@@ -72,7 +68,7 @@ class OPIChannelControllerImpl(
         currency: ISOAlphaCurrency
     ): Flow<OPIOperationStatus> = flow {
         emit(OPIOperationStatus.Pending.NoMessage)
-        val context = currentCoroutineContext()
+        val flowContext = currentCoroutineContext()
 
         if (initialized) {
             channel0.open()
@@ -84,7 +80,7 @@ class OPIChannelControllerImpl(
                     merchantReceipt = "",
                     rawData = "",
                     data = null
-                ), context)
+                ), flowContext)
             }
 
             handleChannel1Communication()
@@ -123,7 +119,7 @@ class OPIChannelControllerImpl(
                         merchantReceipt = "",
                         rawData = responseXml,
                         data = null
-                    ), context)
+                    ), flowContext)
                 } else {
                     // TODO emit errors
                 }
@@ -133,6 +129,12 @@ class OPIChannelControllerImpl(
 
         } else {
             emit(OPIOperationStatus.Error.NotInitialised)
+        }
+    }
+
+    override fun close() {
+        if (initialized) {
+            finishOperation()
         }
     }
 

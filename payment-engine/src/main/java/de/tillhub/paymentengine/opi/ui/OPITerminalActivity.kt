@@ -49,6 +49,11 @@ abstract class OPITerminalActivity : AppCompatActivity() {
         viewModel.init(config)
     }
 
+    override fun onDestroy() {
+        viewModel.onDestroy()
+        super.onDestroy()
+    }
+
     private fun finishWithSuccess(state: OPITerminalViewModel.State.Success) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(Activity.RESULT_OK, Intent().apply {

@@ -24,6 +24,10 @@ class OPITerminalViewModel(
         opiChannelController.init(terminal)
     }
 
+    fun onDestroy() {
+        opiChannelController.close()
+    }
+
     fun startPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
         viewModelScope.launch {
             opiChannelController.initiateCardPayment(amount, currency).collect { status ->

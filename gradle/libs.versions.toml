@@ -26,7 +26,6 @@ lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
 compose-bom = "2024.02.02"
 
-okhttp3-bom = "4.12.0"
 retrofit-simplexml = "2.10.0"
 
 [libraries]
@@ -66,8 +65,6 @@ common-codec = { group = "commons-codec", name = "commons-codec", version.ref = 
 simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref = "simpleXml" }
 
 # OPI
-okhttp3-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp3-bom" }
-okhttp3 = { group = "com.squareup.okhttp3", name = "okhttp" }
 retrofit-simplexml = { group = "com.squareup.retrofit2", name = "converter-simplexml", version.ref = "retrofit-simplexml" }
 
 # Unit testing
