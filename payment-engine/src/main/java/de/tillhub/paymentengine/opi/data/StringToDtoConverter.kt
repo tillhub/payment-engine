@@ -9,7 +9,8 @@ class StringToDtoConverter<T>(
     private val serializer: Serializer = OPISerializer()
 ) : Converter<String, T> {
 
-    override fun convert(value: String): T? = try {
+    @Suppress("TooGenericExceptionThrown", "TooGenericExceptionCaught")
+    override fun convert(value: String): T = try {
         val read: T = serializer.read(clazz, value, true)
             ?: throw IllegalStateException("Could not deserialize body as $clazz")
         read

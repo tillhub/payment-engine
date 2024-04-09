@@ -25,7 +25,7 @@ class OPIChannel1(
     private val dataOutputStreams = mutableListOf<DataOutputStream>()
 
     private var onMessage: (String) -> Unit = {}
-    private var onError: (Throwable, String) -> Unit = {_,_ -> }
+    private var onError: (Throwable, String) -> Unit = { _, _ -> }
 
     val isConnected: Boolean
         get() = webSocket != null && (webSocket?.isClosed?.not() ?: false)

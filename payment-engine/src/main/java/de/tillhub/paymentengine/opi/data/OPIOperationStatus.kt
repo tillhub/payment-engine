@@ -4,13 +4,17 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import java.time.Instant
 
 sealed class OPIOperationStatus {
-    sealed class Pending : OPIOperationStatus() {
-        data object NoMessage: Pending()
-        data class WithMessage(val message: String): Pending()
-    }
+    data object Idle : OPIOperationStatus()
+
+    data class Pending(
+        val date: Instant,
+        val messageLines: List<String> = emptyList(),
+        val customerReceipt: String? = null,
+        val merchantReceipt: String? = null,
+    ) : OPIOperationStatus()
 
     sealed class Error : OPIOperationStatus() {
-        data object NotInitialised: Error()
+        data object NotInitialised : Error()
         data class Result(
             val date: Instant,
             val customerReceipt: String,

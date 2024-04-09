@@ -120,7 +120,7 @@ data class CardValue(
     var expiryDate: ValueElement,
     @field:Element(name = "CardPAN")
     @param:Element(name = "CardPAN")
-    var CardPAN: ValueElement,
+    var cardPAN: ValueElement,
 )
 
 data class PrivateData(

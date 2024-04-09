@@ -11,7 +11,7 @@ import de.tillhub.paymentengine.helper.serializable
 import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
 
-class OPIPaymentActivity: OPITerminalActivity() {
+class OPIPaymentActivity : OPITerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
 

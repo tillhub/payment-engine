@@ -11,6 +11,7 @@ class DtoToStringConverter<T>(
     private val serializer: Serializer = OPISerializer()
 ) : Converter<T, String> {
 
+    @Suppress("TooGenericExceptionThrown", "TooGenericExceptionCaught")
     override fun convert(value: T): String {
         val buffer = Buffer()
         try {

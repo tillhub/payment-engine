@@ -58,9 +58,17 @@ data class TextLine(
     @param:Attribute(name = "Hidden", required = false)
     var hidden: Boolean = false,
 
-    @field:Text
-    @param:Text
-    var value: String
+    @field:Attribute(name = "Column", required = false)
+    @param:Attribute(name = "Column", required = false)
+    var column: Int? = null,
+
+    @field:Attribute(name = "Row", required = false)
+    @param:Attribute(name = "Row", required = false)
+    var row: Int? = null,
+
+    @field:Text(required = false)
+    @param:Text(required = false)
+    var value: String? = null
 )
 
 enum class DeviceType(val value: String) {
@@ -70,6 +78,7 @@ enum class DeviceType(val value: String) {
     PRINTER_RECEIPT("PrinterReceipt"),
     CASHIER_KEYBOARD("CashierKeyboard"),
     CASHIER_TERMINAL("CashierTerminal"),
+    UNKNOWN(""),
 }
 
 enum class DeviceRequestType(val value: String) {

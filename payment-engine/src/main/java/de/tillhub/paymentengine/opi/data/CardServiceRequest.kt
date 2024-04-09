@@ -73,5 +73,5 @@ enum class CardServiceRequestType(val value: String) {
     CARD_PAYMENT("CardPayment"),
     PAYMENT_REVERSAL("PaymentReversal"),
     PAYMENT_REFUND("PaymentRefund"),
-    RECONCILIATION("ReconciliationWithClosure");
+    RECONCILIATION("ReconciliationWithClosure")
 }

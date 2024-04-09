@@ -22,7 +22,7 @@ class OPIChannel0(
     private var working: AtomicBoolean = AtomicBoolean(false)
 
     private var onMessage: ((String) -> Unit)? = null
-    private var onError: (Throwable, String) -> Unit = {_,_ -> }
+    private var onError: (Throwable, String) -> Unit = { _, _ -> }
 
     private var dataOutputStream: DataOutputStream? = null
     private var dataInputStream: DataInputStream? = null

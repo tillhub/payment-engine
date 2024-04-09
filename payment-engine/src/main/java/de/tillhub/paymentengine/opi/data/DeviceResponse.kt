@@ -6,7 +6,6 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
-import org.simpleframework.xml.Text
 
 @Root(name = "DeviceResponse", strict = false)
 @NamespaceList(
@@ -29,6 +28,9 @@ data class DeviceResponse(
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
     var workstationID: String,
+    @field:Attribute(name = "OverallResult")
+    @param:Attribute(name = "OverallResult")
+    var overallResult: String,
 
     @field:Element(name = "Output", required = false)
     @param:ElementList(name = "Output", required = false)

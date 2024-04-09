@@ -8,7 +8,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-
 fun String.toInstant(
     dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
 ): Instant {

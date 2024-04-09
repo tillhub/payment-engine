@@ -5,11 +5,8 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
-import androidx.viewbinding.ViewBinding
 import de.lavego.sdk.PaymentProtocol
 import de.lavego.sdk.PaymentTerminalActivity
 import de.lavego.sdk.SaleConfiguration
