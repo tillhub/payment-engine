@@ -45,6 +45,10 @@ class OPIPaymentActivity : OPITerminalActivity() {
         binding.message.text = status
     }
 
+    override fun showOperationErrorStatus(status: String) {
+        binding.message.text = status
+    }
+
     override fun startOperation() {
         viewModel.startPayment(amount, currency)
     }

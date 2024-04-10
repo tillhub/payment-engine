@@ -39,8 +39,12 @@ class OPITerminalViewModel(
                             State.Pending.WithMessage(message)
                         }
                     }
-                    is OPIOperationStatus.Error -> State.Error(status)
-                    is OPIOperationStatus.Success -> State.Success(status)
+                    is OPIOperationStatus.Error -> State.OperationError(
+                        status,
+                        status.message
+                    )
+                    is OPIOperationStatus.Result.Error -> State.ResultError(status)
+                    is OPIOperationStatus.Result.Success -> State.ResultSuccess(status)
                 }
             }
         }
@@ -63,12 +67,17 @@ class OPITerminalViewModel(
             data class WithMessage(val message: String) : Pending()
         }
 
-        data class Error(
+        data class OperationError(
             val data: OPIOperationStatus.Error,
+            val message: String
         ) : State()
 
-        data class Success(
-            val data: OPIOperationStatus.Success
+        data class ResultError(
+            val data: OPIOperationStatus.Result.Error,
+        ) : State()
+
+        data class ResultSuccess(
+            val data: OPIOperationStatus.Result.Success
         ) : State()
     }
 }

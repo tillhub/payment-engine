@@ -13,34 +13,52 @@ sealed class OPIOperationStatus {
         val merchantReceipt: String? = null,
     ) : OPIOperationStatus()
 
-    sealed class Error : OPIOperationStatus() {
-        data object NotInitialised : Error()
-        data class Result(
-            val date: Instant,
-            val customerReceipt: String,
-            val merchantReceipt: String,
-            val rawData: String,
-            val data: CardServiceResponse?
-        ) : Error()
+    sealed class Error(open val message: String) : OPIOperationStatus() {
+        data object NotInitialised : Error("OPI Communication controller not initialised.")
+        data class Communication(
+            override val message: String
+        ) : Error(message)
+        data class DataHandling(
+            override val message: String,
+            val error: Throwable,
+        ) : Error(message)
+    }
 
-        fun toTerminalOperation() = when (this) {
-            NotInitialised -> TODO()
-            is Result -> TerminalOperationStatus.Error.OPI(
-                date, customerReceipt, merchantReceipt, rawData
-            )
+    sealed class Result : OPIOperationStatus() {
+        abstract val date: Instant
+        abstract val customerReceipt: String
+        abstract val merchantReceipt: String
+        abstract val rawData: String
+        abstract val data: CardServiceResponse?
+
+        abstract fun toTerminalOperation(): TerminalOperationStatus
+
+        data class Error(
+            override val date: Instant,
+            override val customerReceipt: String,
+            override val merchantReceipt: String,
+            override val rawData: String,
+            override val data: CardServiceResponse?
+        ) : Result() {
+            override fun toTerminalOperation() =
+                TerminalOperationStatus.Error.OPI(
+                    date, customerReceipt, merchantReceipt, rawData
+                )
+        }
+
+        data class Success(
+            override val date: Instant,
+            override val customerReceipt: String,
+            override val merchantReceipt: String,
+            override val rawData: String,
+            override val data: CardServiceResponse?
+        ) : Result() {
+            override fun toTerminalOperation() =
+                TerminalOperationStatus.Success.OPI(
+                    date, customerReceipt, merchantReceipt, rawData
+                )
         }
     }
 
-    data class Success(
-        val date: Instant,
-        val customerReceipt: String,
-        val merchantReceipt: String,
-        val rawData: String,
-        val data: CardServiceResponse?
-    ) : OPIOperationStatus() {
-        fun toTerminalOperation() =
-            TerminalOperationStatus.Success.OPI(
-                date, customerReceipt, merchantReceipt, rawData
-            )
-    }
+
 }

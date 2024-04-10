@@ -88,13 +88,7 @@ class OPIChannelControllerImpl(
             channel0.open()
             channel0.setOnError { err, message ->
                 // TODO
-                _operationState.value = OPIOperationStatus.Error.Result(
-                    date = terminalConfig.timeNow(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
-                    rawData = "",
-                    data = null
-                )
+                _operationState.value = OPIOperationStatus.Error.Communication(message)
             }
 
             handleChannel1Communication()
@@ -120,7 +114,10 @@ class OPIChannelControllerImpl(
             val xml = try {
                 requestConverter.convert(payload)
             } catch (e: Exception) {
-                // TODO handle exception
+                _operationState.value = OPIOperationStatus.Error.DataHandling(
+                    message = "Channel 0 request object could not be converted to XML.",
+                    error = e
+                )
                 return
             }
 
@@ -132,7 +129,10 @@ class OPIChannelControllerImpl(
                 val response = try {
                     responseConverter.convert(responseXml)
                 } catch (e: Exception) {
-                    // TODO handle exception
+                    _operationState.value = OPIOperationStatus.Error.DataHandling(
+                        message = "Channel 0 response XML could not be parsed.",
+                        error = e
+                    )
                     return@sendMessage
                 }
 
@@ -142,8 +142,7 @@ class OPIChannelControllerImpl(
                     ?.merchantReceipt.orEmpty()
 
                 if (response.overallResult == OverallResult.SUCCESS.value) {
-
-                    _operationState.value = OPIOperationStatus.Success(
+                    _operationState.value = OPIOperationStatus.Result.Success(
                         date = terminalConfig.timeNow(),
                         customerReceipt = customerReceipt,
                         merchantReceipt = merchantReceipt,
@@ -151,7 +150,13 @@ class OPIChannelControllerImpl(
                         data = null
                     )
                 } else {
-                    // TODO emit errors
+                    _operationState.value = OPIOperationStatus.Result.Error(
+                        date = terminalConfig.timeNow(),
+                        customerReceipt = customerReceipt,
+                        merchantReceipt = merchantReceipt,
+                        rawData = responseXml,
+                        data = null
+                    )
                 }
 
                 finishOperation()
@@ -184,14 +189,17 @@ class OPIChannelControllerImpl(
         val responseConverter = converterFactory.newDtoToStringConverter<DeviceResponse>()
 
         channel1.setOnError { err, message ->
-            // TODO
+            _operationState.value = OPIOperationStatus.Error.Communication(message)
         }
 
         channel1.setOnMessage { requestXml ->
             val request = try {
                 requestConverter.convert(requestXml)
             } catch (e: Exception) {
-                // TODO handle exception
+                _operationState.value = OPIOperationStatus.Error.DataHandling(
+                    message = "Channel 1 request XML could not be parsed.",
+                    error = e
+                )
                 return@setOnMessage
             }
             if (request.requestType == DeviceRequestType.OUTPUT.value) {
@@ -245,7 +253,10 @@ class OPIChannelControllerImpl(
                     }
                 ))
             } catch (e: Exception) {
-                // TODO handle exception
+                _operationState.value = OPIOperationStatus.Error.DataHandling(
+                    message = "Channel 1 response object could not be converted to XML.",
+                    error = e
+                )
                 return@setOnMessage
             }
 

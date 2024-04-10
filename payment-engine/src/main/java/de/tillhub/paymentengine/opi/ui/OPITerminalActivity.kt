@@ -30,7 +30,6 @@ abstract class OPITerminalActivity : AppCompatActivity() {
 
         viewModel.opiOperationState.observe(this) { state ->
             when (state) {
-                is OPITerminalViewModel.State.Error -> finishWithError(state)
                 OPITerminalViewModel.State.Idle -> {
                     showLoader()
                     startOperation()
@@ -39,7 +38,11 @@ abstract class OPITerminalActivity : AppCompatActivity() {
                 is OPITerminalViewModel.State.Pending.WithMessage -> {
                     showIntermediateStatus(state.message)
                 }
-                is OPITerminalViewModel.State.Success -> finishWithSuccess(state)
+                is OPITerminalViewModel.State.OperationError -> showOperationErrorStatus(
+                    state.message
+                )
+                is OPITerminalViewModel.State.ResultError -> finishWithError(state)
+                is OPITerminalViewModel.State.ResultSuccess -> finishWithSuccess(state)
             }
         }
     }
@@ -54,7 +57,7 @@ abstract class OPITerminalActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun finishWithSuccess(state: OPITerminalViewModel.State.Success) {
+    private fun finishWithSuccess(state: OPITerminalViewModel.State.ResultSuccess) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation())
@@ -62,7 +65,7 @@ abstract class OPITerminalActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun finishWithError(state: OPITerminalViewModel.State.Error) {
+    private fun finishWithError(state: OPITerminalViewModel.State.ResultError) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation())
@@ -73,5 +76,6 @@ abstract class OPITerminalActivity : AppCompatActivity() {
     abstract fun showLoader()
     abstract fun showInstructions()
     abstract fun showIntermediateStatus(status: String)
+    abstract fun showOperationErrorStatus(status: String)
     abstract fun startOperation()
 }
