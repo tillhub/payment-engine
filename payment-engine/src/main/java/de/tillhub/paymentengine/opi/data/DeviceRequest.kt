@@ -78,10 +78,21 @@ enum class DeviceType(val value: String) {
     PRINTER_RECEIPT("PrinterReceipt"),
     CASHIER_KEYBOARD("CashierKeyboard"),
     CASHIER_TERMINAL("CashierTerminal"),
-    UNKNOWN(""),
+    UNKNOWN("");
+
+    companion object {
+        fun find(value: String): DeviceType =
+            entries.find { it.value == value } ?: UNKNOWN
+    }
 }
 
 enum class DeviceRequestType(val value: String) {
     OUTPUT("Output"),
-    INPUT("Input")
+    INPUT("Input"),
+    UNKNOWN("");
+
+    companion object {
+        fun find(value: String): DeviceRequestType =
+            entries.find { it.value == value } ?: UNKNOWN
+    }
 }

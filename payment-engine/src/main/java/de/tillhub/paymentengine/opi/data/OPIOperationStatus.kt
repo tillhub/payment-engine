@@ -59,6 +59,4 @@ sealed class OPIOperationStatus {
                 )
         }
     }
-
-
 }

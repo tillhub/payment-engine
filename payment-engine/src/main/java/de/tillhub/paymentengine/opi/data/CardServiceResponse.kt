@@ -150,5 +150,10 @@ enum class OverallResult(val value: String) {
     VALIDATION_ERROR("ValidationError"),
     MISSING_MANDATORY_DATA("MissingMandatoryData"),
     UNKNOWN_CARD("UnknownCard"),
-    UNKNOWN("Unknown"),
+    UNKNOWN("Unknown");
+
+    companion object {
+        fun find(value: String): OverallResult =
+            entries.find { it.value == value } ?: UNKNOWN
+    }
 }
