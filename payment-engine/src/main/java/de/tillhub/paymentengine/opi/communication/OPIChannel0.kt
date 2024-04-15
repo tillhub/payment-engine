@@ -53,10 +53,15 @@ class OPIChannel0(
 
     fun sendMessage(message: String, onResponse: (String) -> Unit) {
         onMessage = onResponse
-        Log.d("OPI_CHANNEL_0", "SENT:\n$message")
+
+        val charset = Charsets.ISO_8859_1 // iOS uses this exclusively (the xml says something else ;-))
+        val msg = message.toByteArray(charset) // for now lets play safe - would really like to see utf8 capabilities though
+
+        Log.d("OPI_CHANNEL_0", "SENT:\n$msg")
         coroutineScope.launch {
             Log.d("OPI_CHANNEL_0", "str: ${dataOutputStream?.toString()}")
-            dataOutputStream?.writeUTF(message)
+            dataOutputStream?.writeInt(msg.size) // this needs additional checking for htonl() and friends
+            dataOutputStream?.write(msg)
             dataOutputStream?.flush()
         }
     }
