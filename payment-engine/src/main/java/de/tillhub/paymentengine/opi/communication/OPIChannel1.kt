@@ -12,6 +12,8 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
+import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
@@ -66,7 +68,10 @@ class OPIChannel1(
     fun sendMessage(message: String) {
         coroutineScope.launch {
             Log.d("OPI_CHANNEL_1", "SENT:\n$message")
-            dataOutputStreams.forEach { it.writeUTF(message) }
+            dataOutputStreams.forEach {
+                it.writeUTF(message)
+                it.flush()
+            }
         }
     }
 
@@ -86,11 +91,33 @@ class OPIChannel1(
 
         while (working.get() && !socket.isClosed) {
             try {
-                if (dataInputStream.available() > 0) {
-                    val message = dataInputStream.readUTF()
-                    Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
-                    onMessage(message)
+                val length = dataInputStream.available()
+                when {
+                    length == 4 -> { // byte length
+                        dataInputStream.readBytes().let { bytes ->
+                            val beInt = ByteBuffer.wrap(bytes).getInt()
+                            val leInt = ByteBuffer.wrap(bytes).order(
+                                java.nio.ByteOrder.LITTLE_ENDIAN
+                            ).getInt()
+
+                            Log.d("OPI_CHANNEL_1", "LENGTH RECEIVED:\nBE: $beInt\nLE: $leInt")
+                        }
+                    }
+                    length > 4 -> {
+                        val bytes = dataInputStream.readBytes()
+                        val message = String(bytes, StandardCharsets.UTF_8)
+
+                        Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
+                        onMessage(message)
+                    }
+                    else -> Unit
                 }
+
+//                if (dataInputStream.available() > 0) {
+//                    val message = dataInputStream.readUTF()
+//                    Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
+//                    onMessage(message)
+//                }
             } catch (e: IOException) {
                 dataInputStream.close()
                 dataOutputStream.close()

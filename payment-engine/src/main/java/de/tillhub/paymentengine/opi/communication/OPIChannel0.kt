@@ -10,6 +10,8 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.net.Socket
+import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel0(
@@ -55,6 +57,7 @@ class OPIChannel0(
         coroutineScope.launch {
             Log.d("OPI_CHANNEL_0", "str: ${dataOutputStream?.toString()}")
             dataOutputStream?.writeUTF(message)
+            dataOutputStream?.flush()
         }
     }
 
@@ -68,11 +71,33 @@ class OPIChannel0(
 
         while (working.get() && !socket.isClosed) {
             try {
-                if (dataInputStream!!.available() > 0) {
-                    val message = dataInputStream!!.readUTF()
-                    Log.d("OPI_CHANNEL_0", "MSG RECEIVED:\n$message")
-                    onMessage?.invoke(message)
+                val length = dataInputStream!!.available()
+                when {
+                    length == 4 -> { // byte length
+                        dataInputStream!!.readBytes().let { bytes ->
+                            val beInt = ByteBuffer.wrap(bytes).getInt()
+                            val leInt = ByteBuffer.wrap(bytes).order(
+                                java.nio.ByteOrder.LITTLE_ENDIAN
+                            ).getInt()
+
+                            Log.d("OPI_CHANNEL_0", "LENGTH RECEIVED:\nBE: $beInt\nLE: $leInt")
+                        }
+                    }
+                    length > 4 -> {
+                        val bytes = dataInputStream!!.readBytes()
+                        val message = String(bytes, StandardCharsets.UTF_8)
+
+                        Log.d("OPI_CHANNEL_0", "MSG RECEIVED:\n$message")
+                        onMessage?.invoke(message)
+                    }
+                    else -> Unit
                 }
+//                if (dataInputStream!!.available() > 0) {
+//                    val message = dataInputStream!!.readBytes()
+//
+//                    Log.d("OPI_CHANNEL_0", "MSG RECEIVED:\n$message")
+//                    onMessage?.invoke(message.toString())
+//                }
             } catch (e: IOException) {
                 Log.d("OPI_CHANNEL_0", "channel closed ${e.message}")
                 dataInputStream!!.close()
