@@ -62,9 +62,9 @@ class MainViewModel : ViewModel() {
     private fun setupTerminalConfigs(cardManager: CardManager) {
         cardManager.putTerminalConfig(Terminal.OPI(
             name = "opi",
-            ipAddress = "192.168.1.13",
-            port = 4002,
-            port2 = 4007
+            ipAddress = "192.168.2.73",
+            port = 20002,
+            port2 = 20007
         ))
 //        cardManager.putTerminalConfig(Terminal.ZVT(
 //            name = "zvt-local",
