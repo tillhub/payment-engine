@@ -173,8 +173,6 @@ class OPIChannelControllerImpl(
      * sets up the error and message listeners.
      */
     private fun handleChannel1Communication() {
-        channel1.open()
-
         val requestConverter = converterFactory.newStringToDtoConverter(
             clazz = DeviceRequest::class.java
         )
@@ -183,8 +181,9 @@ class OPIChannelControllerImpl(
         channel1.setOnError { err, message ->
             _operationState.value = OPIOperationStatus.Error.Communication(message)
         }
-
         channel1.setOnMessage(getC1MessageHandler(requestConverter, responseConverter))
+
+        channel1.open()
     }
 
     /**
@@ -286,11 +285,12 @@ class OPIChannelControllerImpl(
         requestConverter: DtoToStringConverter<T>,
         onResponse: (String) -> Unit
     ) {
-        channel0.open()
         channel0.setOnError { err, message ->
             // TODO
             _operationState.value = OPIOperationStatus.Error.Communication(message)
         }
+
+        channel0.open()
 
         val xml = try {
             requestConverter.convert(payload)
@@ -314,14 +314,15 @@ class OPIChannelControllerImpl(
 
     private fun generateRequestId(): String {
         val chars = "1234567890"
-        val salt = StringBuilder()
-        while (salt.length < 8) { // length of the random string.
-            salt.append(chars[(Random.nextFloat() * chars.length).toInt()])
+        val idBuilder = StringBuilder()
+        while (idBuilder.length < REQUEST_ID_LENGTH) {
+            idBuilder.append(chars[(Random.nextFloat() * chars.length).toInt()])
         }
-        return salt.toString()
+        return idBuilder.toString()
     }
 
     companion object {
         private const val CONNECTION_WAIT_DELAY = 100L
+        private const val REQUEST_ID_LENGTH = 8
     }
 }

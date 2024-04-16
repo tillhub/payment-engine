@@ -6,11 +6,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.net.Socket
-import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel0(
@@ -37,8 +37,14 @@ class OPIChannel0(
         working.set(true)
 
         coroutineScope.launch {
-            webSocket = Socket(socketIp, socketPort)
-            Log.d("OPI_CHANNEL_0", "channel opened ${webSocket!!.isConnected}")
+            try {
+                webSocket = Socket(socketIp, socketPort)
+            } catch (e: Exception) {
+                close()
+                onError(e, "Terminal not reachable!")
+                return@launch
+            }
+            Timber.tag("OPI_CHANNEL_0").d("channel opened ${webSocket!!.isConnected}")
             handleOpenConnection(webSocket!!)
         }
     }
@@ -53,10 +59,10 @@ class OPIChannel0(
     fun sendMessage(message: String, onResponse: (String) -> Unit) {
         onMessage = onResponse
 
-        val charset = Charsets.ISO_8859_1 // iOS uses this exclusively (the xml says something else ;-))
-        val msg = message.toByteArray(charset) // for now lets play safe - would really like to see utf8 capabilities though
+        // for now lets play safe - would really like to see utf8 capabilities though
+        val msg = message.toByteArray(CHARSET)
 
-        Log.d("OPI_CHANNEL_0", "SENT:\n$message")
+        Timber.tag("OPI_CHANNEL_0").d("SENT:\n$message")
         coroutineScope.launch {
             dataOutputStream?.writeInt(msg.size) // this needs additional checking for htonl() and friends
             dataOutputStream?.write(msg)
@@ -77,27 +83,27 @@ class OPIChannel0(
             try {
                 val length = dataInputStream!!.available()
                 when {
-                    length > 7 -> {
+                    length > PAYLOAD_SIZE_LIMIT -> {
                         val bytes = ByteArray(length)
                         dataInputStream!!.read(bytes)
 
-                        val sliced = bytes.slice(IntRange(4, length)).toByteArray()
-                        val message = String(sliced, Charsets.ISO_8859_1)
+                        val sliced = bytes.slice(IntRange(PAYLOAD_OFFSET, length-1)).toByteArray()
+                        val message = String(sliced, CHARSET)
 
-                        Log.d("OPI_CHANNEL_0", "MSG RECEIVED:\n$message")
+                        Timber.tag("OPI_CHANNEL_0").d("MSG RECEIVED:\n$message")
                         onMessage?.invoke(message)
                     }
                     length == 0 -> Unit
                     else -> {
                         val bytes = ByteArray(length)
                         dataInputStream!!.read(bytes)
-                        val message = String(bytes, Charsets.ISO_8859_1)
+                        val message = String(bytes, CHARSET)
 
-                        Log.d("OPI_CHANNEL_0", "MSG DATA:\n$bytes\n$message")
+                        Timber.tag("OPI_CHANNEL_0").d("MSG DATA:\n$bytes\n$message")
                     }
                 }
             } catch (e: IOException) {
-                Log.d("OPI_CHANNEL_0", "channel closed ${e.message}")
+                Timber.tag("OPI_CHANNEL_0").d("channel closed ${e.message}")
                 dataInputStream!!.close()
                 dataOutputStream!!.close()
                 onError(e, "Socket message read failed")
@@ -110,5 +116,13 @@ class OPIChannel0(
 
         dataInputStream = null
         dataOutputStream = null
+    }
+
+    companion object {
+        private const val PAYLOAD_SIZE_LIMIT = 7
+        private const val PAYLOAD_OFFSET = 4
+
+        // iOS uses this exclusively (the xml says something else ;-))
+        private val CHARSET = Charsets.ISO_8859_1
     }
 }

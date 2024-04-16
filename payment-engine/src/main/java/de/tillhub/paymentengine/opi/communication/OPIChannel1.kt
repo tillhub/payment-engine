@@ -7,12 +7,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
-import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
@@ -37,13 +37,13 @@ class OPIChannel1(
         working.set(true)
         coroutineScope.launch {
             webSocket = ServerSocket(socketPort)
-            Log.d("OPI_CHANNEL_1", "channel opened ${webSocket!!.isBound}")
+            Timber.tag("OPI_CHANNEL_1").d("channel opened ${webSocket!!.isBound}")
 
             while (working.get()) {
                 webSocket?.let {
                     try {
                         val socket = it.accept()
-                        Log.d("OPI_CHANNEL_1", "channel socket accepted ${socket!!.isBound}")
+                        Timber.tag("OPI_CHANNEL_1").d("channel socket accepted ${socket!!.isBound}")
                         launch {
                             handleOpenConnection(socket)
                         }
@@ -65,11 +65,11 @@ class OPIChannel1(
     }
 
     fun sendMessage(message: String) {
-        val charset = Charsets.ISO_8859_1 // iOS uses this exclusively (the xml says something else ;-))
-        val msg = message.toByteArray(charset) // for now lets play safe - would really like to see utf8 capabilities though
+        // for now lets play safe - would really like to see utf8 capabilities though
+        val msg = message.toByteArray(CHARSET)
 
         coroutineScope.launch {
-            Log.d("OPI_CHANNEL_1", "SENT:\n$message")
+            Timber.tag("OPI_CHANNEL_1").d("SENT:\n$message")
             dataOutputStreams.forEach {
                 it.writeInt(msg.size) // this needs additional checking for htonl() and friends
                 it.write(msg)
@@ -96,23 +96,23 @@ class OPIChannel1(
             try {
                 val length = dataInputStream.available()
                 when {
-                    length > 7 -> {
+                    length > PAYLOAD_SIZE_LIMIT -> {
                         val bytes = ByteArray(length)
                         dataInputStream.read(bytes)
 
-                        val sliced = bytes.slice(IntRange(4, length)).toByteArray()
-                        val message = String(sliced, Charsets.ISO_8859_1)
+                        val sliced = bytes.slice(IntRange(PAYLOAD_OFFSET, length-1)).toByteArray()
+                        val message = String(sliced, CHARSET)
 
-                        Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
+                        Timber.tag("OPI_CHANNEL_1").d("MSG RECEIVED:\n$message")
                         onMessage(message)
                     }
                     length == 0 -> Unit
                     else -> {
                         val bytes = ByteArray(length)
                         dataInputStream.read(bytes)
-                        val message = String(bytes, Charsets.ISO_8859_1)
+                        val message = String(bytes, CHARSET)
 
-                        Log.d("OPI_CHANNEL_1", "MSG DATA:\n$bytes\n$message")
+                        Timber.tag("OPI_CHANNEL_1").d("MSG DATA:\n$bytes\n$message")
                     }
                 }
             } catch (e: IOException) {
@@ -134,5 +134,10 @@ class OPIChannel1(
 
     companion object {
         private const val DEFAULT_DELAY = 50L
+        private const val PAYLOAD_SIZE_LIMIT = 7
+        private const val PAYLOAD_OFFSET = 4
+
+        // iOS uses this exclusively (the xml says something else ;-))
+        private val CHARSET = Charsets.ISO_8859_1
     }
 }
