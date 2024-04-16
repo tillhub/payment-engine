@@ -9,25 +9,24 @@ import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1
 import de.tillhub.paymentengine.opi.communication.OPIChannelFactory
 import de.tillhub.paymentengine.opi.data.CardServiceRequest
+import de.tillhub.paymentengine.opi.data.CardServiceRequestType
 import de.tillhub.paymentengine.opi.data.CardServiceResponse
 import de.tillhub.paymentengine.opi.data.ConverterFactory
 import de.tillhub.paymentengine.opi.data.DeviceRequest
-import de.tillhub.paymentengine.opi.data.OPIOperationStatus
-import de.tillhub.paymentengine.opi.data.OverallResult
-import de.tillhub.paymentengine.opi.data.PosData
-import de.tillhub.paymentengine.opi.data.CardServiceRequestType
 import de.tillhub.paymentengine.opi.data.DeviceRequestType
 import de.tillhub.paymentengine.opi.data.DeviceResponse
 import de.tillhub.paymentengine.opi.data.DeviceType
 import de.tillhub.paymentengine.opi.data.DtoToStringConverter
+import de.tillhub.paymentengine.opi.data.OPIOperationStatus
+import de.tillhub.paymentengine.opi.data.OverallResult
+import de.tillhub.paymentengine.opi.data.PosData
 import de.tillhub.paymentengine.opi.data.StringToDtoConverter
 import de.tillhub.paymentengine.opi.data.TotalAmount
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.lang.StringBuilder
 import java.math.BigDecimal
-import java.util.UUID
+import kotlin.random.Random
 
 interface OPIChannelController {
 
@@ -108,7 +107,7 @@ class OPIChannelControllerImpl(
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
-                requestId = UUID.randomUUID().toString(),
+                requestId = generateRequestId(),
                 requestType = CardServiceRequestType.CARD_PAYMENT.value,
                 workstationID = terminal.saleConfig.saleId,
                 posData = PosData(terminalConfig.timeNow().toISOString()),
@@ -311,6 +310,15 @@ class OPIChannelControllerImpl(
         }
 
         channel0.sendMessage(xml, onResponse)
+    }
+
+    private fun generateRequestId(): String {
+        val chars = "1234567890"
+        val salt = StringBuilder()
+        while (salt.length < 8) { // length of the random string.
+            salt.append(chars[(Random.nextFloat() * chars.length).toInt()])
+        }
+        return salt.toString()
     }
 
     companion object {

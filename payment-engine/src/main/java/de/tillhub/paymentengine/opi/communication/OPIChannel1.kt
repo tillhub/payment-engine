@@ -13,7 +13,6 @@ import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.ByteBuffer
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
@@ -66,10 +65,14 @@ class OPIChannel1(
     }
 
     fun sendMessage(message: String) {
+        val charset = Charsets.ISO_8859_1 // iOS uses this exclusively (the xml says something else ;-))
+        val msg = message.toByteArray(charset) // for now lets play safe - would really like to see utf8 capabilities though
+
         coroutineScope.launch {
             Log.d("OPI_CHANNEL_1", "SENT:\n$message")
             dataOutputStreams.forEach {
-                it.writeUTF(message)
+                it.writeInt(msg.size) // this needs additional checking for htonl() and friends
+                it.write(msg)
                 it.flush()
             }
         }
@@ -93,31 +96,35 @@ class OPIChannel1(
             try {
                 val length = dataInputStream.available()
                 when {
-                    length == 4 -> { // byte length
-                        dataInputStream.readBytes().let { bytes ->
-                            val beInt = ByteBuffer.wrap(bytes).getInt()
-                            val leInt = ByteBuffer.wrap(bytes).order(
-                                java.nio.ByteOrder.LITTLE_ENDIAN
-                            ).getInt()
+                    length == 7 -> { // byte length
+                        val bytes = ByteArray(length)
+                        dataInputStream.read(bytes)
 
-                            Log.d("OPI_CHANNEL_1", "LENGTH RECEIVED:\nBE: $beInt\nLE: $leInt")
-                        }
+                        val beInt = ByteBuffer.wrap(bytes).getInt()
+                        val leInt = ByteBuffer.wrap(bytes).order(
+                            java.nio.ByteOrder.LITTLE_ENDIAN
+                        ).getInt()
+
+                        Log.d("OPI_CHANNEL_1", "LENGTH RECEIVED:\nBE: $beInt\nLE: $leInt")
+
                     }
-                    length > 4 -> {
-                        val bytes = dataInputStream.readBytes()
-                        val message = String(bytes, StandardCharsets.UTF_8)
+                    length > 7 -> {
+                        val bytes = ByteArray(length)
+                        dataInputStream.read(bytes)
+                        val message = String(bytes, Charsets.ISO_8859_1)
 
                         Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
                         onMessage(message)
                     }
-                    else -> Unit
-                }
+                    length == 0 -> Unit
+                    else -> {
+                        val bytes = ByteArray(length)
+                        dataInputStream.read(bytes)
+                        val message = String(bytes, Charsets.ISO_8859_1)
 
-//                if (dataInputStream.available() > 0) {
-//                    val message = dataInputStream.readUTF()
-//                    Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
-//                    onMessage(message)
-//                }
+                        Log.d("OPI_CHANNEL_1", "MSG DAT:\n$bytes\n$message")
+                    }
+                }
             } catch (e: IOException) {
                 dataInputStream.close()
                 dataOutputStream.close()
@@ -133,6 +140,6 @@ class OPIChannel1(
     }
 
     companion object {
-        private const val DEFAULT_DELAY = 500L
+        private const val DEFAULT_DELAY = 50L
     }
 }
