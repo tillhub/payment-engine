@@ -32,7 +32,7 @@ data class DeviceResponse(
     @param:Attribute(name = "OverallResult")
     var overallResult: String,
 
-    @field:Element(name = "Output", required = false)
-    @param:ElementList(name = "Output", required = false)
+    @field:ElementList(inline = true, required = false)
+    @param:ElementList(inline = true, required = false)
     var output: List<Output>? = null,
 )

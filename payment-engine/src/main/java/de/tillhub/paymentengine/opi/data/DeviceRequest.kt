@@ -17,9 +17,6 @@ data class DeviceRequest(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
     var applicationSender: String,
-    @field:Attribute(name = "POPID")
-    @param:Attribute(name = "POPID")
-    var popId: String,
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
     var requestId: String,
@@ -30,11 +27,12 @@ data class DeviceRequest(
     @param:Attribute(name = "WorkstationID")
     var workstationID: String,
 
-    @field:Element(name = "Output", required = false)
-    @param:ElementList(name = "Output", required = false)
+    @field:ElementList(inline = true, required = false)
+    @param:ElementList(inline = true, required = false)
     var output: List<Output>? = null,
 )
 
+@Root(name = "Output", strict = false)
 data class Output(
     @field:Attribute(name = "OutDeviceTarget")
     @param:Attribute(name = "OutDeviceTarget")
@@ -44,11 +42,12 @@ data class Output(
     @param:Attribute(name = "OutResult", required = false)
     var outResult: String? = null,
 
-    @field:ElementList(name = "TextLine", required = false)
-    @param:ElementList(name = "TextLine", required = false)
+    @field:ElementList(inline = true, required = false)
+    @param:ElementList(inline = true, required = false)
     var textLines: List<TextLine>? = null
 )
 
+@Root(name = "TextLine", strict = false)
 data class TextLine(
     @field:Attribute(name = "TimeOut", required = false)
     @param:Attribute(name = "TimeOut", required = false)

@@ -42,12 +42,12 @@ class OPIChannel1(
             while (working.get()) {
                 webSocket?.let {
                     try {
-                        it.accept().use {
-                            Log.d("OPI_CHANNEL_1", "channel opened ${webSocket!!.isBound}")
-                            launch {
-                                handleOpenConnection(it)
-                            }
+                        val socket = it.accept()
+                        Log.d("OPI_CHANNEL_1", "channel socket accepted ${socket!!.isBound}")
+                        launch {
+                            handleOpenConnection(socket)
                         }
+
                         delay(DEFAULT_DELAY)
                     } catch (e: IOException) {
                         onError(e, "Socket accept failed")
@@ -122,12 +122,13 @@ class OPIChannel1(
                         dataInputStream.read(bytes)
                         val message = String(bytes, Charsets.ISO_8859_1)
 
-                        Log.d("OPI_CHANNEL_1", "MSG DAT:\n$bytes\n$message")
+                        Log.d("OPI_CHANNEL_1", "MSG DATA:\n$bytes\n$message")
                     }
                 }
             } catch (e: IOException) {
                 dataInputStream.close()
                 dataOutputStream.close()
+                socket.close()
                 onError(e, "Socket message read failed")
                 return@withContext
             }
@@ -137,6 +138,8 @@ class OPIChannel1(
 
         dataInputStream.close()
         dataOutputStream.close()
+
+        socket.close()
     }
 
     companion object {

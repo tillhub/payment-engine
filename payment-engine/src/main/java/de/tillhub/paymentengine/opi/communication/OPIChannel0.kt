@@ -103,7 +103,7 @@ class OPIChannel0(
                         dataInputStream!!.read(bytes)
                         val message = String(bytes, Charsets.ISO_8859_1)
 
-                        Log.d("OPI_CHANNEL_0", "MSG DAT:\n$bytes\n$message")
+                        Log.d("OPI_CHANNEL_0", "MSG DATA:\n$bytes\n$message")
                     }
                 }
             } catch (e: IOException) {

@@ -252,7 +252,7 @@ class OPIChannelControllerImpl(
             try {
                 responseConverter.convert(DeviceResponse(
                     applicationSender = terminal.saleConfig.applicationName,
-                    popId = request.popId,
+                    popId = terminal.saleConfig.poiId,
                     requestId = request.requestId,
                     requestType = request.requestType,
                     workstationID = request.requestId,
