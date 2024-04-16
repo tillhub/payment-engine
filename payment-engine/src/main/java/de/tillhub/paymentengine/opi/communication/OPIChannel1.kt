@@ -96,22 +96,12 @@ class OPIChannel1(
             try {
                 val length = dataInputStream.available()
                 when {
-                    length == 7 -> { // byte length
-                        val bytes = ByteArray(length)
-                        dataInputStream.read(bytes)
-
-                        val beInt = ByteBuffer.wrap(bytes).getInt()
-                        val leInt = ByteBuffer.wrap(bytes).order(
-                            java.nio.ByteOrder.LITTLE_ENDIAN
-                        ).getInt()
-
-                        Log.d("OPI_CHANNEL_1", "LENGTH RECEIVED:\nBE: $beInt\nLE: $leInt")
-
-                    }
                     length > 7 -> {
                         val bytes = ByteArray(length)
                         dataInputStream.read(bytes)
-                        val message = String(bytes, Charsets.ISO_8859_1)
+
+                        val sliced = bytes.slice(IntRange(4, length)).toByteArray()
+                        val message = String(sliced, Charsets.ISO_8859_1)
 
                         Log.d("OPI_CHANNEL_1", "MSG RECEIVED:\n$message")
                         onMessage(message)
