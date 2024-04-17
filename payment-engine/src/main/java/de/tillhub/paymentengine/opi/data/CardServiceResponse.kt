@@ -13,12 +13,6 @@ import org.simpleframework.xml.Text
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
 data class CardServiceResponse(
-    @field:Attribute(name = "ApplicationSender")
-    @param:Attribute(name = "ApplicationSender")
-    var applicationSender: String,
-    @field:Attribute(name = "POPID")
-    @param:Attribute(name = "POPID")
-    var popId: String,
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
     var requestId: String,
@@ -88,15 +82,15 @@ data class Authorisation(
     @field:Attribute(name = "ActionCode")
     @param:Attribute(name = "ActionCode")
     var actionCode: String,
-    @field:Attribute(name = "ReturnCode")
-    @param:Attribute(name = "ReturnCode")
-    var returnCode: String,
+    @field:Attribute(name = "ReturnCode", required = false)
+    @param:Attribute(name = "ReturnCode", required = false)
+    var returnCode: String? = null,
     @field:Attribute(name = "CardCircuit")
     @param:Attribute(name = "CardCircuit")
     var cardCircuit: String,
-    @field:Attribute(name = "ApprovalCode")
-    @param:Attribute(name = "ApprovalCode")
-    var approvalCode: String,
+    @field:Attribute(name = "ApprovalCode", required = false)
+    @param:Attribute(name = "ApprovalCode", required = false)
+    var approvalCode: String? = null,
     @field:Attribute(name = "ReceiptNumber")
     @param:Attribute(name = "ReceiptNumber")
     var receiptNumber: String,
@@ -105,28 +99,37 @@ data class Authorisation(
     var authorisationType: String,
 )
 
+@Root(name = "CardDetails", strict = false)
 data class CardDetails(
     @field:Element(name = "ExpiryDate")
     @param:Element(name = "ExpiryDate")
     var expiryDate: ValueElement
 )
 
+@Root(name = "CardValue", strict = false)
 data class CardValue(
-    @field:Element(name = "CardCircuit")
+    @field:Element(name = "CardCircuit", required = false)
     @param:Element(name = "CardCircuit")
-    var cardCircuit: ValueElement,
-    @field:Element(name = "ExpiryDate")
-    @param:Element(name = "ExpiryDate")
-    var expiryDate: ValueElement,
-    @field:Element(name = "CardPAN")
-    @param:Element(name = "CardPAN")
-    var cardPAN: ValueElement,
+    var cardCircuit: ValueElement? = null,
+    @field:Element(name = "ExpiryDate", required = false)
+    @param:Element(name = "ExpiryDate", required = false)
+    var expiryDate: ValueElement? = null,
+    @field:Element(name = "CardPAN", required = false)
+    @param:Element(name = "CardPAN", required = false)
+    var cardPAN: ValueElement? = null,
 )
 
+@Root(name = "PrivateData", strict = false)
 data class PrivateData(
-    @field:Element(name = "CardHolderAuthentication")
-    @param:Element(name = "CardHolderAuthentication")
-    var cardHolderAuthentication: ValueElement,
+    @field:Element(name = "CardHolderAuthentication", required = false)
+    @param:Element(name = "CardHolderAuthentication", required = false)
+    var cardHolderAuthentication: ValueElement? = null,
+    @field:Element(name = "CardTechnologyType", required = false)
+    @param:Element(name = "CardTechnologyType", required = false)
+    var cardTechnologyType: ValueElement? = null,
+    @field:Element(name = "CardVerificationMethod", required = false)
+    @param:Element(name = "CardVerificationMethod", required = false)
+    var cardVerificationMethod: ValueElement? = null,
 )
 
 data class ValueElement(

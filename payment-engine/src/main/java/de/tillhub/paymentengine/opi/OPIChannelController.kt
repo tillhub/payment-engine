@@ -128,6 +128,7 @@ class OPIChannelControllerImpl(
                         message = "Channel 0 response XML could not be parsed.",
                         error = e
                     )
+                    e.printStackTrace()
                     return@handleChannel0Communication
                 }
 
@@ -227,14 +228,18 @@ class OPIChannelControllerImpl(
                         // PRINTER entries are build into merchantReceipt
                         DeviceType.PRINTER -> currentState.copy(
                             merchantReceipt = StringBuilder().apply {
-                                output.textLines?.forEach { appendLine(it.value) }
+                                output.textLines?.forEach {
+                                    appendLine(it.value.orEmpty())
+                                }
                             }.toString()
                         )
 
                         // PRINTER_RECEIPT entries are build into customerReceipt
                         DeviceType.PRINTER_RECEIPT -> currentState.copy(
                             customerReceipt = StringBuilder().apply {
-                                output.textLines?.forEach { appendLine(it.value) }
+                                output.textLines?.forEach {
+                                    appendLine(it.value.orEmpty())
+                                }
                             }.toString()
                         )
 

@@ -13,6 +13,7 @@ import java.io.DataOutputStream
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketException
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
@@ -23,7 +24,7 @@ class OPIChannel1(
     private var webSocket: ServerSocket? = null
     private var working: AtomicBoolean = AtomicBoolean(false)
 
-    private val dataOutputStreams = mutableListOf<DataOutputStream>()
+    private var dataOutputStream: DataOutputStream? = null
 
     private var onMessage: (String) -> Unit = {}
     private var onError: (Throwable, String) -> Unit = { _, _ -> }
@@ -70,10 +71,12 @@ class OPIChannel1(
 
         coroutineScope.launch {
             Timber.tag("OPI_CHANNEL_1").d("SENT:\n$message")
-            dataOutputStreams.forEach {
-                it.writeInt(msg.size) // this needs additional checking for htonl() and friends
-                it.write(msg)
-                it.flush()
+            dataOutputStream?.let {
+                try {
+                    it.writeInt(msg.size) // this needs additional checking for htonl() and friends
+                    it.write(msg)
+                    it.flush()
+                } catch (_: SocketException) {}
             }
         }
     }
@@ -88,9 +91,7 @@ class OPIChannel1(
 
     private suspend fun handleOpenConnection(socket: Socket) = withContext(Dispatchers.IO) {
         val dataInputStream = DataInputStream(socket.getInputStream())
-        val dataOutputStream = DataOutputStream(socket.getOutputStream())
-
-        dataOutputStreams.add(dataOutputStream)
+        dataOutputStream = DataOutputStream(socket.getOutputStream())
 
         while (working.get() && !socket.isClosed) {
             try {
@@ -117,17 +118,16 @@ class OPIChannel1(
                 }
             } catch (e: IOException) {
                 dataInputStream.close()
-                dataOutputStream.close()
+                dataOutputStream?.close()
                 socket.close()
                 onError(e, "Socket message read failed")
                 return@withContext
             }
         }
 
-        dataOutputStreams.remove(dataOutputStream)
-
         dataInputStream.close()
-        dataOutputStream.close()
+        dataOutputStream?.close()
+        dataOutputStream = null
 
         socket.close()
     }
