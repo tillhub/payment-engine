@@ -47,13 +47,14 @@ data class CardServiceResponse(
     var privateData: PrivateData? = null,
 )
 
+@Root(name = "Terminal", strict = false)
 data class Terminal(
-    @field:Attribute(name = "STAN")
-    @param:Attribute(name = "STAN")
-    var stan: String,
-    @field:Attribute(name = "TerminalID")
-    @param:Attribute(name = "TerminalID")
-    var terminalId: String,
+    @field:Attribute(name = "STAN", required = false)
+    @param:Attribute(name = "STAN", required = false)
+    var stan: String? = null,
+    @field:Attribute(name = "TerminalID", required = false)
+    @param:Attribute(name = "TerminalID", required = false)
+    var terminalId: String? = null,
 )
 
 data class Tender(
@@ -130,6 +131,12 @@ data class PrivateData(
     @field:Element(name = "CardVerificationMethod", required = false)
     @param:Element(name = "CardVerificationMethod", required = false)
     var cardVerificationMethod: ValueElement? = null,
+    @field:Element(name = "SoftwareVersion", required = false)
+    @param:Element(name = "SoftwareVersion", required = false)
+    var softwareVersion: ValueElement? = null,
+    @field:Element(name = "ErrorCode", required = false)
+    @param:Element(name = "ErrorCode", required = false)
+    var errorCode: ValueElement? = null,
 )
 
 data class ValueElement(

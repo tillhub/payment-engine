@@ -29,7 +29,7 @@ class OPITerminalViewModel(
             opiChannelController.operationState.collect { status ->
                 _opiOperationState.value = when (status) {
                     OPIOperationStatus.Idle -> State.Idle
-                    is OPIOperationStatus.Pending -> {
+                    is OPIOperationStatus.Pending.Operation -> {
                         if (status.messageLines.isEmpty()) {
                             State.Pending.NoMessage
                         } else {
@@ -39,12 +39,19 @@ class OPITerminalViewModel(
                             State.Pending.WithMessage(message)
                         }
                     }
+                    is OPIOperationStatus.Pending.Login -> State.Pending.Login
                     is OPIOperationStatus.Error -> State.OperationError(
                         status,
                         status.message
                     )
                     is OPIOperationStatus.Result.Error -> State.ResultError(status)
-                    is OPIOperationStatus.Result.Success -> State.ResultSuccess(status)
+                    is OPIOperationStatus.Result.Success -> {
+                        if (_opiOperationState.value is State.Pending.Login) {
+                            State.LoggedIn
+                        } else {
+                            State.ResultSuccess(status)
+                        }
+                    }
                 }
             }
         }
@@ -52,6 +59,12 @@ class OPITerminalViewModel(
 
     fun onDestroy() {
         opiChannelController.close()
+    }
+
+    fun loginToTerminal() {
+        viewModelScope.launch {
+            opiChannelController.login()
+        }
     }
 
     fun startPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
@@ -62,9 +75,13 @@ class OPITerminalViewModel(
 
     sealed class State {
         data object Idle : State()
+
+        data object LoggedIn : State()
+
         sealed class Pending : State() {
             data object NoMessage : Pending()
             data class WithMessage(val message: String) : Pending()
+            data object Login : Pending()
         }
 
         data class OperationError(

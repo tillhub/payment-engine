@@ -62,7 +62,7 @@ class MainViewModel : ViewModel() {
     private fun setupTerminalConfigs(cardManager: CardManager) {
         cardManager.putTerminalConfig(Terminal.OPI(
             name = "opi",
-            ipAddress = "192.168.2.73",
+            ipAddress = "192.168.1.7",
             port = 20002,
             port2 = 20007
         ))

@@ -9,7 +9,7 @@ import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1
 import de.tillhub.paymentengine.opi.communication.OPIChannelFactory
 import de.tillhub.paymentengine.opi.data.CardServiceRequest
-import de.tillhub.paymentengine.opi.data.CardServiceRequestType
+import de.tillhub.paymentengine.opi.data.ServiceRequestType
 import de.tillhub.paymentengine.opi.data.CardServiceResponse
 import de.tillhub.paymentengine.opi.data.ConverterFactory
 import de.tillhub.paymentengine.opi.data.DeviceRequest
@@ -20,6 +20,8 @@ import de.tillhub.paymentengine.opi.data.DtoToStringConverter
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import de.tillhub.paymentengine.opi.data.OverallResult
 import de.tillhub.paymentengine.opi.data.PosData
+import de.tillhub.paymentengine.opi.data.ServiceRequest
+import de.tillhub.paymentengine.opi.data.ServiceResponse
 import de.tillhub.paymentengine.opi.data.StringToDtoConverter
 import de.tillhub.paymentengine.opi.data.TotalAmount
 import kotlinx.coroutines.delay
@@ -34,6 +36,8 @@ interface OPIChannelController {
 
     fun init(terminal: Terminal.OPI)
     fun close()
+
+    suspend fun login()
 
     suspend fun initiateCardPayment(
         amount: BigDecimal,
@@ -84,6 +88,70 @@ class OPIChannelControllerImpl(
         }
     }
 
+    override suspend fun login() {
+        // If the state is not Idle, then we should drop the new request
+        if (_operationState.value !is OPIOperationStatus.Idle) return
+
+        _operationState.value = OPIOperationStatus.Pending.Login
+
+        // checks if the controller is initialized
+        if (initialized) {
+            val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = ServiceResponse::class.java
+            )
+
+            val payload = ServiceRequest(
+                applicationSender = terminal.saleConfig.applicationName,
+                popId = terminal.saleConfig.poiId,
+                requestId = generateRequestId(),
+                requestType = ServiceRequestType.LOGIN.value,
+                workstationID = terminal.saleConfig.saleId,
+                posData = PosData(terminalConfig.timeNow().toISOString()),
+            )
+
+            // setup C0 communication
+            handleChannel0Communication(payload, requestConverter) { responseXml ->
+                val response = try {
+                    responseConverter.convert(responseXml)
+                } catch (e: Exception) {
+                    // In case of an exception when converting the XML to the DTO we
+                    // set the state to `Error.DataHandling`.
+                    _operationState.value = OPIOperationStatus.Error.DataHandling(
+                        message = "Channel 0 response XML could not be parsed.",
+                        error = e
+                    )
+                    e.printStackTrace()
+                    return@handleChannel0Communication
+                }
+
+                _operationState.value = when (OverallResult.find(response.overallResult)) {
+                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
+                        date = terminalConfig.timeNow(),
+                        customerReceipt = "",
+                        merchantReceipt = "",
+                        rawData = responseXml,
+                        data = null
+                    )
+
+                    else -> OPIOperationStatus.Result.Error(
+                        date = terminalConfig.timeNow(),
+                        customerReceipt = "",
+                        merchantReceipt = "",
+                        rawData = responseXml,
+                        data = null
+                    )
+                }
+
+                // as per protocol, both channels are closed after C0 response
+                finishOperation()
+            }
+        } else {
+            // in case the controller is not initialized set the state to `Error.NotInitialised`
+            _operationState.value = OPIOperationStatus.Error.NotInitialised
+        }
+    }
+
     override suspend fun initiateCardPayment(
         amount: BigDecimal,
         currency: ISOAlphaCurrency
@@ -91,7 +159,7 @@ class OPIChannelControllerImpl(
         // If the state is not Idle, then we should drop the new request
         if (_operationState.value !is OPIOperationStatus.Idle) return
 
-        _operationState.value = OPIOperationStatus.Pending(terminalConfig.timeNow())
+        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
         // checks if the controller is initialized
         if (initialized) {
@@ -108,7 +176,7 @@ class OPIChannelControllerImpl(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
                 requestId = generateRequestId(),
-                requestType = CardServiceRequestType.CARD_PAYMENT.value,
+                requestType = ServiceRequestType.CARD_PAYMENT.value,
                 workstationID = terminal.saleConfig.saleId,
                 posData = PosData(terminalConfig.timeNow().toISOString()),
                 totalAmount = TotalAmount(
@@ -128,13 +196,14 @@ class OPIChannelControllerImpl(
                         message = "Channel 0 response XML could not be parsed.",
                         error = e
                     )
-                    e.printStackTrace()
                     return@handleChannel0Communication
                 }
 
-                val customerReceipt = (_operationState.value as? OPIOperationStatus.Pending)
+                val customerReceipt =
+                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
                     ?.customerReceipt.orEmpty()
-                val merchantReceipt = (_operationState.value as? OPIOperationStatus.Pending)
+                val merchantReceipt =
+                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
                     ?.merchantReceipt.orEmpty()
 
                 _operationState.value = when (OverallResult.find(response.overallResult)) {
@@ -143,14 +212,14 @@ class OPIChannelControllerImpl(
                         customerReceipt = customerReceipt,
                         merchantReceipt = merchantReceipt,
                         rawData = responseXml,
-                        data = null
+                        data = response
                     )
                     else -> OPIOperationStatus.Result.Error(
                         date = terminalConfig.timeNow(),
                         customerReceipt = customerReceipt,
                         merchantReceipt = merchantReceipt,
                         rawData = responseXml,
-                        data = null
+                        data = response
                     )
                 }
 
@@ -210,8 +279,9 @@ class OPIChannelControllerImpl(
         }?.let { request ->
             when (DeviceRequestType.find(request.requestType)) {
                 DeviceRequestType.OUTPUT -> request.output?.forEach { output ->
-                    val currentState = (_operationState.value as? OPIOperationStatus.Pending)
-                        ?: OPIOperationStatus.Pending(terminalConfig.timeNow())
+                    val currentState =
+                        (_operationState.value as? OPIOperationStatus.Pending.Operation)
+                        ?: OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
                     // For every Output in the C1 request we update the Pending state.
                     _operationState.value = when (DeviceType.find(output.outDeviceTarget)) {

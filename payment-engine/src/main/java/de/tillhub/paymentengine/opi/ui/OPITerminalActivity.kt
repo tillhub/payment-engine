@@ -32,12 +32,14 @@ abstract class OPITerminalActivity : AppCompatActivity() {
             when (state) {
                 OPITerminalViewModel.State.Idle -> {
                     showLoader()
-                    startOperation()
+                    viewModel.loginToTerminal()
                 }
                 OPITerminalViewModel.State.Pending.NoMessage -> showInstructions()
                 is OPITerminalViewModel.State.Pending.WithMessage -> {
                     showIntermediateStatus(state.message)
                 }
+                OPITerminalViewModel.State.Pending.Login -> Unit
+                OPITerminalViewModel.State.LoggedIn -> startOperation()
                 is OPITerminalViewModel.State.OperationError -> showOperationErrorStatus(
                     state.message
                 )

@@ -6,12 +6,15 @@ import java.time.Instant
 sealed class OPIOperationStatus {
     data object Idle : OPIOperationStatus()
 
-    data class Pending(
-        val date: Instant,
-        val messageLines: List<String> = emptyList(),
-        val customerReceipt: String? = null,
-        val merchantReceipt: String? = null,
-    ) : OPIOperationStatus()
+    sealed class Pending : OPIOperationStatus() {
+        data object Login : Pending()
+        data class Operation(
+            val date: Instant,
+            val messageLines: List<String> = emptyList(),
+            val customerReceipt: String? = null,
+            val merchantReceipt: String? = null,
+        ) : Pending()
+    }
 
     sealed class Error(open val message: String) : OPIOperationStatus() {
         data object NotInitialised : Error("OPI Communication controller not initialised.")

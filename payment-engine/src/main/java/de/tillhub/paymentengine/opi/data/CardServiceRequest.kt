@@ -69,9 +69,10 @@ data class OriginalTransaction(
     var stan: String,
 )
 
-enum class CardServiceRequestType(val value: String) {
+enum class ServiceRequestType(val value: String) {
     CARD_PAYMENT("CardPayment"),
     PAYMENT_REVERSAL("PaymentReversal"),
     PAYMENT_REFUND("PaymentRefund"),
-    RECONCILIATION("ReconciliationWithClosure")
+    RECONCILIATION("ReconciliationWithClosure"),
+    LOGIN("Login"),
 }
