@@ -40,18 +40,13 @@ class OPITerminalViewModel(
                         }
                     }
                     is OPIOperationStatus.Pending.Login -> State.Pending.Login
+                    OPIOperationStatus.LoggedIn -> State.LoggedIn
                     is OPIOperationStatus.Error -> State.OperationError(
                         status,
                         status.message
                     )
                     is OPIOperationStatus.Result.Error -> State.ResultError(status)
-                    is OPIOperationStatus.Result.Success -> {
-                        if (_opiOperationState.value is State.Pending.Login) {
-                            State.LoggedIn
-                        } else {
-                            State.ResultSuccess(status)
-                        }
-                    }
+                    is OPIOperationStatus.Result.Success -> State.ResultSuccess(status)
                 }
             }
         }

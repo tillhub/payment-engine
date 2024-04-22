@@ -16,6 +16,8 @@ sealed class OPIOperationStatus {
         ) : Pending()
     }
 
+    data object LoggedIn : OPIOperationStatus()
+
     sealed class Error(open val message: String) : OPIOperationStatus() {
         data object NotInitialised : Error("OPI Communication controller not initialised.")
         data class Communication(

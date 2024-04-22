@@ -126,13 +126,7 @@ class OPIChannelControllerImpl(
                 }
 
                 _operationState.value = when (OverallResult.find(response.overallResult)) {
-                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = "",
-                        merchantReceipt = "",
-                        rawData = responseXml,
-                        data = null
-                    )
+                    OverallResult.SUCCESS -> OPIOperationStatus.LoggedIn
 
                     else -> OPIOperationStatus.Result.Error(
                         date = terminalConfig.timeNow(),
@@ -156,8 +150,8 @@ class OPIChannelControllerImpl(
         amount: BigDecimal,
         currency: ISOAlphaCurrency
     ) {
-        // If the state is not Idle, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.Idle) return
+        // If the state is not LoggedIn, then we should drop the new request
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
 
         _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
