@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.opi.communication
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,6 +13,7 @@ import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
+import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
@@ -68,13 +68,14 @@ class OPIChannel1(
     fun sendMessage(message: String) {
         // for now lets play safe - would really like to see utf8 capabilities though
         val msg = message.toByteArray(CHARSET)
+        // this needs additional checking for htonl() and friends
+        val msgSize = ByteBuffer.allocate(INT_BYTE_LENGTH).putInt(msg.size).array()
 
         coroutineScope.launch {
             Timber.tag("OPI_CHANNEL_1").d("SENT:\n$message")
             dataOutputStream?.let {
                 try {
-                    it.writeInt(msg.size) // this needs additional checking for htonl() and friends
-                    it.write(msg)
+                    it.write(msgSize + msg)
                     it.flush()
                 } catch (_: SocketException) {}
             }
@@ -101,7 +102,7 @@ class OPIChannel1(
                         val bytes = ByteArray(length)
                         dataInputStream.read(bytes)
 
-                        val sliced = bytes.slice(IntRange(PAYLOAD_OFFSET, length-1)).toByteArray()
+                        val sliced = bytes.slice(IntRange(INT_BYTE_LENGTH, length-1)).toByteArray()
                         val message = String(sliced, CHARSET)
 
                         Timber.tag("OPI_CHANNEL_1").d("MSG RECEIVED:\n$message")
@@ -135,7 +136,7 @@ class OPIChannel1(
     companion object {
         private const val DEFAULT_DELAY = 50L
         private const val PAYLOAD_SIZE_LIMIT = 7
-        private const val PAYLOAD_OFFSET = 4
+        private const val INT_BYTE_LENGTH = 4
 
         // iOS uses this exclusively (the xml says something else ;-))
         private val CHARSET = Charsets.ISO_8859_1

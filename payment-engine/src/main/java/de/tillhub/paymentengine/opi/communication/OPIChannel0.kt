@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.opi.communication
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -11,6 +10,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.net.Socket
+import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel0(
@@ -61,11 +61,12 @@ class OPIChannel0(
 
         // for now lets play safe - would really like to see utf8 capabilities though
         val msg = message.toByteArray(CHARSET)
+        // this needs additional checking for htonl() and friends
+        val msgSize = ByteBuffer.allocate(INT_BYTE_LENGTH).putInt(msg.size).array()
 
         Timber.tag("OPI_CHANNEL_0").d("SENT:\n$message")
         coroutineScope.launch {
-            dataOutputStream?.writeInt(msg.size) // this needs additional checking for htonl() and friends
-            dataOutputStream?.write(msg)
+            dataOutputStream?.write(msgSize + msg)
 
             dataOutputStream?.flush()
         }
@@ -87,7 +88,7 @@ class OPIChannel0(
                         val bytes = ByteArray(length)
                         dataInputStream!!.read(bytes)
 
-                        val sliced = bytes.slice(IntRange(PAYLOAD_OFFSET, length-1)).toByteArray()
+                        val sliced = bytes.slice(IntRange(INT_BYTE_LENGTH, length-1)).toByteArray()
                         val message = String(sliced, CHARSET)
 
                         Timber.tag("OPI_CHANNEL_0").d("MSG RECEIVED:\n$message")
@@ -120,7 +121,7 @@ class OPIChannel0(
 
     companion object {
         private const val PAYLOAD_SIZE_LIMIT = 7
-        private const val PAYLOAD_OFFSET = 4
+        private const val INT_BYTE_LENGTH = 4
 
         // iOS uses this exclusively (the xml says something else ;-))
         private val CHARSET = Charsets.ISO_8859_1
