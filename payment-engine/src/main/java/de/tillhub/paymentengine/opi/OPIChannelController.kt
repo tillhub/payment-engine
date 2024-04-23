@@ -121,7 +121,6 @@ class OPIChannelControllerImpl(
                         message = "Channel 0 response XML could not be parsed.",
                         error = e
                     )
-                    e.printStackTrace()
                     return@handleChannel0Communication
                 }
 
