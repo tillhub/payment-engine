@@ -107,7 +107,7 @@ class OPIChannel0(
 
                             msgSize = ByteBuffer.allocate(INT_BYTE_LENGTH).put(
                                 bytes.slice(IntRange(0, INT_BYTE_LENGTH - 1)).toByteArray()
-                            ).getInt()
+                            ).getInt(0)
 
                             partialMsg = msgSize != sliced.size
                             messageSB += sliced
