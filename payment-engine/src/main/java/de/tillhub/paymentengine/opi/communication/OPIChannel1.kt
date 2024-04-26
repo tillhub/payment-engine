@@ -105,11 +105,17 @@ class OPIChannel1(
                 if (length == 0) continue
 
                 if (partialMsg) {
-                    val bytes = ByteArray(length)
-                    dataInputStream.read(bytes)
+                    Timber.tag("OPI_CHANNEL_1").d("PARTIAL MSG")
+                    val toRead = minOf(
+                        a = length,
+                        b = msgSize - messageSB.size
+                    )
 
-                    partialMsg = msgSize != messageSB.size
+                    val bytes = ByteArray(toRead)
+                    dataInputStream.read(bytes, 0, toRead)
+
                     messageSB += bytes
+                    partialMsg = msgSize != messageSB.size
                 } else {
                     when {
                         length > INT_BYTE_LENGTH -> {
