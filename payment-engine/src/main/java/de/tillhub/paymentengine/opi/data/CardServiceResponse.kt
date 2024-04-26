@@ -57,47 +57,49 @@ data class Terminal(
     var terminalId: String? = null,
 )
 
+@Root(name = "Tender", strict = false)
 data class Tender(
-    @field:Element(name = "Authorisation")
-    @param:Element(name = "Authorisation")
-    var authorisation: Authorisation,
+    @field:Element(name = "Authorisation", required = false)
+    @param:Element(name = "Authorisation", required = false)
+    var authorisation: Authorisation? = null,
 
-    @field:Element(name = "TotalAmount")
-    @param:Element(name = "TotalAmount")
-    var totalAmount: TotalAmount
+    @field:Element(name = "TotalAmount", required = false)
+    @param:Element(name = "TotalAmount", required = false)
+    var totalAmount: TotalAmount? = null
 )
 
+@Root(name = "Authorisation", strict = false)
 data class Authorisation(
-    @field:Attribute(name = "CardPAN")
-    @param:Attribute(name = "CardPAN")
-    var cardPAN: String,
-    @field:Attribute(name = "Merchant")
-    @param:Attribute(name = "Merchant")
-    var merchant: String,
-    @field:Attribute(name = "TimeStamp")
-    @param:Attribute(name = "TimeStamp")
-    var timeStamp: String,
-    @field:Attribute(name = "AcquirerID")
-    @param:Attribute(name = "AcquirerID")
-    var acquirerID: String,
-    @field:Attribute(name = "ActionCode")
-    @param:Attribute(name = "ActionCode")
-    var actionCode: String,
+    @field:Attribute(name = "CardPAN", required = false)
+    @param:Attribute(name = "CardPAN", required = false)
+    var cardPAN: String? = null,
+    @field:Attribute(name = "Merchant", required = false)
+    @param:Attribute(name = "Merchant", required = false)
+    var merchant: String? = null,
+    @field:Attribute(name = "TimeStamp", required = false)
+    @param:Attribute(name = "TimeStamp", required = false)
+    var timeStamp: String? = null,
+    @field:Attribute(name = "AcquirerID", required = false)
+    @param:Attribute(name = "AcquirerID", required = false)
+    var acquirerID: String? = null,
+    @field:Attribute(name = "ActionCode", required = false)
+    @param:Attribute(name = "ActionCode", required = false)
+    var actionCode: String? = null,
     @field:Attribute(name = "ReturnCode", required = false)
     @param:Attribute(name = "ReturnCode", required = false)
     var returnCode: String? = null,
-    @field:Attribute(name = "CardCircuit")
-    @param:Attribute(name = "CardCircuit")
-    var cardCircuit: String,
+    @field:Attribute(name = "CardCircuit", required = false)
+    @param:Attribute(name = "CardCircuit", required = false)
+    var cardCircuit: String? = null,
     @field:Attribute(name = "ApprovalCode", required = false)
     @param:Attribute(name = "ApprovalCode", required = false)
     var approvalCode: String? = null,
-    @field:Attribute(name = "ReceiptNumber")
-    @param:Attribute(name = "ReceiptNumber")
-    var receiptNumber: String,
-    @field:Attribute(name = "AuthorisationType")
-    @param:Attribute(name = "AuthorisationType")
-    var authorisationType: String,
+    @field:Attribute(name = "ReceiptNumber", required = false)
+    @param:Attribute(name = "ReceiptNumber", required = false)
+    var receiptNumber: String? = null,
+    @field:Attribute(name = "AuthorisationType", required = false)
+    @param:Attribute(name = "AuthorisationType", required = false)
+    var authorisationType: String? = null,
 )
 
 @Root(name = "CardDetails", strict = false)
