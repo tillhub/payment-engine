@@ -131,8 +131,9 @@ class OPIChannel1(
                 }
 
                 if(!partialMsg) {
-                    Timber.tag("OPI_CHANNEL_1").d("MSG RECEIVED:\n$messageSB")
-                    onMessage(String(messageSB, CHARSET))
+                    val message = String(messageSB, CHARSET)
+                    Timber.tag("OPI_CHANNEL_1").d("MSG RECEIVED:\n$message")
+                    onMessage(message)
                     msgSize = 0
                     messageSB = ByteArray(0)
                 }
