@@ -97,7 +97,7 @@ class OPIChannel1(
 
         var partialMsg = false
         var msgSize = 0
-        val messageSB = StringBuilder()
+        var messageSB = ByteArray(0)
 
         while (working.get() && !socket.isClosed) {
             try {
@@ -108,8 +108,8 @@ class OPIChannel1(
                     val bytes = ByteArray(length)
                     dataInputStream.read(bytes)
 
-                    partialMsg = msgSize != bytes.size
-                    messageSB.append(String(bytes, CHARSET))
+                    partialMsg = msgSize != messageSB.size
+                    messageSB += bytes
                 } else {
                     when {
                         length > INT_BYTE_LENGTH -> {
@@ -124,7 +124,7 @@ class OPIChannel1(
                             ).getInt()
 
                             partialMsg = msgSize != sliced.size
-                            messageSB.append(String(sliced, CHARSET))
+                            messageSB += sliced
                         }
                         else -> Unit
                     }
@@ -132,9 +132,9 @@ class OPIChannel1(
 
                 if(!partialMsg) {
                     Timber.tag("OPI_CHANNEL_1").d("MSG RECEIVED:\n$messageSB")
-                    onMessage(messageSB.toString())
+                    onMessage(String(messageSB, CHARSET))
                     msgSize = 0
-                    messageSB.clear()
+                    messageSB = ByteArray(0)
                 }
             } catch (e: IOException) {
                 dataInputStream.close()
