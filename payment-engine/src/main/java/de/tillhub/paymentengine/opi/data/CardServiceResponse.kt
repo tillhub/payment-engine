@@ -142,9 +142,9 @@ data class PrivateData(
 )
 
 data class ValueElement(
-    @field:Text
-    @param:Text
-    var value: String,
+    @field:Text(required = false)
+    @param:Text(required = false)
+    var value: String? = null,
 )
 
 enum class OverallResult(val value: String) {
