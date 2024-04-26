@@ -9,6 +9,7 @@ import timber.log.Timber
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
+import java.lang.StringBuilder
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
@@ -80,28 +81,46 @@ class OPIChannel0(
         dataInputStream = DataInputStream(socket.getInputStream())
         dataOutputStream = DataOutputStream(socket.getOutputStream())
 
+        var partialMsg = false
+        var msgSize = 0
+        val messageSB = StringBuilder()
+
         while (working.get() && !socket.isClosed) {
             try {
                 val length = dataInputStream!!.available()
-                when {
-                    length > PAYLOAD_SIZE_LIMIT -> {
-                        val bytes = ByteArray(length)
-                        dataInputStream!!.read(bytes)
+                if (length == 0) continue
 
-                        val sliced = bytes.slice(IntRange(INT_BYTE_LENGTH, length-1)).toByteArray()
-                        val message = String(sliced, CHARSET)
+                if (partialMsg) {
+                    val bytes = ByteArray(length)
+                    dataInputStream!!.read(bytes)
 
-                        Timber.tag("OPI_CHANNEL_0").d("MSG RECEIVED:\n$message")
-                        onMessage?.invoke(message)
+                    partialMsg = msgSize != bytes.size
+                    messageSB.append(String(bytes, CHARSET))
+                } else {
+                    when {
+                        length > INT_BYTE_LENGTH -> {
+                            val bytes = ByteArray(length)
+                            dataInputStream!!.read(bytes)
+
+                            val sliced = bytes.slice(IntRange(INT_BYTE_LENGTH, length - 1))
+                                .toByteArray()
+
+                            msgSize = ByteBuffer.allocate(INT_BYTE_LENGTH).put(
+                                bytes.slice(IntRange(0, INT_BYTE_LENGTH - 1)).toByteArray()
+                            ).getInt()
+
+                            partialMsg = msgSize != sliced.size
+                            messageSB.append(String(sliced, CHARSET))
+                        }
+                        else -> Unit
                     }
-                    length == 0 -> Unit
-                    else -> {
-                        val bytes = ByteArray(length)
-                        dataInputStream!!.read(bytes)
-                        val message = String(bytes, CHARSET)
+                }
 
-                        Timber.tag("OPI_CHANNEL_0").d("MSG DATA:\n$bytes\n$message")
-                    }
+                if(!partialMsg) {
+                    Timber.tag("OPI_CHANNEL_0").d("MSG RECEIVED:\n$messageSB")
+                    onMessage?.invoke(messageSB.toString())
+                    msgSize = 0
+                    messageSB.clear()
                 }
             } catch (e: IOException) {
                 Timber.tag("OPI_CHANNEL_0").d("channel closed ${e.message}")
