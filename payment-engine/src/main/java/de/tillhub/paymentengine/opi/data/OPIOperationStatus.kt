@@ -47,7 +47,7 @@ sealed class OPIOperationStatus {
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Error.OPI(
-                    date, customerReceipt, merchantReceipt, rawData
+                    date, customerReceipt, merchantReceipt, rawData, data
                 )
         }
 
@@ -60,7 +60,7 @@ sealed class OPIOperationStatus {
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Success.OPI(
-                    date, customerReceipt, merchantReceipt, rawData
+                    date, customerReceipt, merchantReceipt, rawData, data
                 )
         }
     }

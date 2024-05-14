@@ -1,5 +1,7 @@
 package de.tillhub.paymentengine.opi.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Namespace
@@ -49,6 +51,7 @@ data class PosData(
     var timestamp: String
 )
 
+@Parcelize
 @Root(name = "TotalAmount", strict = false)
 data class TotalAmount(
     @field:Text
@@ -61,7 +64,7 @@ data class TotalAmount(
     @field:Attribute(name = "PaymentAmount", required = false)
     @param:Attribute(name = "PaymentAmount", required = false)
     var paymentAmount: String? = null,
-)
+) : Parcelable
 
 data class OriginalTransaction(
     @field:Attribute(name = "STAN")
@@ -76,3 +79,58 @@ enum class ServiceRequestType(val value: String) {
     RECONCILIATION("ReconciliationWithClosure"),
     LOGIN("Login"),
 }
+
+/***
+ * XML examples
+ *
+ * Payment request:
+ * <?xml version="1.0" encoding="ISO-8859-1" ?>
+ * <CardServiceRequest
+ *   ApplicationSender="SECposPay"
+ *   POPID="001"
+ *   RequestID="0"
+ *   RequestType="CardPayment"
+ *   WorkstationID=""
+ *   xmlns="http://www.nrf-arts.org/IXRetail/namespace"
+ *   xmlns:xsi="http://www.w3.org/2001/XMLSchema- instance">
+ * 	    <POSdata>
+ * 		    <POSTimeStamp>2007-05-23T13:19:39</POSTimeStamp>
+ * 	    </POSdata>
+ * 	    <TotalAmount Currency="EUR">120.00</TotalAmount>
+ * </CardServiceRequest>
+ *
+ *
+ * Payment reversal request:
+ *
+ * <?xml version="1.0" encoding="ISO-8859-1" ?>.
+ * <CardServiceRequest
+ *   ApplicationSender="SECposPay"
+ *   POPID="001" RequestID="0"
+ *   RequestType="PaymentReversal"
+ *   WorkstationID=""
+ *   xmlns="http://www.nrf-arts.org/IXRetail/namespace"
+ *   xmlns:xsi="http://www.w3.org/2001/XMLSchema- instance">
+ * 	    <POSdata>
+ * 		    <POSTimeStamp>2007-05-23T13:24:19</POSTimeStamp>
+ * 	    </POSdata>
+ * 	    <OriginalTransaction STAN="29" />
+ * </CardServiceRequest>
+ *
+ * Payment refund request:
+ *
+ * <?xml version="1.0" encoding="ISO-8859-1" ?>.
+ * <CardServiceRequest
+ *   ApplicationSender="SECposPay"
+ *   POPID="001"
+ *   RequestID="0"
+ *   RequestType="PaymentRefund"
+ *   WorkstationID=""
+ *   xmlns="http://www.nrf-arts.org/IXRetail/namespace"
+ *   xmlns:xsi="http://www.w3.org/2001/XMLSchema- instance">
+ * 	    <POSdata>
+ * 		    <POSTimeStamp>2007-05- 23T13:34:37</POSTimeStamp>
+ * 	    </POSdata>
+ * 	    <TotalAmount Currency="EUR">15.00</TotalAmount>
+ * </CardServiceRequest>
+ *
+ */

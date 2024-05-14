@@ -9,7 +9,6 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.opi.OPIChannelController
 import de.tillhub.paymentengine.opi.OPIChannelControllerImpl
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.math.BigDecimal
@@ -65,6 +64,12 @@ class OPITerminalViewModel(
     fun startPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
         viewModelScope.launch {
             opiChannelController.initiateCardPayment(amount, currency)
+        }
+    }
+
+    fun startPaymentReversal(stan: String) {
+        viewModelScope.launch {
+            opiChannelController.initiatePaymentReversal(stan)
         }
     }
 

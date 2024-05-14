@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
 import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 
 class PaymentReversalContract : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
@@ -18,7 +19,10 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
             }
 
-            is Terminal.OPI -> TODO()
+            is Terminal.OPI -> Intent(context, OPIPaymentReversalActivity::class.java).apply {
+                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
+                putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
+            }
         }
     }
 
