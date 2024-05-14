@@ -40,7 +40,7 @@ interface OPIChannelController {
 
     suspend fun login()
 
-    suspend fun initiatePaymentReversal(
+    suspend fun initiateCardPayment(
         amount: BigDecimal,
         currency: ISOAlphaCurrency
     )
@@ -147,7 +147,7 @@ class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiatePaymentReversal(
+    override suspend fun initiateCardPayment(
         amount: BigDecimal,
         currency: ISOAlphaCurrency
     ) {

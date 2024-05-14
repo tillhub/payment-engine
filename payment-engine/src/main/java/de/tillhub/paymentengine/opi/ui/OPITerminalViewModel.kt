@@ -63,7 +63,7 @@ class OPITerminalViewModel(
 
     fun startPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
         viewModelScope.launch {
-            opiChannelController.initiatePaymentReversal(amount, currency)
+            opiChannelController.initiateCardPayment(amount, currency)
         }
     }
 
