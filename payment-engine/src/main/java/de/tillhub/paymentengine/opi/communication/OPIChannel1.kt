@@ -161,10 +161,9 @@ class OPIChannel1(
 
     companion object {
         private const val DEFAULT_DELAY = 50L
-        private const val PAYLOAD_SIZE_LIMIT = 7
         private const val INT_BYTE_LENGTH = 4
 
-        // iOS uses this exclusively (the xml says something else ;-))
-        private val CHARSET = Charsets.ISO_8859_1
+        // iOS uses ISO_8859_1 exclusively (the xml says something else ;-))
+        private val CHARSET = Charsets.UTF_8
     }
 }
