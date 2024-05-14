@@ -24,7 +24,9 @@ kotest = "5.8.0"
 lifecycle = "2.7.0"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
-compose-bom = "2024.02.00"
+compose-bom = "2024.02.02"
+
+retrofit-simplexml = "2.10.0"
 
 [libraries]
 # Define the libraries
@@ -61,6 +63,9 @@ lavego-sale-sdk = { group = "com.github.lavego.sales-sdk", name = "saleSdk", ver
 lavego-sale-utils = { group = "com.github.lavego.sales-sdk", name = "utils", version.ref = "lavegoUtils" }
 common-codec = { group = "commons-codec", name = "commons-codec", version.ref = "commonsCodec" }
 simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref = "simpleXml" }
+
+# OPI
+retrofit-simplexml = { group = "com.squareup.retrofit2", name = "converter-simplexml", version.ref = "retrofit-simplexml" }
 
 # Unit testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

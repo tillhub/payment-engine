@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.data
+package de.tillhub.paymentengine.zvt.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

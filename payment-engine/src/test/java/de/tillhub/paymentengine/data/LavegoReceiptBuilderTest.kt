@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.data
 
+import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 

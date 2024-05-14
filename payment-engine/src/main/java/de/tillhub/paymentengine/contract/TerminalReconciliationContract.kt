@@ -7,7 +7,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.ui.TerminalReconciliationActivity
+import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
 class TerminalReconciliationContract : ActivityResultContract<Terminal, TerminalOperationStatus>() {
     override fun createIntent(context: Context, input: Terminal): Intent {
@@ -15,6 +15,8 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
             is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
+
+            is Terminal.OPI -> TODO()
         }
     }
 

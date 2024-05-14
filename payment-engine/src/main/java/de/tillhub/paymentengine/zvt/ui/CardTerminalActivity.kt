@@ -1,15 +1,12 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
-import androidx.viewbinding.ViewBinding
 import de.lavego.sdk.PaymentProtocol
 import de.lavego.sdk.PaymentTerminalActivity
 import de.lavego.sdk.SaleConfiguration
@@ -172,7 +169,3 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
         private const val TERMINAL_CONFIG_BYTE: Byte = 0b11000110.toByte()
     }
 }
-
-inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
-    crossinline bindingInflater: (LayoutInflater) -> T,
-) = lazy(LazyThreadSafetyMode.NONE) { bindingInflater.invoke(layoutInflater) }

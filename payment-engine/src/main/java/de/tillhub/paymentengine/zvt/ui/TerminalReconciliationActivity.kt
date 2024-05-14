@@ -1,9 +1,10 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.databinding.ActivityTerminalReconciliationBinding
+import de.tillhub.paymentengine.helper.viewBinding
 
 class TerminalReconciliationActivity : CardTerminalActivity() {
 

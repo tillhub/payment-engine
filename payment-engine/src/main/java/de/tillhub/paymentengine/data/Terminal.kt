@@ -27,12 +27,20 @@ sealed class Terminal : Parcelable {
         }
     }
 
-    // TODO("To be implemented in future")
-//    data class OPI(
-//        override val name: String,
-//        override val ipAddress: String,
-//        override val port: Int,
-//        override val saleConfig: CardSaleConfig,
-//        val port2: Int
-//    ) : Terminal()
+    data class OPI(
+        override val name: String = DEFAULT_NAME,
+        override val ipAddress: String = DEFAULT_IP_ADDRESS,
+        override val port: Int = DEFAULT_PORT_1,
+        override val saleConfig: CardSaleConfig = CardSaleConfig(),
+        val port2: Int = DEFAULT_PORT_2,
+        val currencyCode: String = DEFAULT_CURRENCY_CODE,
+    ) : Terminal() {
+        companion object {
+            private const val DEFAULT_NAME = "Default:OPI"
+            private const val DEFAULT_IP_ADDRESS = "127.0.0.1"
+            private const val DEFAULT_PORT_1 = 20002
+            private const val DEFAULT_PORT_2 = 20007
+            private const val DEFAULT_CURRENCY_CODE = "EUR"
+        }
+    }
 }

@@ -8,7 +8,8 @@ import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.ui.CardPaymentActivity
+import de.tillhub.paymentengine.opi.ui.OPIPaymentActivity
+import de.tillhub.paymentengine.zvt.ui.CardPaymentActivity
 import java.math.BigDecimal
 
 class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOperationStatus>() {
@@ -16,6 +17,11 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
     override fun createIntent(context: Context, input: PaymentRequest): Intent {
         return when (input.config) {
             is Terminal.ZVT -> Intent(context, CardPaymentActivity::class.java).apply {
+                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
+                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
+                putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
+            }
+            is Terminal.OPI -> Intent(context, OPIPaymentActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)

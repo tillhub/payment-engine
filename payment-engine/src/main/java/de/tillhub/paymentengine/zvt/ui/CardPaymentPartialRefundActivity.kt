@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import android.os.Bundle
 import androidx.core.os.BundleCompat
@@ -12,6 +12,7 @@ import de.tillhub.paymentengine.contract.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentPartialRefundBinding
 import de.tillhub.paymentengine.helper.serializable
+import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
 
 class CardPaymentPartialRefundActivity : CardTerminalActivity() {
