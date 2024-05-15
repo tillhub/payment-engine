@@ -73,6 +73,12 @@ class OPITerminalViewModel(
         }
     }
 
+    fun startPartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) {
+        viewModelScope.launch {
+            opiChannelController.initiatePartialRefund(amount, currency)
+        }
+    }
+
     sealed class State {
         data object Idle : State()
 

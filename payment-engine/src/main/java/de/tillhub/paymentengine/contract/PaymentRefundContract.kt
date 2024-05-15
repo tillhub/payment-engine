@@ -8,6 +8,7 @@ import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 
@@ -21,7 +22,11 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
 
-            is Terminal.OPI -> TODO()
+            is Terminal.OPI -> Intent(context, OPIPartialRefundActivity::class.java).apply {
+                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
+                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
+                putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
+            }
         }
     }
 
