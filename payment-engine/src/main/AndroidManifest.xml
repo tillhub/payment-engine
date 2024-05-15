@@ -48,5 +48,11 @@
             android:theme="@style/Theme.Payment"
             android:exported="false" />
 
+        <activity
+            android:name=".opi.ui.OPIPartialRefundActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
     </application>
 </manifest>
