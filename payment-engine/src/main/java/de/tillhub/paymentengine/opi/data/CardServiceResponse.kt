@@ -148,6 +148,9 @@ data class PrivateData(
     @field:Element(name = "ErrorCode", required = false)
     @param:Element(name = "ErrorCode", required = false)
     var errorCode: ValueElement? = null,
+    @field:Element(name = "RebootInfo", required = false)
+    @param:Element(name = "RebootInfo", required = false)
+    var rebootInfo: ValueElement? = null,
 ) : Parcelable
 
 @Parcelize

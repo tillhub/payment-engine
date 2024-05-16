@@ -61,6 +61,15 @@ data class TotalAmount(
     @param:Attribute(name = "Currency")
     var currency: String,
 
+    @field:Attribute(name = "CardCircuit", required = false)
+    @param:Attribute(name = "CardCircuit", required = false)
+    var cardCircuit: String? = null,
+    @field:Attribute(name = "NumberPayments", required = false)
+    @param:Attribute(name = "NumberPayments", required = false)
+    var numberPayments: Int? = null,
+    @field:Attribute(name = "PaymentType", required = false)
+    @param:Attribute(name = "PaymentType", required = false)
+    var paymentType: String? = null,
     @field:Attribute(name = "PaymentAmount", required = false)
     @param:Attribute(name = "PaymentAmount", required = false)
     var paymentAmount: String? = null,

@@ -79,6 +79,12 @@ class OPITerminalViewModel(
         }
     }
 
+    fun startReconciliation() {
+        viewModelScope.launch {
+            opiChannelController.initiateReconciliation()
+        }
+    }
+
     sealed class State {
         data object Idle : State()
 

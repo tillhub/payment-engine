@@ -1,12 +1,16 @@
 package de.tillhub.paymentengine.opi.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
+import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
 import org.simpleframework.xml.Text
 
+@Parcelize
 @Root(name = "ServiceResponse", strict = false)
 @NamespaceList(
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
@@ -33,4 +37,24 @@ data class ServiceResponse(
     @field:Element(name = "PrivateData", required = false)
     @param:Element(name = "PrivateData", required = false)
     var privateData: PrivateData? = null,
-)
+
+    @field:Element(name = "Authorisation", required = false)
+    @param:Element(name = "Authorisation", required = false)
+    var authorisation: Authorisation? = null,
+
+    @field:Element(name = "Reconciliation", required = false)
+    @param:Element(name = "Reconciliation", required = false)
+    var reconciliation: Reconciliation? = null,
+) : Parcelable
+
+@Parcelize
+@Root(name = "Reconciliation", strict = false)
+data class Reconciliation(
+    @field:Attribute(name = "LanguageCode", required = false)
+    @param:Attribute(name = "LanguageCode", required = false)
+    var languageCode: String? = null,
+
+    @field:ElementList(inline = true, required = false)
+    @param:ElementList(inline = true, required = false)
+    var totalAmounts: List<TotalAmount>? = null
+) : Parcelable

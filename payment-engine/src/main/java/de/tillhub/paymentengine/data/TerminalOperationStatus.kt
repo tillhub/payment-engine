@@ -2,6 +2,7 @@ package de.tillhub.paymentengine.data
 
 import android.os.Parcelable
 import de.tillhub.paymentengine.opi.data.CardServiceResponse
+import de.tillhub.paymentengine.opi.data.ServiceResponse
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
 import de.tillhub.paymentengine.zvt.data.TransactionResultCode
 import kotlinx.parcelize.Parcelize
@@ -41,7 +42,8 @@ sealed class TerminalOperationStatus : Parcelable {
             override val customerReceipt: String,
             override val merchantReceipt: String,
             override val rawData: String,
-            val data: CardServiceResponse?
+            val data: CardServiceResponse?,
+            val reconciliationData: ServiceResponse?
         ) : Success()
     }
 
@@ -66,7 +68,8 @@ sealed class TerminalOperationStatus : Parcelable {
             override val customerReceipt: String,
             override val merchantReceipt: String,
             override val rawData: String,
-            val data: CardServiceResponse?
+            val data: CardServiceResponse?,
+            val reconciliationData: ServiceResponse?
         ) : Error()
     }
 }

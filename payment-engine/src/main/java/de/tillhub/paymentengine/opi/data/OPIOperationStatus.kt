@@ -35,6 +35,7 @@ sealed class OPIOperationStatus {
         abstract val merchantReceipt: String
         abstract val rawData: String
         abstract val data: CardServiceResponse?
+        abstract val reconciliationData: ServiceResponse?
 
         abstract fun toTerminalOperation(): TerminalOperationStatus
 
@@ -43,11 +44,12 @@ sealed class OPIOperationStatus {
             override val customerReceipt: String,
             override val merchantReceipt: String,
             override val rawData: String,
-            override val data: CardServiceResponse?
+            override val data: CardServiceResponse? = null,
+            override val reconciliationData: ServiceResponse? = null
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Error.OPI(
-                    date, customerReceipt, merchantReceipt, rawData, data
+                    date, customerReceipt, merchantReceipt, rawData, data, reconciliationData
                 )
         }
 
@@ -56,11 +58,12 @@ sealed class OPIOperationStatus {
             override val customerReceipt: String,
             override val merchantReceipt: String,
             override val rawData: String,
-            override val data: CardServiceResponse?
+            override val data: CardServiceResponse? = null,
+            override val reconciliationData: ServiceResponse? = null
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Success.OPI(
-                    date, customerReceipt, merchantReceipt, rawData, data
+                    date, customerReceipt, merchantReceipt, rawData, data, reconciliationData
                 )
         }
     }
