@@ -49,6 +49,7 @@ interface OPIChannelController {
         amount: BigDecimal,
         currency: ISOAlphaCurrency
     )
+    suspend fun initiateReconciliation()
     // TODO implement other methods
 }
 
@@ -382,6 +383,79 @@ class OPIChannelControllerImpl(
         }
     }
 
+    override suspend fun initiateReconciliation() {
+        // If the state is not LoggedIn, then we should drop the new request
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+
+        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
+
+        // checks if the controller is initialized
+        if (initialized) {
+            // setup C1 communication, it has to be setup before C0,
+            // because once C0 request is sent, C1 needs to handle the intermediate communication
+            handleChannel1Communication()
+
+            val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = ServiceResponse::class.java
+            )
+
+            val payload = ServiceRequest(
+                applicationSender = terminal.saleConfig.applicationName,
+                popId = terminal.saleConfig.poiId,
+                requestId = generateRequestId(),
+                requestType = ServiceRequestType.RECONCILIATION.value,
+                workstationID = terminal.saleConfig.saleId
+            )
+
+            // setup C0 communication
+            handleChannel0Communication(payload, requestConverter) { responseXml ->
+                val response = try {
+                    responseConverter.convert(responseXml)
+                } catch (e: Exception) {
+                    // In case of an exception when converting the XML to the DTO we
+                    // set the state to `Error.DataHandling`.
+                    _operationState.value = OPIOperationStatus.Error.DataHandling(
+                        message = "Channel 0 response XML could not be parsed.",
+                        error = e
+                    )
+                    e.printStackTrace()
+                    return@handleChannel0Communication
+                }
+
+                val customerReceipt =
+                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
+                        ?.customerReceipt.orEmpty()
+                val merchantReceipt =
+                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
+                        ?.merchantReceipt.orEmpty()
+
+                _operationState.value = when (OverallResult.find(response.overallResult)) {
+                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
+                        date = terminalConfig.timeNow(),
+                        customerReceipt = customerReceipt,
+                        merchantReceipt = merchantReceipt,
+                        rawData = responseXml,
+                        reconciliationData = response
+                    )
+                    else -> OPIOperationStatus.Result.Error(
+                        date = terminalConfig.timeNow(),
+                        customerReceipt = customerReceipt,
+                        merchantReceipt = merchantReceipt,
+                        rawData = responseXml,
+                        reconciliationData = response
+                    )
+                }
+
+                // as per protocol, both channels are closed after C0 response
+                finishOperation()
+            }
+        } else {
+            // in case the controller is not initialized set the state to `Error.NotInitialised`
+            _operationState.value = OPIOperationStatus.Error.NotInitialised
+        }
+    }
+
     private fun finishOperation() {
         channel0.close()
         channel1.close()
@@ -407,7 +481,7 @@ class OPIChannelControllerImpl(
     }
 
     /**
-     * This method returns the message listener for OPI channel 0.
+     * This method returns the message listener for OPI channel 1.
      * the lambda converts the received XML message to the DTO,
      * then based on the message it sets the controller state and
      * answers according to the OPI protocol.
