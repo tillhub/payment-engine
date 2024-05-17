@@ -27,7 +27,7 @@ data class CardServiceResponse(
     var workstationID: String,
     @field:Attribute(name = "OverallResult")
     @param:Attribute(name = "OverallResult")
-    var overallResult: String,
+    override var overallResult: String,
 
     @field:Element(name = "Terminal", required = false)
     @param:Element(name = "Terminal", required = false)
@@ -48,7 +48,7 @@ data class CardServiceResponse(
     @field:Element(name = "PrivateData", required = false)
     @param:Element(name = "PrivateData", required = false)
     var privateData: PrivateData? = null,
-) : Parcelable
+) : Parcelable, OPIResponse
 
 @Parcelize
 @Root(name = "Terminal", strict = false)

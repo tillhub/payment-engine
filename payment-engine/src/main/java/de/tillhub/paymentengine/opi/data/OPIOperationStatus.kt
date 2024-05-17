@@ -21,7 +21,8 @@ sealed class OPIOperationStatus {
     sealed class Error(open val message: String) : OPIOperationStatus() {
         data object NotInitialised : Error("OPI Communication controller not initialised.")
         data class Communication(
-            override val message: String
+            override val message: String,
+            val error: Throwable?,
         ) : Error(message)
         data class DataHandling(
             override val message: String,

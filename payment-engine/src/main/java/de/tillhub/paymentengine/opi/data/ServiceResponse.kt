@@ -28,7 +28,7 @@ data class ServiceResponse(
     var workstationID: String,
     @field:Attribute(name = "OverallResult")
     @param:Attribute(name = "OverallResult")
-    var overallResult: String,
+    override var overallResult: String,
 
     @field:Element(name = "Terminal", required = false)
     @param:Element(name = "Terminal", required = false)
@@ -45,7 +45,7 @@ data class ServiceResponse(
     @field:Element(name = "Reconciliation", required = false)
     @param:Element(name = "Reconciliation", required = false)
     var reconciliation: Reconciliation? = null,
-) : Parcelable
+) : Parcelable, OPIResponse
 
 @Parcelize
 @Root(name = "Reconciliation", strict = false)

@@ -10,7 +10,6 @@ import timber.log.Timber
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
-import java.lang.StringBuilder
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketException
@@ -44,10 +43,13 @@ class OPIChannel1(
             while (working.get()) {
                 webSocket?.let {
                     try {
-                        val socket = it.accept()
-                        Timber.tag("OPI_CHANNEL_1").d("channel socket accepted ${socket!!.isBound}")
-                        launch {
-                            handleOpenConnection(socket)
+                        if (!it.isClosed) {
+                            val socket = it.accept()
+                            Timber.tag("OPI_CHANNEL_1")
+                                .d("channel socket accepted ${socket!!.isBound}")
+                            launch {
+                                handleOpenConnection(socket)
+                            }
                         }
 
                         delay(DEFAULT_DELAY)
