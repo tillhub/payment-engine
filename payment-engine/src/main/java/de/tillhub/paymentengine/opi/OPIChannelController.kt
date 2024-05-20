@@ -20,6 +20,7 @@ import de.tillhub.paymentengine.opi.data.DtoToStringConverter
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import de.tillhub.paymentengine.opi.data.OPIResponse
 import de.tillhub.paymentengine.opi.data.OriginalTransaction
+import de.tillhub.paymentengine.opi.data.Output
 import de.tillhub.paymentengine.opi.data.OverallResult
 import de.tillhub.paymentengine.opi.data.PosData
 import de.tillhub.paymentengine.opi.data.ServiceRequest
@@ -172,10 +173,7 @@ class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiateCardPayment(
-        amount: BigDecimal,
-        currency: ISOAlphaCurrency
-    ) {
+    override suspend fun initiateCardPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
         // If the state is not LoggedIn, then we should drop the new request
         if (_operationState.value !is OPIOperationStatus.LoggedIn) return
 
@@ -369,37 +367,7 @@ class OPIChannelControllerImpl(
                         ?: OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
                     // For every Output in the C1 request we update the Pending state.
-                    _operationState.value = when (DeviceType.find(output.outDeviceTarget)) {
-                        // CASHIER_DISPLAY/CUSTOMER_DISPLAY are added to `messageLines` to be displayed on the UI
-                        DeviceType.CASHIER_DISPLAY,
-                        DeviceType.CUSTOMER_DISPLAY -> currentState.copy(
-                            messageLines = output.textLines
-                                ?.sortedBy { it.row ?: 0 }
-                                ?.mapNotNull {
-                                    it.value
-                                }.orEmpty()
-                        )
-
-                        // PRINTER entries are build into merchantReceipt
-                        DeviceType.PRINTER -> currentState.copy(
-                            merchantReceipt = StringBuilder().apply {
-                                output.textLines?.forEach {
-                                    appendLine(it.value.orEmpty())
-                                }
-                            }.toString()
-                        )
-
-                        // PRINTER_RECEIPT entries are build into customerReceipt
-                        DeviceType.PRINTER_RECEIPT -> currentState.copy(
-                            customerReceipt = StringBuilder().apply {
-                                output.textLines?.forEach {
-                                    appendLine(it.value.orEmpty())
-                                }
-                            }.toString()
-                        )
-
-                        else -> currentState // TODO> Not handled yet
-                    }
+                    _operationState.value = handleC1OutputState(currentState, output)
                 }
                 DeviceRequestType.INPUT -> {
                     // TODO> handle input requests
@@ -527,6 +495,46 @@ class OPIChannelControllerImpl(
         }
 
         _operationState.value = OPIOperationStatus.Error.Communication(message, error)
+    }
+
+    /**
+     * This method provides an updated pending state based on the C1 Output message.
+     * To provide the new state it needs the [currentState] and the received
+     * [output] data.
+     */
+    private fun handleC1OutputState(
+        currentState: OPIOperationStatus.Pending.Operation,
+        output: Output
+    ): OPIOperationStatus = when (DeviceType.find(output.outDeviceTarget)) {
+        // CASHIER_DISPLAY/CUSTOMER_DISPLAY are added to `messageLines` to be displayed on the UI
+        DeviceType.CASHIER_DISPLAY,
+        DeviceType.CUSTOMER_DISPLAY -> currentState.copy(
+            messageLines = output.textLines
+                ?.sortedBy { it.row ?: 0 }
+                ?.mapNotNull {
+                    it.value
+                }.orEmpty()
+        )
+
+        // PRINTER entries are build into merchantReceipt
+        DeviceType.PRINTER -> currentState.copy(
+            merchantReceipt = StringBuilder().apply {
+                output.textLines?.forEach {
+                    appendLine(it.value.orEmpty())
+                }
+            }.toString()
+        )
+
+        // PRINTER_RECEIPT entries are build into customerReceipt
+        DeviceType.PRINTER_RECEIPT -> currentState.copy(
+            customerReceipt = StringBuilder().apply {
+                output.textLines?.forEach {
+                    appendLine(it.value.orEmpty())
+                }
+            }.toString()
+        )
+
+        else -> currentState // TODO> Not handled yet
     }
 
     companion object {
