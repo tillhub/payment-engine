@@ -18,7 +18,9 @@ import de.tillhub.paymentengine.opi.data.DeviceResponse
 import de.tillhub.paymentengine.opi.data.DeviceType
 import de.tillhub.paymentengine.opi.data.DtoToStringConverter
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
+import de.tillhub.paymentengine.opi.data.OPIResponse
 import de.tillhub.paymentengine.opi.data.OriginalTransaction
+import de.tillhub.paymentengine.opi.data.Output
 import de.tillhub.paymentengine.opi.data.OverallResult
 import de.tillhub.paymentengine.opi.data.PosData
 import de.tillhub.paymentengine.opi.data.ServiceRequest
@@ -28,6 +30,7 @@ import de.tillhub.paymentengine.opi.data.TotalAmount
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import timber.log.Timber
 import java.math.BigDecimal
 import kotlin.random.Random
 
@@ -50,7 +53,6 @@ interface OPIChannelController {
         currency: ISOAlphaCurrency
     )
     suspend fun initiateReconciliation()
-    // TODO implement other methods
 }
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException")
@@ -108,17 +110,36 @@ class OPIChannelControllerImpl(
                 clazz = ServiceResponse::class.java
             )
 
-            val payload = ServiceRequest(
-                applicationSender = terminal.saleConfig.applicationName,
-                popId = terminal.saleConfig.poiId,
-                requestId = generateRequestId(),
-                requestType = ServiceRequestType.LOGIN.value,
-                workstationID = terminal.saleConfig.saleId,
-                posData = PosData(terminalConfig.timeNow().toISOString()),
-            )
+            val xml = try {
+                requestConverter.convert(ServiceRequest(
+                    applicationSender = terminal.saleConfig.applicationName,
+                    popId = terminal.saleConfig.poiId,
+                    requestId = generateRequestId(),
+                    requestType = ServiceRequestType.LOGIN.value,
+                    workstationID = terminal.saleConfig.saleId,
+                    posData = PosData(terminalConfig.timeNow().toISOString()),
+                ))
+            } catch (e: Exception) {
+                // In case of an exception when converting the TDO to XML we
+                // set the state to `Error.DataHandling`.
+                _operationState.value = OPIOperationStatus.Error.DataHandling(
+                    message = "Channel 0 request object could not be converted to XML.",
+                    error = e
+                )
+                return
+            }
 
             // setup C0 communication
-            handleChannel0Communication(payload, requestConverter) { responseXml ->
+            channel0.setOnError(::communicationErrorHandler)
+
+            channel0.open()
+
+            // here the app waits for the channel 0 socket to connect to the terminal.
+            while (!channel0.isConnected) {
+                delay(CONNECTION_WAIT_DELAY)
+            }
+
+            channel0.sendMessage(xml) { responseXml ->
                 val response = try {
                     responseConverter.convert(responseXml)
                 } catch (e: Exception) {
@@ -128,7 +149,7 @@ class OPIChannelControllerImpl(
                         message = "Channel 0 response XML could not be parsed.",
                         error = e
                     )
-                    return@handleChannel0Communication
+                    return@sendMessage
                 }
 
                 _operationState.value = when (OverallResult.find(response.overallResult)) {
@@ -152,10 +173,7 @@ class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiateCardPayment(
-        amount: BigDecimal,
-        currency: ISOAlphaCurrency
-    ) {
+    override suspend fun initiateCardPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
         // If the state is not LoggedIn, then we should drop the new request
         if (_operationState.value !is OPIOperationStatus.LoggedIn) return
 
@@ -166,11 +184,6 @@ class OPIChannelControllerImpl(
             // setup C1 communication, it has to be setup before C0,
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
-
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
 
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
@@ -185,47 +198,13 @@ class OPIChannelControllerImpl(
                 )
             )
 
+            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = CardServiceResponse::class.java
+            )
+
             // setup C0 communication
-            handleChannel0Communication(payload, requestConverter) { responseXml ->
-                val response = try {
-                    responseConverter.convert(responseXml)
-                } catch (e: Exception) {
-                    // In case of an exception when converting the XML to the DTO we
-                    // set the state to `Error.DataHandling`.
-                    _operationState.value = OPIOperationStatus.Error.DataHandling(
-                        message = "Channel 0 response XML could not be parsed.",
-                        error = e
-                    )
-                    return@handleChannel0Communication
-                }
-
-                val customerReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                    ?.customerReceipt.orEmpty()
-                val merchantReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                    ?.merchantReceipt.orEmpty()
-
-                _operationState.value = when (OverallResult.find(response.overallResult)) {
-                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        data = response
-                    )
-                    else -> OPIOperationStatus.Result.Error(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        data = response
-                    )
-                }
-
-                // as per protocol, both channels are closed after C0 response
-                finishOperation()
-            }
+            handleC0Communication(payload, requestConverter, responseConverter)
         } else {
             // in case the controller is not initialized set the state to `Error.NotInitialised`
             _operationState.value = OPIOperationStatus.Error.NotInitialised
@@ -244,11 +223,6 @@ class OPIChannelControllerImpl(
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
 
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
-
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
@@ -259,47 +233,13 @@ class OPIChannelControllerImpl(
                 originalTransaction = OriginalTransaction(stan)
             )
 
+            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = CardServiceResponse::class.java
+            )
+
             // setup C0 communication
-            handleChannel0Communication(payload, requestConverter) { responseXml ->
-                val response = try {
-                    responseConverter.convert(responseXml)
-                } catch (e: Exception) {
-                    // In case of an exception when converting the XML to the DTO we
-                    // set the state to `Error.DataHandling`.
-                    _operationState.value = OPIOperationStatus.Error.DataHandling(
-                        message = "Channel 0 response XML could not be parsed.",
-                        error = e
-                    )
-                    return@handleChannel0Communication
-                }
-
-                val customerReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                        ?.customerReceipt.orEmpty()
-                val merchantReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                        ?.merchantReceipt.orEmpty()
-
-                _operationState.value = when (OverallResult.find(response.overallResult)) {
-                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        data = response
-                    )
-                    else -> OPIOperationStatus.Result.Error(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        data = response
-                    )
-                }
-
-                // as per protocol, both channels are closed after C0 response
-                finishOperation()
-            }
+            handleC0Communication(payload, requestConverter, responseConverter)
         } else {
             // in case the controller is not initialized set the state to `Error.NotInitialised`
             _operationState.value = OPIOperationStatus.Error.NotInitialised
@@ -318,11 +258,6 @@ class OPIChannelControllerImpl(
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
 
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
-
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
@@ -336,47 +271,13 @@ class OPIChannelControllerImpl(
                 )
             )
 
+            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = CardServiceResponse::class.java
+            )
+
             // setup C0 communication
-            handleChannel0Communication(payload, requestConverter) { responseXml ->
-                val response = try {
-                    responseConverter.convert(responseXml)
-                } catch (e: Exception) {
-                    // In case of an exception when converting the XML to the DTO we
-                    // set the state to `Error.DataHandling`.
-                    _operationState.value = OPIOperationStatus.Error.DataHandling(
-                        message = "Channel 0 response XML could not be parsed.",
-                        error = e
-                    )
-                    return@handleChannel0Communication
-                }
-
-                val customerReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                        ?.customerReceipt.orEmpty()
-                val merchantReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                        ?.merchantReceipt.orEmpty()
-
-                _operationState.value = when (OverallResult.find(response.overallResult)) {
-                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        data = response
-                    )
-                    else -> OPIOperationStatus.Result.Error(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        data = response
-                    )
-                }
-
-                // as per protocol, both channels are closed after C0 response
-                finishOperation()
-            }
+            handleC0Communication(payload, requestConverter, responseConverter)
         } else {
             // in case the controller is not initialized set the state to `Error.NotInitialised`
             _operationState.value = OPIOperationStatus.Error.NotInitialised
@@ -395,11 +296,6 @@ class OPIChannelControllerImpl(
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
 
-            val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = ServiceResponse::class.java
-            )
-
             val payload = ServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
@@ -408,48 +304,13 @@ class OPIChannelControllerImpl(
                 workstationID = terminal.saleConfig.saleId
             )
 
+            val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = ServiceResponse::class.java
+            )
+
             // setup C0 communication
-            handleChannel0Communication(payload, requestConverter) { responseXml ->
-                val response = try {
-                    responseConverter.convert(responseXml)
-                } catch (e: Exception) {
-                    // In case of an exception when converting the XML to the DTO we
-                    // set the state to `Error.DataHandling`.
-                    _operationState.value = OPIOperationStatus.Error.DataHandling(
-                        message = "Channel 0 response XML could not be parsed.",
-                        error = e
-                    )
-                    e.printStackTrace()
-                    return@handleChannel0Communication
-                }
-
-                val customerReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                        ?.customerReceipt.orEmpty()
-                val merchantReceipt =
-                    (_operationState.value as? OPIOperationStatus.Pending.Operation)
-                        ?.merchantReceipt.orEmpty()
-
-                _operationState.value = when (OverallResult.find(response.overallResult)) {
-                    OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        reconciliationData = response
-                    )
-                    else -> OPIOperationStatus.Result.Error(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = customerReceipt,
-                        merchantReceipt = merchantReceipt,
-                        rawData = responseXml,
-                        reconciliationData = response
-                    )
-                }
-
-                // as per protocol, both channels are closed after C0 response
-                finishOperation()
-            }
+            handleC0Communication(payload, requestConverter, responseConverter)
         } else {
             // in case the controller is not initialized set the state to `Error.NotInitialised`
             _operationState.value = OPIOperationStatus.Error.NotInitialised
@@ -472,9 +333,7 @@ class OPIChannelControllerImpl(
         )
         val responseConverter = converterFactory.newDtoToStringConverter<DeviceResponse>()
 
-        channel1.setOnError { err, message ->
-            _operationState.value = OPIOperationStatus.Error.Communication(message)
-        }
+        channel1.setOnError(::communicationErrorHandler)
         channel1.setOnMessage(getC1MessageHandler(requestConverter, responseConverter))
 
         channel1.open()
@@ -508,37 +367,7 @@ class OPIChannelControllerImpl(
                         ?: OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
                     // For every Output in the C1 request we update the Pending state.
-                    _operationState.value = when (DeviceType.find(output.outDeviceTarget)) {
-                        // CASHIER_DISPLAY/CUSTOMER_DISPLAY are added to `messageLines` to be displayed on the UI
-                        DeviceType.CASHIER_DISPLAY,
-                        DeviceType.CUSTOMER_DISPLAY -> currentState.copy(
-                            messageLines = output.textLines
-                                ?.sortedBy { it.row ?: 0 }
-                                ?.mapNotNull {
-                                    it.value
-                                }.orEmpty()
-                        )
-
-                        // PRINTER entries are build into merchantReceipt
-                        DeviceType.PRINTER -> currentState.copy(
-                            merchantReceipt = StringBuilder().apply {
-                                output.textLines?.forEach {
-                                    appendLine(it.value.orEmpty())
-                                }
-                            }.toString()
-                        )
-
-                        // PRINTER_RECEIPT entries are build into customerReceipt
-                        DeviceType.PRINTER_RECEIPT -> currentState.copy(
-                            customerReceipt = StringBuilder().apply {
-                                output.textLines?.forEach {
-                                    appendLine(it.value.orEmpty())
-                                }
-                            }.toString()
-                        )
-
-                        else -> currentState // TODO> Not handled yet
-                    }
+                    _operationState.value = handleC1OutputState(currentState, output)
                 }
                 DeviceRequestType.INPUT -> {
                     // TODO> handle input requests
@@ -579,15 +408,12 @@ class OPIChannelControllerImpl(
      * it opens the socket, sets up the error listener, converts to payload,
      * and sends the XML payload.
      */
-    private suspend fun <T> handleChannel0Communication(
-        payload: T,
-        requestConverter: DtoToStringConverter<T>,
-        onResponse: (String) -> Unit
+    private suspend fun <U, V : OPIResponse> handleC0Communication(
+        payload: U,
+        requestConverter: DtoToStringConverter<U>,
+        responseConverter: StringToDtoConverter<V>
     ) {
-        channel0.setOnError { err, message ->
-            // TODO
-            _operationState.value = OPIOperationStatus.Error.Communication(message)
-        }
+        channel0.setOnError(::communicationErrorHandler)
 
         channel0.open()
 
@@ -608,7 +434,49 @@ class OPIChannelControllerImpl(
             delay(CONNECTION_WAIT_DELAY)
         }
 
-        channel0.sendMessage(xml, onResponse)
+        channel0.sendMessage(xml) { responseXml ->
+            val response = try {
+                responseConverter.convert(responseXml)
+            } catch (e: Exception) {
+                // In case of an exception when converting the XML to the DTO we
+                // set the state to `Error.DataHandling`.
+                _operationState.value = OPIOperationStatus.Error.DataHandling(
+                    message = "Channel 0 response XML could not be parsed.",
+                    error = e
+                )
+                return@sendMessage
+            }
+
+            val customerReceipt =
+                (_operationState.value as? OPIOperationStatus.Pending.Operation)
+                    ?.customerReceipt.orEmpty()
+            val merchantReceipt =
+                (_operationState.value as? OPIOperationStatus.Pending.Operation)
+                    ?.merchantReceipt.orEmpty()
+
+            _operationState.value = when (OverallResult.find(response.overallResult)) {
+                OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
+                    date = terminalConfig.timeNow(),
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    rawData = responseXml,
+                    data = response as? CardServiceResponse,
+                    reconciliationData = response as? ServiceResponse
+                )
+
+                else -> OPIOperationStatus.Result.Error(
+                    date = terminalConfig.timeNow(),
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    rawData = responseXml,
+                    data = response as? CardServiceResponse,
+                    reconciliationData = response as? ServiceResponse
+                )
+            }
+
+            // as per protocol, both channels are closed after C0 response
+            finishOperation()
+        }
     }
 
     private fun generateRequestId(): String {
@@ -618,6 +486,55 @@ class OPIChannelControllerImpl(
             idBuilder.append(chars[(Random.nextFloat() * chars.length).toInt()])
         }
         return idBuilder.toString()
+    }
+
+    private fun communicationErrorHandler(error: Throwable, message: String) {
+        if (_operationState.value is OPIOperationStatus.Result) {
+            Timber.tag("OPI_CHANNEL_CONTROLLER")
+                .d("Operation done, error ignored.\nError: $message\n$error")
+        }
+
+        _operationState.value = OPIOperationStatus.Error.Communication(message, error)
+    }
+
+    /**
+     * This method provides an updated pending state based on the C1 Output message.
+     * To provide the new state it needs the [currentState] and the received
+     * [output] data.
+     */
+    private fun handleC1OutputState(
+        currentState: OPIOperationStatus.Pending.Operation,
+        output: Output
+    ): OPIOperationStatus = when (DeviceType.find(output.outDeviceTarget)) {
+        // CASHIER_DISPLAY/CUSTOMER_DISPLAY are added to `messageLines` to be displayed on the UI
+        DeviceType.CASHIER_DISPLAY,
+        DeviceType.CUSTOMER_DISPLAY -> currentState.copy(
+            messageLines = output.textLines
+                ?.sortedBy { it.row ?: 0 }
+                ?.mapNotNull {
+                    it.value
+                }.orEmpty()
+        )
+
+        // PRINTER entries are build into merchantReceipt
+        DeviceType.PRINTER -> currentState.copy(
+            merchantReceipt = StringBuilder().apply {
+                output.textLines?.forEach {
+                    appendLine(it.value.orEmpty())
+                }
+            }.toString()
+        )
+
+        // PRINTER_RECEIPT entries are build into customerReceipt
+        DeviceType.PRINTER_RECEIPT -> currentState.copy(
+            customerReceipt = StringBuilder().apply {
+                output.textLines?.forEach {
+                    appendLine(it.value.orEmpty())
+                }
+            }.toString()
+        )
+
+        else -> currentState // TODO> Not handled yet
     }
 
     companion object {
