@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class OPIChannel0(
     private val socketIp: String,
     private val socketPort: Int,
+    private val socketFactory: SocketFactory = SocketFactory(),
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) {
 
@@ -39,7 +40,7 @@ class OPIChannel0(
 
         coroutineScope.launch {
             try {
-                webSocket = Socket(socketIp, socketPort)
+                webSocket = socketFactory.createClientSocket(socketIp, socketPort)
             } catch (e: Exception) {
                 close()
                 onError(e, "Terminal not reachable!")

@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class OPIChannel1(
     private val socketPort: Int,
+    private val socketFactory: SocketFactory = SocketFactory(),
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) {
 
@@ -37,7 +38,7 @@ class OPIChannel1(
 
         working.set(true)
         coroutineScope.launch {
-            webSocket = ServerSocket(socketPort)
+            webSocket = socketFactory.createServerSocket(socketPort)
             Timber.tag("OPI_CHANNEL_1").d("channel opened ${webSocket!!.isBound}")
 
             while (working.get()) {
