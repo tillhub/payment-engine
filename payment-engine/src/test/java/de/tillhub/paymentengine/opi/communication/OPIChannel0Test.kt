@@ -2,18 +2,24 @@ package de.tillhub.paymentengine.opi.communication
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.Ordering
 import io.mockk.Runs
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Socket
+import java.nio.ByteBuffer
 
 @ExperimentalCoroutinesApi
 class OPIChannel0Test : FunSpec({
@@ -31,24 +37,29 @@ class OPIChannel0Test : FunSpec({
 
     beforeAny {
         inputStream = mockk {
-            every { available() } returns CARD_SERVICE_RESPONSE_BYTES.size
+            every { available() } returns 0
             every { read(any(), any(), any()) } answers {
+                val data = RESPONSE_SIZE_BYTES + CARD_SERVICE_RESPONSE_BYTES
                 val arr = firstArg<ByteArray>()
-                CARD_SERVICE_RESPONSE_BYTES.copyInto(arr)
 
-                CARD_SERVICE_RESPONSE_BYTES.size
+                data.copyInto(arr)
+                data.size
             }
             every { close() } just Runs
         }
         outputStream = mockk {
             every { close() } just Runs
             every { flush() } just Runs
-            every { write(any<ByteArray>()) } just Runs
+            every { write(any<Int>()) } just Runs
         }
-        callbacks = mockk {
-            every { onMessage(any()) } just Runs
-            every { onError(any(), any()) } just Runs
-        }
+        callbacks = spyk(object : Callbacks {
+            override fun onMessage(s: String) {
+                every { inputStream.available() } returns 0
+            }
+
+            override fun onError(t: Throwable, s: String) = Unit
+
+        })
         socket = mockk {
             every { isConnected } returns true
             every { isClosed } returns false
@@ -66,12 +77,83 @@ class OPIChannel0Test : FunSpec({
         target.setOnError(callbacks::onError)
     }
 
-    test("open") {
+    test("open & close") {
         target.isConnected shouldBe false
 
         target.open()
 
+        target.isConnected shouldBe true
 
+        verify(Ordering.ORDERED) {
+            socketFactory.createClientSocket(socketIp, socketPort)
+            socket.getInputStream()
+            socket.getOutputStream()
+            inputStream.available()
+        }
+
+        target.close()
+
+        target.isConnected shouldBe false
+    }
+
+    test("send request and receive full response") {
+        target.open()
+
+        target.sendMessage(CARD_SERVICE_REQUEST, callbacks::onMessage)
+
+        every { inputStream.available() } returns
+                (RESPONSE_SIZE_BYTES + CARD_SERVICE_RESPONSE_BYTES).size
+
+        coroutineScope.launch {
+            coVerify {
+                callbacks.onMessage(CARD_SERVICE_RESPONSE)
+            }
+        }
+        target.close()
+    }
+
+    test("send request and receive partial response") {
+        val spliceLoc = CARD_SERVICE_RESPONSE_BYTES.size/2
+        val part1 = RESPONSE_SIZE_BYTES + CARD_SERVICE_RESPONSE_BYTES.slice(IntRange(0, spliceLoc-1))
+        val part2 = CARD_SERVICE_RESPONSE_BYTES
+            .slice(IntRange(spliceLoc, CARD_SERVICE_RESPONSE_BYTES.size-1)).toByteArray()
+
+        var callCount = 0
+        every { inputStream.read(any(), any(), any()) } answers {
+            val arr = firstArg<ByteArray>()
+
+            callCount++
+
+            when (callCount) {
+                1 -> {
+                    every { inputStream.available() } returns part2.size
+
+                    part1.copyInto(arr)
+                    part1.size
+                }
+                2 -> {
+                    every { inputStream.available() } returns 0
+
+                    part2.copyInto(arr)
+                    part2.size
+                }
+                else -> 0
+            }
+        }
+
+        target.open()
+
+        target.sendMessage(CARD_SERVICE_REQUEST, callbacks::onMessage)
+
+        every { inputStream.available() } returns part1.size
+
+        coroutineScope.launch {
+            coVerify {
+                callbacks.onMessage(CARD_SERVICE_RESPONSE)
+            }
+        }
+
+        target.close()
     }
 }) {
     companion object {
@@ -87,6 +169,8 @@ class OPIChannel0Test : FunSpec({
         """.trimIndent()
 
         private val CARD_SERVICE_REQUEST_BYTES = CARD_SERVICE_REQUEST.toByteArray()
+        private val REQUEST_SIZE_BYTES = ByteBuffer.allocate(4)
+            .putInt(CARD_SERVICE_REQUEST_BYTES.size).array()
 
         private val CARD_SERVICE_RESPONSE = """
             <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
@@ -111,6 +195,8 @@ class OPIChannel0Test : FunSpec({
         """.trimIndent()
 
         private val CARD_SERVICE_RESPONSE_BYTES = CARD_SERVICE_RESPONSE.toByteArray()
+        private val RESPONSE_SIZE_BYTES = ByteBuffer.allocate(4)
+            .putInt(CARD_SERVICE_RESPONSE_BYTES.size).array()
     }
 
     interface Callbacks {
