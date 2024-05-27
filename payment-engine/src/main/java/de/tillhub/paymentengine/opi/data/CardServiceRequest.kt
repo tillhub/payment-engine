@@ -30,7 +30,7 @@ data class CardServiceRequest(
     var requestType: String,
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationID: String,
+    var workstationId: String,
 
     @field:Element(name = "POSdata", required = false)
     @param:Element(name = "POSdata", required = false)
@@ -45,6 +45,7 @@ data class CardServiceRequest(
     var originalTransaction: OriginalTransaction? = null,
 )
 
+@Root(name = "POSdata", strict = false)
 data class PosData(
     @field:Element(name = "POSTimeStamp")
     @param:Element(name = "POSTimeStamp")

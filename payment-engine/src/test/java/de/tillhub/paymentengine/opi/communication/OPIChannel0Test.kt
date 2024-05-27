@@ -158,7 +158,7 @@ class OPIChannel0Test : FunSpec({
 }) {
     companion object {
         private val CARD_SERVICE_REQUEST = """
-            <?xml version="1.0" encoding="UTF-8" ?>
+            <?xml version="1.0" encoding="UTF-8"?>
             <CardServiceRequest RequestType="CardPayment" ApplicationSender="TillhubIOS" POPID="001"
             	xmlns="http://www.nrf-arts.org/IXRetail/namespace" RequestID="20544" WorkstationID="1">
             	<POSdata LanguageCode="de" RequestFullPAN="true">
@@ -169,11 +169,9 @@ class OPIChannel0Test : FunSpec({
         """.trimIndent()
 
         private val CARD_SERVICE_REQUEST_BYTES = CARD_SERVICE_REQUEST.toByteArray()
-        private val REQUEST_SIZE_BYTES = ByteBuffer.allocate(4)
-            .putInt(CARD_SERVICE_REQUEST_BYTES.size).array()
 
         private val CARD_SERVICE_RESPONSE = """
-            <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <CardServiceResponse
             	xmlns="http://www.nrf-arts.org/IXRetail/namespace"
             	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.nrf-arts.org/IXRetail/namespace file:///C:/Windows/O.P.I.Schema/CardResponse.xsd" RequestType="CardPayment" WorkstationID="1" RequestID="20544" OverallResult="Success">
