@@ -5,8 +5,6 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
-import org.simpleframework.xml.Text
-import java.math.BigDecimal
 
 @Root(name = "ServiceRequest", strict = false)
 @NamespaceList(
@@ -28,7 +26,7 @@ data class ServiceRequest(
     var requestType: String,
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationID: String,
+    var workstationId: String,
 
     @field:Element(name = "POSdata", required = false)
     @param:Element(name = "POSdata", required = false)

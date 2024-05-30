@@ -1,7 +1,6 @@
 package de.tillhub.paymentengine.opi.data
 
 import org.simpleframework.xml.Attribute
-import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
@@ -25,7 +24,7 @@ data class DeviceRequest(
     var requestType: String,
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationID: String,
+    var workstationId: String,
 
     @field:ElementList(inline = true, required = false)
     @param:ElementList(inline = true, required = false)

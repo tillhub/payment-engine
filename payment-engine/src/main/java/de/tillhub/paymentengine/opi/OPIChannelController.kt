@@ -23,6 +23,7 @@ import de.tillhub.paymentengine.opi.data.OriginalTransaction
 import de.tillhub.paymentengine.opi.data.Output
 import de.tillhub.paymentengine.opi.data.OverallResult
 import de.tillhub.paymentengine.opi.data.PosData
+import de.tillhub.paymentengine.opi.data.RequestIdFactory
 import de.tillhub.paymentengine.opi.data.ServiceRequest
 import de.tillhub.paymentengine.opi.data.ServiceResponse
 import de.tillhub.paymentengine.opi.data.StringToDtoConverter
@@ -59,20 +60,20 @@ interface OPIChannelController {
 class OPIChannelControllerImpl(
     private val converterFactory: ConverterFactory = ConverterFactory(),
     private val channelFactory: OPIChannelFactory = OPIChannelFactory(),
-    private val terminalConfig: TerminalConfig = TerminalConfigImpl()
+    private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
+    private val requestIdFactory: RequestIdFactory = RequestIdFactory()
 ) : OPIChannelController {
 
     private lateinit var terminal: Terminal.OPI
     private lateinit var channel0: OPIChannel0
     private lateinit var channel1: OPIChannel1
 
-    private val _operationState = MutableStateFlow<OPIOperationStatus>(OPIOperationStatus.Idle)
-
     private val initialized: Boolean
         get() = this@OPIChannelControllerImpl::terminal.isInitialized &&
                 this@OPIChannelControllerImpl::channel0.isInitialized &&
                 this@OPIChannelControllerImpl::channel1.isInitialized
 
+    private val _operationState = MutableStateFlow<OPIOperationStatus>(OPIOperationStatus.Idle)
     override val operationState: StateFlow<OPIOperationStatus>
         get() = _operationState
 
@@ -114,9 +115,9 @@ class OPIChannelControllerImpl(
                 requestConverter.convert(ServiceRequest(
                     applicationSender = terminal.saleConfig.applicationName,
                     popId = terminal.saleConfig.poiId,
-                    requestId = generateRequestId(),
+                    requestId = requestIdFactory.generateRequestId(),
                     requestType = ServiceRequestType.LOGIN.value,
-                    workstationID = terminal.saleConfig.saleId,
+                    workstationId = terminal.saleConfig.saleId,
                     posData = PosData(terminalConfig.timeNow().toISOString()),
                 ))
             } catch (e: Exception) {
@@ -159,8 +160,7 @@ class OPIChannelControllerImpl(
                         date = terminalConfig.timeNow(),
                         customerReceipt = "",
                         merchantReceipt = "",
-                        rawData = responseXml,
-                        data = null
+                        rawData = responseXml
                     )
                 }
 
@@ -188,9 +188,9 @@ class OPIChannelControllerImpl(
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
-                requestId = generateRequestId(),
+                requestId = requestIdFactory.generateRequestId(),
                 requestType = ServiceRequestType.CARD_PAYMENT.value,
-                workstationID = terminal.saleConfig.saleId,
+                workstationId = terminal.saleConfig.saleId,
                 posData = PosData(terminalConfig.timeNow().toISOString()),
                 totalAmount = TotalAmount(
                     value = amount.setScale(2),
@@ -226,9 +226,9 @@ class OPIChannelControllerImpl(
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
-                requestId = generateRequestId(),
+                requestId = requestIdFactory.generateRequestId(),
                 requestType = ServiceRequestType.PAYMENT_REVERSAL.value,
-                workstationID = terminal.saleConfig.saleId,
+                workstationId = terminal.saleConfig.saleId,
                 posData = PosData(terminalConfig.timeNow().toISOString()),
                 originalTransaction = OriginalTransaction(stan)
             )
@@ -261,9 +261,9 @@ class OPIChannelControllerImpl(
             val payload = CardServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
-                requestId = generateRequestId(),
+                requestId = requestIdFactory.generateRequestId(),
                 requestType = ServiceRequestType.PAYMENT_REFUND.value,
-                workstationID = terminal.saleConfig.saleId,
+                workstationId = terminal.saleConfig.saleId,
                 posData = PosData(terminalConfig.timeNow().toISOString()),
                 totalAmount = TotalAmount(
                     value = amount.setScale(2),
@@ -299,9 +299,9 @@ class OPIChannelControllerImpl(
             val payload = ServiceRequest(
                 applicationSender = terminal.saleConfig.applicationName,
                 popId = terminal.saleConfig.poiId,
-                requestId = generateRequestId(),
+                requestId = requestIdFactory.generateRequestId(),
                 requestType = ServiceRequestType.RECONCILIATION.value,
-                workstationID = terminal.saleConfig.saleId
+                workstationId = terminal.saleConfig.saleId
             )
 
             val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
@@ -479,15 +479,6 @@ class OPIChannelControllerImpl(
         }
     }
 
-    private fun generateRequestId(): String {
-        val chars = "1234567890"
-        val idBuilder = StringBuilder()
-        while (idBuilder.length < REQUEST_ID_LENGTH) {
-            idBuilder.append(chars[(Random.nextFloat() * chars.length).toInt()])
-        }
-        return idBuilder.toString()
-    }
-
     private fun communicationErrorHandler(error: Throwable, message: String) {
         if (_operationState.value is OPIOperationStatus.Result) {
             Timber.tag("OPI_CHANNEL_CONTROLLER")
@@ -539,6 +530,5 @@ class OPIChannelControllerImpl(
 
     companion object {
         private const val CONNECTION_WAIT_DELAY = 100L
-        private const val REQUEST_ID_LENGTH = 8
     }
 }

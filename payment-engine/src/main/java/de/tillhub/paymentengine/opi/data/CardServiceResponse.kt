@@ -24,7 +24,7 @@ data class CardServiceResponse(
     var requestType: String,
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationID: String,
+    var workstationId: String,
     @field:Attribute(name = "OverallResult")
     @param:Attribute(name = "OverallResult")
     override var overallResult: String,
