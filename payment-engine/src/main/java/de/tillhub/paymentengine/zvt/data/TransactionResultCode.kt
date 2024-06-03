@@ -4,17 +4,41 @@ import android.os.Parcelable
 import androidx.annotation.StringRes
 import de.tillhub.paymentengine.R
 import kotlinx.parcelize.Parcelize
+import java.util.Objects
 
 @Parcelize
-data class TransactionResultCode(
+class TransactionResultCode(
     @StringRes
     val errorMessage: Int,
     @StringRes
     val recoveryMessages: List<Int> = listOf()
-) : Parcelable
+) : Parcelable, Comparable<TransactionResultCode> {
+    override fun compareTo(other: TransactionResultCode): Int =
+        errorMessage.compareTo(other.errorMessage) +
+        if (recoveryMessages.containsAll(other.recoveryMessages) &&
+            other.recoveryMessages.containsAll(recoveryMessages)
+            ) {
+            0
+        } else {
+            -1
+        }
+
+    override fun equals(other: Any?) = other is TransactionResultCode &&
+            errorMessage == other.errorMessage &&
+            recoveryMessages == other.recoveryMessages
+
+    override fun hashCode() = Objects.hash(
+        errorMessage,
+        recoveryMessages
+    )
+    override fun toString() = "TransactionResultCode(" +
+            "errorMessage=$errorMessage, " +
+            "recoveryMessages=$recoveryMessages" +
+            ")"
+}
 
 @SuppressWarnings("MagicNumber")
-sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
+internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
     data object ZvtResultCodes : ResultCodeSets(
         mapOf(
             Pair(
@@ -273,7 +297,8 @@ sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
             Pair(75, TransactionResultCode(R.string.lavego_result_code_75_pin_try_limit_exceeded)),
             Pair(80, TransactionResultCode(R.string.lavego_result_code_80_referenced_tx_unknown)),
             Pair(
-                81, TransactionResultCode(
+                81,
+                TransactionResultCode(
                     errorMessage = R.string.lavego_result_code_81_initialisation_required,
                     recoveryMessages = listOf(R.string.recovery_message_initialisation)
                 )
@@ -289,8 +314,10 @@ sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
     companion object {
         fun get(resultCode: Int?): TransactionResultCode {
             return LavegoResultCodes.mapping.getOrDefault(
-                resultCode, ZvtResultCodes.mapping.getOrDefault(
-                    resultCode, TransactionResultCode(
+                resultCode,
+                ZvtResultCodes.mapping.getOrDefault(
+                    resultCode,
+                    TransactionResultCode(
                         errorMessage = R.string.zvt_error_code_unknown,
                         recoveryMessages = emptyList()
                     )

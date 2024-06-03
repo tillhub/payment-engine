@@ -56,7 +56,7 @@ class ConvertersTest : FunSpec({
     }
 }) {
     companion object {
-        val CARD_SERVICE_REQUEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        const val CARD_SERVICE_REQUEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<CardServiceRequest ApplicationSender=\"TillhubIOS\" POPID=\"001\" " +
                 "RequestID=\"20544\" RequestType=\"CardPayment\" " +
                 "WorkstationID=\"1\" xmlns=\"http://www.nrf-arts.org/IXRetail/namespace\" " +
@@ -138,7 +138,7 @@ class ConvertersTest : FunSpec({
             )
         )
 
-        val SERVICE_REQUEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        const val SERVICE_REQUEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<ServiceRequest " +
                 "ApplicationSender=\"TillhubIOS\" POPID=\"001\" RequestID=\"20793\" " +
                 "RequestType=\"Login\" WorkstationID=\"1\" " +
@@ -238,7 +238,7 @@ class ConvertersTest : FunSpec({
             )
         )
 
-        val DEVICE_RESPONSE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        const val DEVICE_RESPONSE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<DeviceResponse ApplicationSender=\"WINPOS\" POPID=\"001\" RequestID=\"20792\" " +
                 "RequestType=\"Output\" WorkstationID=\"1\" OverallResult=\"Success\" " +
                 "xmlns=\"http://www.nrf-arts.org/IXRetail/namespace\" " +

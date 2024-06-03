@@ -2,7 +2,7 @@ package de.tillhub.paymentengine.opi.data
 
 import kotlin.random.Random
 
-class RequestIdFactory {
+internal class RequestIdFactory {
     fun generateRequestId(): String {
         val chars = "1234567890"
         val idBuilder = StringBuilder()

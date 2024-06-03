@@ -11,7 +11,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -90,7 +89,7 @@ class OPIChannel1Test : FunSpec({
     }
 
     test("sendMessage") {
-        val payload = RESPONSE_SIZE_BYTES+RESPONSE_XML_BYTES
+        val payload = RESPONSE_SIZE_BYTES + RESPONSE_XML_BYTES
 
         target.open()
 
@@ -121,10 +120,10 @@ class OPIChannel1Test : FunSpec({
     }
 
     test("receive partial message") {
-        val spliceLoc = REQUEST_XML_BYTES.size/2
-        val part1 = REQUEST_SIZE_BYTES + REQUEST_XML_BYTES.slice(IntRange(0, spliceLoc-1))
+        val spliceLoc = REQUEST_XML_BYTES.size / 2
+        val part1 = REQUEST_SIZE_BYTES + REQUEST_XML_BYTES.slice(IntRange(0, spliceLoc - 1))
         val part2 = REQUEST_XML_BYTES
-            .slice(IntRange(spliceLoc, REQUEST_XML_BYTES.size-1)).toByteArray()
+            .slice(IntRange(spliceLoc, REQUEST_XML_BYTES.size - 1)).toByteArray()
 
         var callCount = 0
         every { inputStream.read(any(), any(), any()) } answers {

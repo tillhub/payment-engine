@@ -13,7 +13,7 @@ import de.tillhub.paymentengine.data.Terminal
 
 abstract class OPITerminalActivity : AppCompatActivity() {
 
-    protected val viewModel by viewModels<OPITerminalViewModel>()
+    internal val viewModel by viewModels<OPITerminalViewModel>()
 
     private val activityManager: ActivityManager by lazy {
         applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -61,17 +61,19 @@ abstract class OPITerminalActivity : AppCompatActivity() {
 
     private fun finishWithSuccess(state: OPITerminalViewModel.State.ResultSuccess) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation())
-        })
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation()) }
+        )
         finish()
     }
 
     private fun finishWithError(state: OPITerminalViewModel.State.ResultError) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation())
-        })
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation()) }
+        )
         finish()
     }
 

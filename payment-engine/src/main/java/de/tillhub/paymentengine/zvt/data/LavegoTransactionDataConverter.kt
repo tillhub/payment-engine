@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.math.BigInteger
 
-class LavegoTransactionDataConverter(
+internal class LavegoTransactionDataConverter(
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 ) {
     private fun createJsonAdapter(): JsonAdapter<TransactionDataDto> =
@@ -60,7 +60,7 @@ class LavegoTransactionDataConverter(
 
 @Keep
 @JsonClass(generateAdapter = true)
-data class TransactionDataDto(
+internal data class TransactionDataDto(
     @Json(name = "additional_text") val additionalText: String,
     @Json(name = "aid") val aid: String,
     @Json(name = "amount") val amount: Long,

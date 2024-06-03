@@ -11,6 +11,7 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
+import java.util.Objects
 
 class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOperationStatus>() {
 
@@ -32,14 +33,24 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
         return intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
-            BundleCompat.getParcelable(it,
-                ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
+            BundleCompat.getParcelable(
+                it,
+                ExtraKeys.EXTRAS_RESULT,
+                TerminalOperationStatus::class.java
+            )
         } ?: TerminalOperationStatus.Canceled
     }
 }
 
-data class RefundRequest(
+class RefundRequest(
     val config: Terminal,
     val amount: BigDecimal,
     val currency: ISOAlphaCurrency
-)
+) {
+    override fun toString() = "RefundRequest(config=$config, amount=$amount, currency=$currency)"
+    override fun equals(other: Any?) = other is RefundRequest &&
+            config == other.config &&
+            amount == other.amount &&
+            currency == other.currency
+    override fun hashCode() = Objects.hash(config, amount, currency)
+}

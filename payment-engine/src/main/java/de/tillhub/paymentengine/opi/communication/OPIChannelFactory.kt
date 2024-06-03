@@ -1,6 +1,6 @@
 package de.tillhub.paymentengine.opi.communication
 
-class OPIChannelFactory {
+internal class OPIChannelFactory {
 
     fun newOPIChannel0(
         socketIp: String,

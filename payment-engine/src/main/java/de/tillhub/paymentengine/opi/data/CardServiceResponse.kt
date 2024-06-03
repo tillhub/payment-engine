@@ -15,7 +15,7 @@ import org.simpleframework.xml.Text
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
-data class CardServiceResponse(
+internal data class CardServiceResponse(
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
     var requestId: String,
@@ -52,7 +52,7 @@ data class CardServiceResponse(
 
 @Parcelize
 @Root(name = "Terminal", strict = false)
-data class Terminal(
+internal data class Terminal(
     @field:Attribute(name = "STAN", required = false)
     @param:Attribute(name = "STAN", required = false)
     var stan: String? = null,
@@ -63,7 +63,7 @@ data class Terminal(
 
 @Parcelize
 @Root(name = "Tender", strict = false)
-data class Tender(
+internal data class Tender(
     @field:Element(name = "Authorisation", required = false)
     @param:Element(name = "Authorisation", required = false)
     var authorisation: Authorisation? = null,
@@ -75,7 +75,7 @@ data class Tender(
 
 @Parcelize
 @Root(name = "Authorisation", strict = false)
-data class Authorisation(
+internal data class Authorisation(
     @field:Attribute(name = "CardPAN", required = false)
     @param:Attribute(name = "CardPAN", required = false)
     var cardPAN: String? = null,
@@ -110,7 +110,7 @@ data class Authorisation(
 
 @Parcelize
 @Root(name = "CardDetails", strict = false)
-data class CardDetails(
+internal data class CardDetails(
     @field:Element(name = "ExpiryDate")
     @param:Element(name = "ExpiryDate")
     var expiryDate: ValueElement
@@ -118,7 +118,7 @@ data class CardDetails(
 
 @Parcelize
 @Root(name = "CardValue", strict = false)
-data class CardValue(
+internal data class CardValue(
     @field:Element(name = "CardCircuit", required = false)
     @param:Element(name = "CardCircuit")
     var cardCircuit: ValueElement? = null,
@@ -132,7 +132,7 @@ data class CardValue(
 
 @Parcelize
 @Root(name = "PrivateData", strict = false)
-data class PrivateData(
+internal data class PrivateData(
     @field:Element(name = "CardHolderAuthentication", required = false)
     @param:Element(name = "CardHolderAuthentication", required = false)
     var cardHolderAuthentication: ValueElement? = null,
@@ -154,13 +154,13 @@ data class PrivateData(
 ) : Parcelable
 
 @Parcelize
-data class ValueElement(
+internal data class ValueElement(
     @field:Text(required = false)
     @param:Text(required = false)
     var value: String? = null,
 ) : Parcelable
 
-enum class OverallResult(val value: String) {
+internal enum class OverallResult(val value: String) {
     SUCCESS("Success"),
     PARTIAL_FAILURE("PartialFailure"),
     FAILURE("Failure"),

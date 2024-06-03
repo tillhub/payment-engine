@@ -9,7 +9,6 @@ import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1
 import de.tillhub.paymentengine.opi.communication.OPIChannelFactory
 import de.tillhub.paymentengine.opi.data.CardServiceRequest
-import de.tillhub.paymentengine.opi.data.ServiceRequestType
 import de.tillhub.paymentengine.opi.data.CardServiceResponse
 import de.tillhub.paymentengine.opi.data.ConverterFactory
 import de.tillhub.paymentengine.opi.data.DeviceRequest
@@ -25,6 +24,7 @@ import de.tillhub.paymentengine.opi.data.OverallResult
 import de.tillhub.paymentengine.opi.data.PosData
 import de.tillhub.paymentengine.opi.data.RequestIdFactory
 import de.tillhub.paymentengine.opi.data.ServiceRequest
+import de.tillhub.paymentengine.opi.data.ServiceRequestType
 import de.tillhub.paymentengine.opi.data.ServiceResponse
 import de.tillhub.paymentengine.opi.data.StringToDtoConverter
 import de.tillhub.paymentengine.opi.data.TotalAmount
@@ -33,9 +33,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import java.math.BigDecimal
-import kotlin.random.Random
 
-interface OPIChannelController {
+internal interface OPIChannelController {
 
     val operationState: StateFlow<OPIOperationStatus>
 
@@ -56,8 +55,8 @@ interface OPIChannelController {
     suspend fun initiateReconciliation()
 }
 
-@Suppress("TooGenericExceptionCaught", "SwallowedException")
-class OPIChannelControllerImpl(
+@Suppress("TooGenericExceptionCaught", "SwallowedException", "TooManyFunctions")
+internal class OPIChannelControllerImpl(
     private val converterFactory: ConverterFactory = ConverterFactory(),
     private val channelFactory: OPIChannelFactory = OPIChannelFactory(),
     private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
@@ -112,14 +111,18 @@ class OPIChannelControllerImpl(
             )
 
             val xml = try {
-                requestConverter.convert(ServiceRequest(
-                    applicationSender = terminal.saleConfig.applicationName,
-                    popId = terminal.saleConfig.poiId,
-                    requestId = requestIdFactory.generateRequestId(),
-                    requestType = ServiceRequestType.LOGIN.value,
-                    workstationId = terminal.saleConfig.saleId,
-                    posData = PosData(terminalConfig.timeNow().toISOString()),
-                ))
+                requestConverter.convert(
+                    ServiceRequest(
+                        applicationSender = terminal.saleConfig.applicationName,
+                        popId = terminal.saleConfig.poiId,
+                        requestId = requestIdFactory.generateRequestId(),
+                        requestType = ServiceRequestType.LOGIN.value,
+                        workstationId = terminal.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = terminalConfig.timeNow().toISOString()
+                        ),
+                    )
+                )
             } catch (e: Exception) {
                 // In case of an exception when converting the TDO to XML we
                 // set the state to `Error.DataHandling`.
@@ -377,20 +380,22 @@ class OPIChannelControllerImpl(
 
             // Sending response
             try {
-                responseConverter.convert(DeviceResponse(
-                    applicationSender = terminal.saleConfig.applicationName,
-                    popId = terminal.saleConfig.poiId,
-                    requestId = request.requestId,
-                    requestType = request.requestType,
-                    workstationID = request.requestId,
-                    overallResult = OverallResult.SUCCESS.value,
-                    output = request.output?.map {
-                        it.copy(
-                            outResult = OverallResult.SUCCESS.value,
-                            textLines = null
-                        )
-                    }
-                ))
+                responseConverter.convert(
+                    DeviceResponse(
+                        applicationSender = terminal.saleConfig.applicationName,
+                        popId = terminal.saleConfig.poiId,
+                        requestId = request.requestId,
+                        requestType = request.requestType,
+                        workstationID = request.requestId,
+                        overallResult = OverallResult.SUCCESS.value,
+                        output = request.output?.map {
+                            it.copy(
+                                outResult = OverallResult.SUCCESS.value,
+                                textLines = null
+                            )
+                        }
+                    )
+                )
             } catch (e: Exception) {
                 // In case of an exception when converting the DTO to XML we
                 // set the state to `Error.DataHandling`.

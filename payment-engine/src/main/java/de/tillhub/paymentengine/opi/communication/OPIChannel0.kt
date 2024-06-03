@@ -9,12 +9,11 @@ import timber.log.Timber
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
-import java.lang.StringBuilder
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
-class OPIChannel0(
+internal class OPIChannel0(
     private val socketIp: String,
     private val socketPort: Int,
     private val socketFactory: SocketFactory = SocketFactory(),
@@ -41,7 +40,7 @@ class OPIChannel0(
         coroutineScope.launch {
             try {
                 webSocket = socketFactory.createClientSocket(socketIp, socketPort)
-            } catch (e: Exception) {
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
                 close()
                 onError(e, "Terminal not reachable!")
                 return@launch
@@ -123,7 +122,7 @@ class OPIChannel0(
                     }
                 }
 
-                if(!partialMsg) {
+                if (!partialMsg) {
                     val message = String(messageSB, CHARSET)
                     Timber.tag("OPI_CHANNEL_0").d("MSG RECEIVED:\n$message")
                     onMessage?.invoke(message)

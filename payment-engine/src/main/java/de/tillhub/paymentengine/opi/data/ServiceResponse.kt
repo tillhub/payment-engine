@@ -8,7 +8,6 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
-import org.simpleframework.xml.Text
 
 @Parcelize
 @Root(name = "ServiceResponse", strict = false)
@@ -16,7 +15,7 @@ import org.simpleframework.xml.Text
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
-data class ServiceResponse(
+internal data class ServiceResponse(
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
     var requestId: String,
@@ -49,7 +48,7 @@ data class ServiceResponse(
 
 @Parcelize
 @Root(name = "Reconciliation", strict = false)
-data class Reconciliation(
+internal data class Reconciliation(
     @field:Attribute(name = "LanguageCode", required = false)
     @param:Attribute(name = "LanguageCode", required = false)
     var languageCode: String? = null,

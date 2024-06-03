@@ -23,3 +23,43 @@
 -keep class de.lavego.** {
     *;
 }
+
+-keeppackagenames de.tillhub.paymentengine.**
+
+# Contracts
+-keep class de.tillhub.paymentengine.contract.** { *; }
+
+# Engine and managers
+-keep class de.tillhub.paymentengine.PaymentEngine { *; }
+-keep class de.tillhub.paymentengine.CardManager { *; }
+-keep class de.tillhub.paymentengine.CardManagerImpl { *; }
+-keep class de.tillhub.paymentengine.PaymentManager { *; }
+-keep class de.tillhub.paymentengine.ReconciliationManager { *; }
+-keep class de.tillhub.paymentengine.RefundManager { *; }
+-keep class de.tillhub.paymentengine.ReversalManager { *; }
+
+# Data classes
+-keep class de.tillhub.paymentengine.data.CardSaleConfig { *; }
+-keep class de.tillhub.paymentengine.data.ISOAlphaCurrency { *; }
+-keep class de.tillhub.paymentengine.data.Payment { *; }
+-keep class de.tillhub.paymentengine.data.Terminal { *; }
+-keep class de.tillhub.paymentengine.data.TerminalOperationStatus { *; }
+-keep class de.tillhub.paymentengine.data.TransactionData { *; }
+-keep class de.tillhub.paymentengine.zvt.data.TransactionResultCode { *; }
+
+# UI classes
+-keep class de.tillhub.paymentengine.helper.SingletonHolder { *; }
+-keep class de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity { *; }
+-keep class de.tillhub.paymentengine.opi.ui.OPIPaymentActivity { *; }
+-keep class de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity { *; }
+-keep class de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity { *; }
+-keep class de.tillhub.paymentengine.opi.ui.OPITerminalActivity { *; }
+-keep class de.tillhub.paymentengine.zvt.ui.CardPaymentActivity { *; }
+-keep class de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity { *; }
+-keep class de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity { *; }
+-keep class de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity { *; }
+-keep class de.tillhub.paymentengine.zvt.ui.CardTerminalActivity { *; }
+
+# Breaking changes with AGP 8.0
+# R8 upgrade documentation
+-dontwarn java.lang.invoke.StringConcatFactory

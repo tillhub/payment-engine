@@ -1,6 +1,6 @@
 package de.tillhub.paymentengine.opi.data
 
-class ConverterFactory {
+internal class ConverterFactory {
 
     fun <T> newStringToDtoConverter(clazz: Class<T>): StringToDtoConverter<T> =
         StringToDtoConverter(clazz)

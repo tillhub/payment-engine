@@ -1,9 +1,10 @@
 package de.tillhub.paymentengine.opi.data
 
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionData
 import java.time.Instant
 
-sealed class OPIOperationStatus {
+internal sealed class OPIOperationStatus {
     data object Idle : OPIOperationStatus()
 
     sealed class Pending : OPIOperationStatus() {
@@ -50,7 +51,27 @@ sealed class OPIOperationStatus {
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Error.OPI(
-                    date, customerReceipt, merchantReceipt, rawData, data, reconciliationData
+                    date = date,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    rawData = rawData,
+                    data = data?.let {
+                        TransactionData(
+                            terminalId = it.terminal?.terminalId.orEmpty(),
+                            transactionId = it.terminal?.stan.orEmpty(),
+                            cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
+                            cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
+                            paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
+                        )
+                    } ?: reconciliationData?.let {
+                        TransactionData(
+                            terminalId = it.terminal?.terminalId.orEmpty(),
+                            transactionId = "",
+                            cardCircuit = "",
+                            cardPan = "",
+                            paymentProvider = it.authorisation?.acquirerID.orEmpty()
+                        )
+                    }
                 )
         }
 
@@ -64,7 +85,27 @@ sealed class OPIOperationStatus {
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Success.OPI(
-                    date, customerReceipt, merchantReceipt, rawData, data, reconciliationData
+                    date = date,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    rawData = rawData,
+                    data = data?.let {
+                        TransactionData(
+                            terminalId = it.terminal?.terminalId.orEmpty(),
+                            transactionId = it.terminal?.stan.orEmpty(),
+                            cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
+                            cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
+                            paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
+                        )
+                    } ?: reconciliationData?.let {
+                        TransactionData(
+                            terminalId = it.terminal?.terminalId.orEmpty(),
+                            transactionId = "",
+                            cardCircuit = "",
+                            cardPan = "",
+                            paymentProvider = it.authorisation?.acquirerID.orEmpty()
+                        )
+                    }
                 )
         }
     }

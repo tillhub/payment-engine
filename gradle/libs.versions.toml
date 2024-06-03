@@ -10,7 +10,7 @@ constraintlayout = "2.1.4"
 moshi = "1.14.0"
 timber = "5.0.1"
 androidDesugarJdkLibs = "2.0.4"
-detekt = "1.23.3"
+detekt = "1.23.6"
 
 lavegoSdk = "1.0.0"
 lavegoUtils = "1.0.0"
@@ -42,7 +42,6 @@ material3 = { group = "androidx.compose.material3", name = "material3" }
 moshi = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
-detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 
 # Core components
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -68,6 +67,8 @@ simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref =
 retrofit-simplexml = { group = "com.squareup.retrofit2", name = "converter-simplexml", version.ref = "retrofit-simplexml" }
 
 # Unit testing
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
+detekt-libraries = { group = "io.gitlab.arturbosch.detekt", name = "detekt-rules-libraries", version.ref = "detekt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk-agent", version.ref = "mockk" }

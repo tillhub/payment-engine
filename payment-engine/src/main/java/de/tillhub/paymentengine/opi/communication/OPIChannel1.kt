@@ -16,7 +16,7 @@ import java.net.SocketException
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
-class OPIChannel1(
+internal class OPIChannel1(
     private val socketPort: Int,
     private val socketFactory: SocketFactory = SocketFactory(),
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -139,7 +139,7 @@ class OPIChannel1(
                     }
                 }
 
-                if(!partialMsg) {
+                if (!partialMsg) {
                     val message = String(messageSB, CHARSET)
                     Timber.tag("OPI_CHANNEL_1").d("MSG RECEIVED:\n$message")
                     onMessage(message)

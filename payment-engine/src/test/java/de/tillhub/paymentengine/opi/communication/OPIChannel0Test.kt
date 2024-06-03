@@ -12,7 +12,6 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -58,7 +57,6 @@ class OPIChannel0Test : FunSpec({
             }
 
             override fun onError(t: Throwable, s: String) = Unit
-
         })
         socket = mockk {
             every { isConnected } returns true
@@ -113,10 +111,10 @@ class OPIChannel0Test : FunSpec({
     }
 
     test("send request and receive partial response") {
-        val spliceLoc = CARD_SERVICE_RESPONSE_BYTES.size/2
-        val part1 = RESPONSE_SIZE_BYTES + CARD_SERVICE_RESPONSE_BYTES.slice(IntRange(0, spliceLoc-1))
+        val spliceLoc = CARD_SERVICE_RESPONSE_BYTES.size / 2
+        val part1 = RESPONSE_SIZE_BYTES + CARD_SERVICE_RESPONSE_BYTES.slice(IntRange(0, spliceLoc - 1))
         val part2 = CARD_SERVICE_RESPONSE_BYTES
-            .slice(IntRange(spliceLoc, CARD_SERVICE_RESPONSE_BYTES.size-1)).toByteArray()
+            .slice(IntRange(spliceLoc, CARD_SERVICE_RESPONSE_BYTES.size - 1)).toByteArray()
 
         var callCount = 0
         every { inputStream.read(any(), any(), any()) } answers {
@@ -167,8 +165,6 @@ class OPIChannel0Test : FunSpec({
             	<TotalAmount Currency="EUR">39.50</TotalAmount>
             </CardServiceRequest>
         """.trimIndent()
-
-        private val CARD_SERVICE_REQUEST_BYTES = CARD_SERVICE_REQUEST.toByteArray()
 
         private val CARD_SERVICE_RESPONSE = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
