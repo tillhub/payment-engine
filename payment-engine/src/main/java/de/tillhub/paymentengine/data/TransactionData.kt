@@ -11,14 +11,7 @@ class TransactionData(
     val cardCircuit: String,
     val cardPan: String,
     val paymentProvider: String,
-) : Parcelable, Comparable<TransactionData> {
-
-    override fun compareTo(other: TransactionData): Int =
-        terminalId.compareTo(other.transactionId) +
-                transactionId.compareTo(other.transactionId) +
-                cardCircuit.compareTo(other.cardCircuit) +
-                cardPan.compareTo(other.cardPan) +
-                paymentProvider.compareTo(other.paymentProvider)
+) : Parcelable {
 
     override fun equals(other: Any?) = other is TransactionData &&
             terminalId == other.terminalId &&

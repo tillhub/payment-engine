@@ -12,7 +12,7 @@ class CardSaleConfig(
     val pin: String = DEFAULT_PIN, // Terminal pin
     val poiId: String = DEFAULT_POI_ID, // Unique terminal ID
     val poiSerialNumber: String = DEFAULT_POI_SERIAL, // Unique terminal serial
-) : Parcelable, Comparable<CardSaleConfig> {
+) : Parcelable {
 
     override fun toString() = "CardSaleConfig(" +
             "applicationName=$applicationName, " +
@@ -22,14 +22,6 @@ class CardSaleConfig(
             "poiId=$poiId, " +
             "poiSerialNumber=$poiSerialNumber" +
             ")"
-
-    override fun compareTo(other: CardSaleConfig): Int =
-        applicationName.compareTo(other.applicationName) +
-        operatorId.compareTo(other.operatorId) +
-        saleId.compareTo(other.saleId) +
-        pin.compareTo(other.pin) +
-        poiId.compareTo(other.poiId) +
-        poiSerialNumber.compareTo(other.poiSerialNumber)
 
     override fun equals(other: Any?) = other is CardSaleConfig &&
             applicationName == other.applicationName &&

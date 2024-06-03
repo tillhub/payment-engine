@@ -8,18 +8,13 @@ import java.time.Instant
 import java.util.Objects
 
 @Parcelize
-sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationStatus> {
+sealed class TerminalOperationStatus : Parcelable {
     data object Waiting : TerminalOperationStatus()
     data object Canceled : TerminalOperationStatus()
 
     @Parcelize
     sealed class Pending : TerminalOperationStatus() {
         class Payment(val amount: BigDecimal, val currency: ISOAlphaCurrency) : Pending() {
-            override fun compareTo(other: TerminalOperationStatus): Int = if (other is Payment) {
-                amount.compareTo(other.amount) + currency.value.compareTo(other.currency.value)
-            } else {
-                -1
-            }
 
             override fun equals(other: Any?) = other is Payment &&
                     amount == other.amount &&
@@ -29,11 +24,6 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             override fun toString() = "Pending.Payment(amount=$amount, currency=$currency)"
         }
         class Reversal(val receiptNo: String) : Pending() {
-            override fun compareTo(other: TerminalOperationStatus): Int = if (other is Reversal) {
-                receiptNo.compareTo(other.receiptNo)
-            } else {
-                -1
-            }
 
             override fun equals(other: Any?) = other is Reversal &&
                     receiptNo == other.receiptNo
@@ -42,11 +32,6 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             override fun toString() = "Pending.Reversal(receiptNo=$receiptNo)"
         }
         class Refund(val amount: BigDecimal, val currency: ISOAlphaCurrency) : Pending() {
-            override fun compareTo(other: TerminalOperationStatus): Int = if (other is Refund) {
-                amount.compareTo(other.amount) + currency.value.compareTo(other.currency.value)
-            } else {
-                -1
-            }
 
             override fun equals(other: Any?) = other is Refund &&
                     amount == other.amount &&
@@ -81,22 +66,6 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             override val rawData: String,
             override val data: TransactionData?
         ) : Success()
-
-        override fun compareTo(other: TerminalOperationStatus): Int = if (other is Success) {
-            date.compareTo(other.date) +
-                    customerReceipt.compareTo(other.customerReceipt) +
-                    merchantReceipt.compareTo(other.merchantReceipt) +
-                    rawData.compareTo(other.rawData) +
-                    if (data != null && other.data != null) {
-                        data!!.compareTo(other.data!!)
-                    } else if (data == null && other.data == null) {
-                        0
-                    } else {
-                        -1
-                    }
-        } else {
-            -1
-        }
 
         override fun equals(other: Any?) = other is ZVT &&
                 date == other.date &&
@@ -148,23 +117,6 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             override val resultCode: TransactionResultCode
         ) : Error()
 
-        override fun compareTo(other: TerminalOperationStatus): Int = if (other is Error.ZVT) {
-            date.compareTo(other.date) +
-                    customerReceipt.compareTo(other.customerReceipt) +
-                    merchantReceipt.compareTo(other.merchantReceipt) +
-                    rawData.compareTo(other.rawData) +
-                    resultCode.compareTo(other.resultCode) +
-                    if (data != null && other.data != null) {
-                        data!!.compareTo(other.data)
-                    } else if (data == null && other.data == null) {
-                        0
-                    } else {
-                        -1
-                    }
-        } else {
-            -1
-        }
-
         override fun equals(other: Any?) = other is Error &&
                 date == other.date &&
                 customerReceipt == other.customerReceipt &&
@@ -190,13 +142,5 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
                 "data=$data, " +
                 "resultCode=$resultCode" +
                 ")"
-
     }
-
-    override fun compareTo(other: TerminalOperationStatus): Int =
-        if (this == other) {
-            0
-        } else {
-            -1
-        }
 }

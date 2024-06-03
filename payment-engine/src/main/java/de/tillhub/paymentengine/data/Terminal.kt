@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
 @Parcelize
-sealed class Terminal : Parcelable, Comparable<Terminal> {
+sealed class Terminal : Parcelable {
     abstract val name: String
     abstract val ipAddress: String
     abstract val port: Int
@@ -27,19 +27,6 @@ sealed class Terminal : Parcelable, Comparable<Terminal> {
                 "terminalPrinterAvailable=$terminalPrinterAvailable, " +
                 "isoCurrencyNumber=$isoCurrencyNumber" +
                 ")"
-
-        override fun compareTo(other: Terminal): Int {
-            if (other !is ZVT) {
-                return -1
-            }
-
-            return name.compareTo(other.name) +
-                ipAddress.compareTo(other.ipAddress) +
-                port.compareTo(other.port) +
-                saleConfig.compareTo(other.saleConfig) +
-                terminalPrinterAvailable.compareTo(other.terminalPrinterAvailable) +
-                isoCurrencyNumber.compareTo(other.isoCurrencyNumber)
-        }
 
         override fun equals(other: Any?) = other is ZVT &&
                 name == other.name &&
@@ -83,19 +70,6 @@ sealed class Terminal : Parcelable, Comparable<Terminal> {
                 "port2=$port2, " +
                 "currencyCode=$currencyCode" +
                 ")"
-
-        override fun compareTo(other: Terminal): Int {
-            if (other !is OPI) {
-                return -1
-            }
-
-            return name.compareTo(other.name) +
-                    ipAddress.compareTo(other.ipAddress) +
-                    port.compareTo(other.port) +
-                    saleConfig.compareTo(other.saleConfig) +
-                    port2.compareTo(other.port2) +
-                    currencyCode.compareTo(other.currencyCode)
-        }
 
         override fun equals(other: Any?) = other is OPI &&
                 name == other.name &&

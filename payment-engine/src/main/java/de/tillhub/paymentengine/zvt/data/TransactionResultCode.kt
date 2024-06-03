@@ -12,17 +12,7 @@ class TransactionResultCode(
     val errorMessage: Int,
     @StringRes
     val recoveryMessages: List<Int> = listOf()
-) : Parcelable, Comparable<TransactionResultCode> {
-    override fun compareTo(other: TransactionResultCode): Int =
-        errorMessage.compareTo(other.errorMessage) +
-        if (recoveryMessages.containsAll(other.recoveryMessages) &&
-            other.recoveryMessages.containsAll(recoveryMessages)
-            ) {
-            0
-        } else {
-            -1
-        }
-
+) : Parcelable {
     override fun equals(other: Any?) = other is TransactionResultCode &&
             errorMessage == other.errorMessage &&
             recoveryMessages == other.recoveryMessages
