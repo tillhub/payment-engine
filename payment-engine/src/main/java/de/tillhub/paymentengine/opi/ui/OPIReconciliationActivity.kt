@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
-class OPIReconciliationActivity : OPITerminalActivity() {
+internal class OPIReconciliationActivity : OPITerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
 

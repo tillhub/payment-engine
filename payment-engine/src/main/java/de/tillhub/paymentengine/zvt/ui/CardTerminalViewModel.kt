@@ -32,7 +32,7 @@ internal class CardTerminalViewModel(
 
     private val _terminalOperationState: MutableLiveData<State> =
         MutableLiveData(State.Idle)
-    internal val terminalOperationState: LiveData<State> = _terminalOperationState
+    val terminalOperationState: LiveData<State> = _terminalOperationState
 
     fun init() {
         viewModelScope.launch {

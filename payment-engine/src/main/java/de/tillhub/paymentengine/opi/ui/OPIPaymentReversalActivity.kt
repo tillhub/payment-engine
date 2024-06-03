@@ -7,7 +7,7 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
-class OPIPaymentReversalActivity : OPITerminalActivity() {
+internal class OPIPaymentReversalActivity : OPITerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
 

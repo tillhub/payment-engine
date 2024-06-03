@@ -19,7 +19,7 @@ internal class OPITerminalViewModel(
 
     private val _opiOperationState: MutableLiveData<State> =
         MutableLiveData(State.Idle)
-    internal val opiOperationState: LiveData<State> = _opiOperationState
+    val opiOperationState: LiveData<State> = _opiOperationState
 
     fun init(terminal: Terminal.OPI) {
         opiChannelController.init(terminal)

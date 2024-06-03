@@ -14,7 +14,7 @@ import de.tillhub.paymentengine.databinding.ActivityCardPaymentPartialRefundBind
 import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
 
-class CardPaymentPartialRefundActivity : CardTerminalActivity() {
+internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
 
     companion object {
         private const val TAG = "CardPaymentPartialRefundActivity"

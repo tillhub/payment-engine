@@ -10,7 +10,7 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentReversalBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
-class CardPaymentReversalActivity : CardTerminalActivity() {
+internal class CardPaymentReversalActivity : CardTerminalActivity() {
 
     companion object {
         private const val TAG = "CardPaymentReversalActivity"

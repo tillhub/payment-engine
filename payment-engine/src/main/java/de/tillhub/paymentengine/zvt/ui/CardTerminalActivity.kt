@@ -19,7 +19,7 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 
 @Suppress("TooManyFunctions")
-abstract class CardTerminalActivity : PaymentTerminalActivity() {
+internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private val viewModel by viewModels<CardTerminalViewModel>()
 

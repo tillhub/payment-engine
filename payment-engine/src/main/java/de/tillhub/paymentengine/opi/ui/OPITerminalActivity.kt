@@ -11,7 +11,7 @@ import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 
-abstract class OPITerminalActivity : AppCompatActivity() {
+internal abstract class OPITerminalActivity : AppCompatActivity() {
 
     internal val viewModel by viewModels<OPITerminalViewModel>()
 
