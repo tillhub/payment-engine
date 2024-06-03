@@ -31,6 +31,7 @@
 
 # Engine and managers
 -keep class de.tillhub.paymentengine.PaymentEngine { *; }
+-keep class de.tillhub.paymentengine.PaymentEngine$Companion { *; }
 -keep class de.tillhub.paymentengine.CardManager { *; }
 -keep class de.tillhub.paymentengine.CardManagerImpl { *; }
 -keep class de.tillhub.paymentengine.PaymentManager { *; }
@@ -40,10 +41,13 @@
 
 # Data classes
 -keep class de.tillhub.paymentengine.data.CardSaleConfig { *; }
+-keep class de.tillhub.paymentengine.data.CardSaleConfig$* { *; }
 -keep class de.tillhub.paymentengine.data.ISOAlphaCurrency { *; }
 -keep class de.tillhub.paymentengine.data.Payment { *; }
 -keep class de.tillhub.paymentengine.data.Terminal { *; }
+-keep class de.tillhub.paymentengine.data.Terminal$* { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus { *; }
+-keep class de.tillhub.paymentengine.data.TerminalOperationStatus$* { *; }
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.zvt.data.TransactionResultCode { *; }
 
