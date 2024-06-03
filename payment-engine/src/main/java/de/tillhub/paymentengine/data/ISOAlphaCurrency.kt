@@ -8,9 +8,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 value class ISOAlphaCurrency(val value: String) : Parcelable {
     init {
-        require(ISOCurrency.entries.any {
-            this.value == it.alpha()
-        }) {
+        require(
+            ISOCurrency.entries.any { this.value == it.alpha() }
+        ) {
             "Currency must be part of ISO 4217 currency codes, was $value"
         }
     }

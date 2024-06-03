@@ -1,5 +1,5 @@
 package de.tillhub.paymentengine.opi.data
 
-interface OPIResponse {
+internal interface OPIResponse {
     var overallResult: String
 }

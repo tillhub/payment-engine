@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import de.tillhub.paymentengine.databinding.ActivityTerminalReconciliationBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
-class TerminalReconciliationActivity : CardTerminalActivity() {
+internal class TerminalReconciliationActivity : CardTerminalActivity() {
 
     private val binding by viewBinding(ActivityTerminalReconciliationBinding::inflate)
 

@@ -11,7 +11,7 @@ import org.simpleframework.xml.Root
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
-data class ServiceRequest(
+internal data class ServiceRequest(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
     var applicationSender: String,

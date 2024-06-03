@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.contract
+package de.tillhub.paymentengine.data
 
 object ExtraKeys {
     const val EXTRA_CONFIG = "extra_config"

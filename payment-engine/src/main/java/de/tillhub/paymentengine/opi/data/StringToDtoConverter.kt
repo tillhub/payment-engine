@@ -4,7 +4,7 @@ import org.simpleframework.xml.Serializer
 import retrofit2.Converter
 import java.io.IOException
 
-class StringToDtoConverter<T>(
+internal class StringToDtoConverter<T>(
     private val clazz: Class<T>,
     private val serializer: Serializer = OPISerializer()
 ) : Converter<String, T> {

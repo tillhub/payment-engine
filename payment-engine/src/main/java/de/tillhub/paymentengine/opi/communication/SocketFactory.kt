@@ -3,7 +3,7 @@ package de.tillhub.paymentengine.opi.communication
 import java.net.ServerSocket
 import java.net.Socket
 
-class SocketFactory {
+internal class SocketFactory {
     fun createServerSocket(socketPort: Int): ServerSocket =
         ServerSocket(socketPort)
 

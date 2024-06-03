@@ -1,7 +1,6 @@
 package de.tillhub.paymentengine.opi.data
 
 import org.simpleframework.xml.Attribute
-import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
@@ -12,7 +11,7 @@ import org.simpleframework.xml.Root
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
-data class DeviceResponse(
+internal data class DeviceResponse(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
     var applicationSender: String,

@@ -5,12 +5,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPaymentActivity
 import de.tillhub.paymentengine.zvt.ui.CardPaymentActivity
 import java.math.BigDecimal
+import java.util.Objects
 
 class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOperationStatus>() {
 
@@ -36,8 +38,15 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
     }
 }
 
-data class PaymentRequest(
+class PaymentRequest(
     val config: Terminal,
     val amount: BigDecimal,
     val currency: ISOAlphaCurrency
-)
+) {
+    override fun toString() = "PaymentRequest(config=$config, amount=$amount, currency=$currency)"
+    override fun equals(other: Any?) = other is PaymentRequest &&
+            config == other.config &&
+            amount == other.amount &&
+            currency == other.currency
+    override fun hashCode() = Objects.hash(config, amount, currency)
+}

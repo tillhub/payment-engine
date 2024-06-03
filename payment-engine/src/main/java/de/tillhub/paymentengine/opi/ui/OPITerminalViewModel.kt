@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.math.BigDecimal
 
-class OPITerminalViewModel(
+internal class OPITerminalViewModel(
     private val opiChannelController: OPIChannelController = OPIChannelControllerImpl()
 ) : ViewModel() {
 
@@ -85,7 +85,7 @@ class OPITerminalViewModel(
         }
     }
 
-    sealed class State {
+    internal sealed class State {
         data object Idle : State()
 
         data object LoggedIn : State()

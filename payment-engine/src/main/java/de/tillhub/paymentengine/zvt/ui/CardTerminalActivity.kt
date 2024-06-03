@@ -15,10 +15,11 @@ import de.lavego.sdk.TransportConfiguration
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 
-abstract class CardTerminalActivity : PaymentTerminalActivity() {
+@Suppress("TooManyFunctions")
+internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private val viewModel by viewModels<CardTerminalViewModel>()
 
@@ -99,11 +100,13 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
             with(zvtFlags) {
                 isoCurrencyRegister(config.isoCurrencyNumber)
-                paymentType(if (config.terminalPrinterAvailable) {
-                    0b1000100.toByte() // terminal supports the printer ready bit (3)
-                } else {
-                    0b1000000.toByte() // terminal does NOT support the printer ready bit (3)
-                })
+                paymentType(
+                    if (config.terminalPrinterAvailable) {
+                        0b1000100.toByte() // terminal supports the printer ready bit (3)
+                    } else {
+                        0b1000000.toByte() // terminal does NOT support the printer ready bit (3)
+                    }
+                )
             }
         }
     }
@@ -147,17 +150,19 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation())
-        })
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
+        )
         finish()
     }
 
     private fun finishWithError(state: CardTerminalViewModel.State.Error) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation())
-        })
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
+        )
         finish()
     }
 

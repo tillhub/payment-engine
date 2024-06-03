@@ -15,7 +15,7 @@ import java.math.BigDecimal
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
-data class CardServiceRequest(
+internal data class CardServiceRequest(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
     var applicationSender: String,
@@ -46,7 +46,7 @@ data class CardServiceRequest(
 )
 
 @Root(name = "POSdata", strict = false)
-data class PosData(
+internal data class PosData(
     @field:Element(name = "POSTimeStamp")
     @param:Element(name = "POSTimeStamp")
     var timestamp: String
@@ -54,7 +54,7 @@ data class PosData(
 
 @Parcelize
 @Root(name = "TotalAmount", strict = false)
-data class TotalAmount(
+internal data class TotalAmount(
     @field:Text
     @param:Text
     var value: BigDecimal,
@@ -76,13 +76,13 @@ data class TotalAmount(
     var paymentAmount: String? = null,
 ) : Parcelable
 
-data class OriginalTransaction(
+internal data class OriginalTransaction(
     @field:Attribute(name = "STAN")
     @param:Attribute(name = "STAN")
     var stan: String,
 )
 
-enum class ServiceRequestType(val value: String) {
+internal enum class ServiceRequestType(val value: String) {
     CARD_PAYMENT("CardPayment"),
     PAYMENT_REVERSAL("PaymentReversal"),
     PAYMENT_REFUND("PaymentRefund"),

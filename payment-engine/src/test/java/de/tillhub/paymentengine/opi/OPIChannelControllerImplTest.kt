@@ -38,7 +38,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-
+@Suppress("LargeClass")
 @ExperimentalCoroutinesApi
 class OPIChannelControllerImplTest : DescribeSpec({
     lateinit var converterFactory: ConverterFactory
@@ -171,14 +171,18 @@ class OPIChannelControllerImplTest : DescribeSpec({
                     converterFactory.newStringToDtoConverter(ServiceResponse::class.java)
                     requestIdFactory.generateRequestId()
                     terminalConfig.timeNow()
-                    serviceRequestConverter.convert(ServiceRequest(
-                        applicationSender = TERMINAL.saleConfig.applicationName,
-                        popId = TERMINAL.saleConfig.poiId,
-                        requestId = "12345678",
-                        requestType = "Login",
-                        workstationId = TERMINAL.saleConfig.saleId,
-                        posData = PosData("2024-02-09T09:36:36Z"),
-                    ))
+                    serviceRequestConverter.convert(
+                        ServiceRequest(
+                            applicationSender = TERMINAL.saleConfig.applicationName,
+                            popId = TERMINAL.saleConfig.poiId,
+                            requestId = "12345678",
+                            requestType = "Login",
+                            workstationId = TERMINAL.saleConfig.saleId,
+                            posData = PosData(
+                                timestamp = "2024-02-09T09:36:36Z"
+                            ),
+                        )
+                    )
                     opiChannel0.setOnError(any())
                     opiChannel0.open()
                     opiChannel0.sendMessage(ConvertersTest.SERVICE_REQUEST_XML, any())
@@ -206,14 +210,18 @@ class OPIChannelControllerImplTest : DescribeSpec({
                     converterFactory.newStringToDtoConverter(ServiceResponse::class.java)
                     requestIdFactory.generateRequestId()
                     terminalConfig.timeNow()
-                    serviceRequestConverter.convert(ServiceRequest(
-                        applicationSender = TERMINAL.saleConfig.applicationName,
-                        popId = TERMINAL.saleConfig.poiId,
-                        requestId = "12345678",
-                        requestType = "Login",
-                        workstationId = TERMINAL.saleConfig.saleId,
-                        posData = PosData("2024-02-09T09:36:36Z"),
-                    ))
+                    serviceRequestConverter.convert(
+                        ServiceRequest(
+                            applicationSender = TERMINAL.saleConfig.applicationName,
+                            popId = TERMINAL.saleConfig.poiId,
+                            requestId = "12345678",
+                            requestType = "Login",
+                            workstationId = TERMINAL.saleConfig.saleId,
+                            posData = PosData(
+                                timestamp = "2024-02-09T09:36:36Z"
+                            ),
+                        )
+                    )
                     opiChannel0.setOnError(any())
                     opiChannel0.open()
                     opiChannel0.sendMessage(ConvertersTest.SERVICE_REQUEST_XML, any())
@@ -249,7 +257,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("SUCCESS") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -270,18 +278,22 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                cardServiceRequestConverter.convert(CardServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "CardPayment",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                    posData = PosData("2024-02-09T09:36:36Z"),
-                    totalAmount = TotalAmount(
-                        value = 6.0.toBigDecimal().setScale(2),
-                        currency = "EUR"
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "CardPayment",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                        totalAmount = TotalAmount(
+                            value = 6.0.toBigDecimal().setScale(2),
+                            currency = "EUR"
+                        )
                     )
-                ))
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -336,7 +348,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("ERROR") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -357,18 +369,22 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                cardServiceRequestConverter.convert(CardServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "CardPayment",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                    posData = PosData("2024-02-09T09:36:36Z"),
-                    totalAmount = TotalAmount(
-                        value = 6.0.toBigDecimal().setScale(2),
-                        currency = "EUR"
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "CardPayment",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                        totalAmount = TotalAmount(
+                            value = 6.0.toBigDecimal().setScale(2),
+                            currency = "EUR"
+                        )
                     )
-                ))
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -399,7 +415,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("SUCCESS") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -420,15 +436,19 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                cardServiceRequestConverter.convert(CardServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "PaymentReversal",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                    posData = PosData("2024-02-09T09:36:36Z"),
-                    originalTransaction = OriginalTransaction("223")
-                ))
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "PaymentReversal",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                        originalTransaction = OriginalTransaction("223")
+                    )
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -483,7 +503,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("ERROR") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -504,15 +524,19 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                cardServiceRequestConverter.convert(CardServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "PaymentReversal",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                    posData = PosData("2024-02-09T09:36:36Z"),
-                    originalTransaction = OriginalTransaction("223")
-                ))
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "PaymentReversal",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                        originalTransaction = OriginalTransaction("223")
+                    )
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -543,7 +567,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("SUCCESS") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -564,18 +588,22 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                cardServiceRequestConverter.convert(CardServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "PaymentRefund",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                    posData = PosData("2024-02-09T09:36:36Z"),
-                    totalAmount = TotalAmount(
-                        value = 6.0.toBigDecimal().setScale(2),
-                        currency = "EUR"
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "PaymentRefund",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                        totalAmount = TotalAmount(
+                            value = 6.0.toBigDecimal().setScale(2),
+                            currency = "EUR"
+                        )
                     )
-                ))
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -630,7 +658,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("ERROR") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -651,18 +679,22 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                cardServiceRequestConverter.convert(CardServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "PaymentRefund",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                    posData = PosData("2024-02-09T09:36:36Z"),
-                    totalAmount = TotalAmount(
-                        value = 6.0.toBigDecimal().setScale(2),
-                        currency = "EUR"
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "PaymentRefund",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                        totalAmount = TotalAmount(
+                            value = 6.0.toBigDecimal().setScale(2),
+                            currency = "EUR"
+                        )
                     )
-                ))
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -692,7 +724,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
         }
 
         it("SUCCESS") {
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<ServiceRequest>() } returns serviceRequestConverter
 
                 deviceResponseConverter
@@ -713,13 +745,15 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(ServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                serviceRequestConverter.convert(ServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "ReconciliationWithClosure",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                ))
+                serviceRequestConverter.convert(
+                    ServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "ReconciliationWithClosure",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                    )
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.SERVICE_REQUEST_XML, any())
             }
@@ -773,7 +807,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
         }
 
         it("ERROR") {
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<ServiceRequest>() } returns serviceRequestConverter
 
                 deviceResponseConverter
@@ -794,13 +828,15 @@ class OPIChannelControllerImplTest : DescribeSpec({
                 converterFactory.newStringToDtoConverter(ServiceResponse::class.java)
                 opiChannel0.setOnError(any())
                 opiChannel0.open()
-                serviceRequestConverter.convert(ServiceRequest(
-                    applicationSender = TERMINAL.saleConfig.applicationName,
-                    popId = TERMINAL.saleConfig.poiId,
-                    requestId = "12345678",
-                    requestType = "ReconciliationWithClosure",
-                    workstationId = TERMINAL.saleConfig.saleId,
-                ))
+                serviceRequestConverter.convert(
+                    ServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "ReconciliationWithClosure",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                    )
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.SERVICE_REQUEST_XML, any())
             }
@@ -835,7 +871,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("channel 1 errors") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter
@@ -854,7 +890,7 @@ class OPIChannelControllerImplTest : DescribeSpec({
 
         it("channel 0 errors") {
             every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
-            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers  {
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
                 every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
 
                 deviceResponseConverter

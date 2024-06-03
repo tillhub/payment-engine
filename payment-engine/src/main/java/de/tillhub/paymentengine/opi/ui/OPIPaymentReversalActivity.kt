@@ -1,17 +1,13 @@
 package de.tillhub.paymentengine.opi.ui
 
 import android.os.Bundle
-import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import de.tillhub.paymentengine.contract.ExtraKeys
-import de.tillhub.paymentengine.data.ISOAlphaCurrency
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
-import de.tillhub.paymentengine.helper.serializable
 import de.tillhub.paymentengine.helper.viewBinding
-import java.math.BigDecimal
 
-class OPIPaymentReversalActivity : OPITerminalActivity() {
+internal class OPIPaymentReversalActivity : OPITerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
 

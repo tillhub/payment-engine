@@ -8,7 +8,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-fun String.toInstant(
+internal fun String.toInstant(
     dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME
 ): Instant {
     return try {
@@ -27,7 +27,7 @@ fun String.toInstant(
     }
 }
 
-fun Instant.toISOString(
+internal fun Instant.toISOString(
     dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT
 ): String {
     return dateTimeFormatter.withZone(ZoneId.from(ZoneOffset.UTC)).format(this)

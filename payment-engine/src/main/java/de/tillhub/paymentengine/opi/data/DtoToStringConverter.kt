@@ -7,7 +7,7 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.nio.charset.Charset
 
-class DtoToStringConverter<T>(
+internal class DtoToStringConverter<T>(
     private val serializer: Serializer = OPISerializer()
 ) : Converter<T, String> {
 

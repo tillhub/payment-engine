@@ -12,7 +12,7 @@ import org.simpleframework.xml.Text
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
     Namespace(prefix = "xsi", reference = "http://www.w3.org/2001/XMLSchema-instance"),
 )
-data class DeviceRequest(
+internal data class DeviceRequest(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
     var applicationSender: String,
@@ -32,7 +32,7 @@ data class DeviceRequest(
 )
 
 @Root(name = "Output", strict = false)
-data class Output(
+internal data class Output(
     @field:Attribute(name = "OutDeviceTarget")
     @param:Attribute(name = "OutDeviceTarget")
     var outDeviceTarget: String,
@@ -47,7 +47,7 @@ data class Output(
 )
 
 @Root(name = "TextLine", strict = false)
-data class TextLine(
+internal data class TextLine(
     @field:Attribute(name = "TimeOut", required = false)
     @param:Attribute(name = "TimeOut", required = false)
     var timeOut: Int? = null,
@@ -69,7 +69,7 @@ data class TextLine(
     var value: String? = null
 )
 
-enum class DeviceType(val value: String) {
+internal enum class DeviceType(val value: String) {
     CASHIER_DISPLAY("CashierDisplay"),
     CUSTOMER_DISPLAY("CustomerDisplay"),
     PRINTER("Printer"),
@@ -84,7 +84,7 @@ enum class DeviceType(val value: String) {
     }
 }
 
-enum class DeviceRequestType(val value: String) {
+internal enum class DeviceRequestType(val value: String) {
     OUTPUT("Output"),
     INPUT("Input"),
     UNKNOWN("");
