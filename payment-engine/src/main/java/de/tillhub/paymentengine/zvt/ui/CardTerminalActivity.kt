@@ -15,7 +15,7 @@ import de.lavego.sdk.TransportConfiguration
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 
 @Suppress("TooManyFunctions")

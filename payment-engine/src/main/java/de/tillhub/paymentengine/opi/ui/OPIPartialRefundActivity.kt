@@ -4,10 +4,9 @@ import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
-import de.tillhub.paymentengine.helper.serializable
 import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
 
@@ -16,8 +15,10 @@ class OPIPartialRefundActivity : OPITerminalActivity() {
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
 
     private val amount: BigDecimal by lazy {
-        intent.extras?.serializable<BigDecimal>(ExtraKeys.EXTRA_AMOUNT)
-            ?: throw IllegalArgumentException("$TAG: Argument amount is missing")
+        intent.extras?.let {
+            BundleCompat.getSerializable(it, ExtraKeys.EXTRA_AMOUNT, BigDecimal::class.java)
+                ?: throw IllegalArgumentException("$TAG: Argument amount is missing")
+        } ?: throw IllegalArgumentException("$TAG: Extras are missing")
     }
     private val currency: ISOAlphaCurrency by lazy {
         intent.extras?.let {

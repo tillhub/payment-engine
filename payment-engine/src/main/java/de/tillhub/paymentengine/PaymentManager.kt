@@ -20,7 +20,7 @@ interface PaymentManager : CardManager {
     fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, config: Terminal)
 }
 
-class PaymentManagerImpl(
+internal class PaymentManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
     resultCaller: ActivityResultCaller

@@ -8,10 +8,9 @@ import de.lavego.ISO4217
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentPartialRefundBinding
-import de.tillhub.paymentengine.helper.serializable
 import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
 
@@ -25,8 +24,10 @@ class CardPaymentPartialRefundActivity : CardTerminalActivity() {
     private val binding by viewBinding(ActivityCardPaymentPartialRefundBinding::inflate)
 
     private val amount: BigDecimal by lazy {
-        intent.extras?.serializable<BigDecimal>(ExtraKeys.EXTRA_AMOUNT)
-            ?: throw IllegalArgumentException("$TAG: Argument amount is missing")
+        intent.extras?.let {
+            BundleCompat.getSerializable(it, ExtraKeys.EXTRA_AMOUNT, BigDecimal::class.java)
+                ?: throw IllegalArgumentException("$TAG: Argument amount is missing")
+        } ?: throw IllegalArgumentException("$TAG: Extras are missing")
     }
     private val currency: ISOAlphaCurrency by lazy {
         intent.extras?.let {

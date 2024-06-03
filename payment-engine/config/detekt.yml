@@ -764,7 +764,6 @@ libraries:
         excludes:
             - '**/main/java/de/tillhub/paymentengine/contract/**'
             - '**/main/java/de/tillhub/paymentengine/CardManager.kt'
-            - '**/main/java/de/tillhub/paymentengine/CardManagerImpl.kt'
             - '**/main/java/de/tillhub/paymentengine/PaymentEngine.kt'
             - '**/main/java/de/tillhub/paymentengine/PaymentManager.kt'
             - '**/main/java/de/tillhub/paymentengine/ReconciliationManager.kt'

@@ -3,7 +3,7 @@ package de.tillhub.paymentengine.opi.ui
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
