@@ -40,7 +40,7 @@ internal class OPIChannel0(
         coroutineScope.launch {
             try {
                 webSocket = socketFactory.createClientSocket(socketIp, socketPort)
-            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            } catch (e: IOException) {
                 close()
                 onError(e, "Terminal not reachable!")
                 return@launch
