@@ -112,7 +112,7 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             rawData,
             data
         )
-        override fun toString() = "Success.ZVT(" +
+        override fun toString() = "Success(" +
                 "date=$date, " +
                 "customerReceipt=$customerReceipt, " +
                 "merchantReceipt=$merchantReceipt, " +
@@ -128,6 +128,7 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
         abstract val merchantReceipt: String
         abstract val rawData: String
         abstract val data: TransactionData?
+        abstract val resultCode: TransactionResultCode
 
         class ZVT(
             override val date: Instant,
@@ -135,48 +136,8 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             override val merchantReceipt: String,
             override val rawData: String,
             override val data: TransactionData?,
-            val resultCode: TransactionResultCode
-        ) : Error() {
-            override fun compareTo(other: TerminalOperationStatus): Int = if (other is ZVT) {
-                date.compareTo(other.date) +
-                        customerReceipt.compareTo(other.customerReceipt) +
-                        merchantReceipt.compareTo(other.merchantReceipt) +
-                        rawData.compareTo(other.rawData) +
-                        resultCode.compareTo(other.resultCode) +
-                        if (data != null && other.data != null) {
-                            data.compareTo(other.data)
-                        } else if (data == null && other.data == null) {
-                            0
-                        } else {
-                            -1
-                        }
-            } else {
-                -1
-            }
-
-            override fun equals(other: Any?) = other is ZVT &&
-                    date == other.date &&
-                    customerReceipt == other.customerReceipt &&
-                    merchantReceipt == other.merchantReceipt &&
-                    rawData == other.rawData &&
-                    data == other.data &&
-                    resultCode == other.resultCode
-
-            override fun hashCode() = Objects.hash(
-                date,
-                customerReceipt,
-                merchantReceipt,
-                rawData,
-                data
-            )
-            override fun toString() = "Error.ZVT(" +
-                    "date=$date, " +
-                    "customerReceipt=$customerReceipt, " +
-                    "merchantReceipt=$merchantReceipt, " +
-                    "rawData=$rawData, " +
-                    "data=$data" +
-                    ")"
-        }
+            override val resultCode: TransactionResultCode
+        ) : Error()
 
         class OPI(
             override val date: Instant,
@@ -184,49 +145,56 @@ sealed class TerminalOperationStatus : Parcelable, Comparable<TerminalOperationS
             override val merchantReceipt: String,
             override val rawData: String,
             override val data: TransactionData?,
-        ) : Error() {
-            override fun compareTo(other: TerminalOperationStatus): Int = if (other is OPI) {
-                date.compareTo(other.date) +
-                        customerReceipt.compareTo(other.customerReceipt) +
-                        merchantReceipt.compareTo(other.merchantReceipt) +
-                        rawData.compareTo(other.rawData) +
-                        if (data != null && other.data != null) {
-                            data.compareTo(other.data)
-                        } else if (data == null && other.data == null) {
-                            0
-                        } else {
-                            -1
-                        }
-            } else {
-                -1
-            }
+            override val resultCode: TransactionResultCode
+        ) : Error()
 
-            override fun equals(other: Any?) = other is OPI &&
-                    date == other.date &&
-                    customerReceipt == other.customerReceipt &&
-                    merchantReceipt == other.merchantReceipt &&
-                    rawData == other.rawData &&
-                    data == other.data
-
-            override fun hashCode() = Objects.hash(
-                date,
-                customerReceipt,
-                merchantReceipt,
-                rawData,
-                data
-            )
-            override fun toString() = "Error.OPI(" +
-                    "date=$date, " +
-                    "customerReceipt=$customerReceipt, " +
-                    "merchantReceipt=$merchantReceipt, " +
-                    "rawData=$rawData, " +
-                    "data=$data" +
-                    ")"
+        override fun compareTo(other: TerminalOperationStatus): Int = if (other is Error.ZVT) {
+            date.compareTo(other.date) +
+                    customerReceipt.compareTo(other.customerReceipt) +
+                    merchantReceipt.compareTo(other.merchantReceipt) +
+                    rawData.compareTo(other.rawData) +
+                    resultCode.compareTo(other.resultCode) +
+                    if (data != null && other.data != null) {
+                        data!!.compareTo(other.data)
+                    } else if (data == null && other.data == null) {
+                        0
+                    } else {
+                        -1
+                    }
+        } else {
+            -1
         }
+
+        override fun equals(other: Any?) = other is Error &&
+                date == other.date &&
+                customerReceipt == other.customerReceipt &&
+                merchantReceipt == other.merchantReceipt &&
+                rawData == other.rawData &&
+                data == other.data &&
+                resultCode == other.resultCode
+
+        override fun hashCode() = Objects.hash(
+            date,
+            customerReceipt,
+            merchantReceipt,
+            rawData,
+            data,
+            resultCode
+        )
+
+        override fun toString() = "Error(" +
+                "date=$date, " +
+                "customerReceipt=$customerReceipt, " +
+                "merchantReceipt=$merchantReceipt, " +
+                "rawData=$rawData, " +
+                "data=$data, " +
+                "resultCode=$resultCode" +
+                ")"
+
     }
 
     override fun compareTo(other: TerminalOperationStatus): Int =
-        if (other == this) {
+        if (this == other) {
             0
         } else {
             -1
