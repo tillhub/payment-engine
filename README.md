@@ -4,7 +4,8 @@
 # Payment Engine
 
 Android library which combines different payments protocols into single interface solution. So far supported payments are:
-* **ZVT** 
+* **ZVT** - Zero Reactive Voltage Transmission is an german abbreviation and stands for Payment Terminal
+* **OPI** - The Open Payment Initiative, or O.P.I. for short
 # How to setup
 
 **Step 1.** Add the JitPack repository to your `settings.gradle` file:
@@ -14,7 +15,7 @@ dependencyResolutionManagement {
     repositories {
         ...
         mavenCentral()
-		maven { url 'https://jitpack.io' }
+        maven { url 'https://jitpack.io' }
     }
 }
 ```
