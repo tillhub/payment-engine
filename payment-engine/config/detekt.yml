@@ -775,5 +775,5 @@ libraries:
             - '**/main/java/de/tillhub/paymentengine/data/Terminal.kt'
             - '**/main/java/de/tillhub/paymentengine/data/TerminalOperationStatus.kt'
             - '**/main/java/de/tillhub/paymentengine/data/TransactionData.kt'
-            - '**/main/java/de/tillhub/paymentengine/zvt/data/TransactionResultCode.kt'
+            - '**/main/java/de/tillhub/paymentengine/data/TransactionResultCode.kt'
             - '**/main/java/de/tillhub/paymentengine/helper/SingletonHolder.kt'
