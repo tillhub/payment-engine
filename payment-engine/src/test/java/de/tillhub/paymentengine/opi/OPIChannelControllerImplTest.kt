@@ -40,7 +40,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Suppress("LargeClass")
 @ExperimentalCoroutinesApi
-class OPIChannelControllerImplTest : DescribeSpec({
+internal class OPIChannelControllerImplTest : DescribeSpec({
     lateinit var converterFactory: ConverterFactory
     lateinit var channelFactory: OPIChannelFactory
     lateinit var terminalConfig: TerminalConfig
