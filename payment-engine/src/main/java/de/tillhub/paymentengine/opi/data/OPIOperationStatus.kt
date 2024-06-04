@@ -1,8 +1,8 @@
 package de.tillhub.paymentengine.opi.data
 
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionData
-import de.tillhub.paymentengine.zvt.data.TransactionResultCode
 import java.time.Instant
 
 internal sealed class OPIOperationStatus {
@@ -73,8 +73,9 @@ internal sealed class OPIOperationStatus {
                             paymentProvider = it.authorisation?.acquirerID.orEmpty()
                         )
                     },
-                    resultCode = TransactionResultCode(
-                        errorMessage = 0
+                    resultCode = ResultCodeSets.getOPICode(
+                        resultCode = data?.tender?.authorisation?.actionCode?.toIntOrNull()
+                            ?: reconciliationData?.privateData?.errorCode?.value?.toIntOrNull()
                     )
                 )
         }

@@ -2,7 +2,7 @@ package de.tillhub.paymentengine.ui
 
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
-import de.tillhub.paymentengine.zvt.data.TransactionResultCode
+import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.helper.CoreTestCoroutineDispatcher
 import de.tillhub.paymentengine.helper.InstantTaskExecutor
 import de.tillhub.paymentengine.helper.TerminalConfig

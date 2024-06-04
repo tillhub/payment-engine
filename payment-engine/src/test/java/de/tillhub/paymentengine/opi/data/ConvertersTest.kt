@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-class ConvertersTest : FunSpec({
+internal class ConvertersTest : FunSpec({
 
     test("CardServiceRequest") {
         val target = DtoToStringConverter<CardServiceRequest>()

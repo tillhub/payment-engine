@@ -50,7 +50,7 @@
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus$* { *; }
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
--keep class de.tillhub.paymentengine.zvt.data.TransactionResultCode { *; }
+-keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
 
 # Breaking changes with AGP 8.0
 # R8 upgrade documentation
