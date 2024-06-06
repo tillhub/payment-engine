@@ -17,7 +17,7 @@ interface ReconciliationManager : CardManager {
     fun startReconciliation(config: Terminal)
 }
 
-class ReconciliationManagerImpl(
+internal class ReconciliationManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
     resultCaller: ActivityResultCaller

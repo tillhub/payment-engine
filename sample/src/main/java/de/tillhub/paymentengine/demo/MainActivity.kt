@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.demo.ui.theme.DemoPaymentTheme
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
 
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.plant(Timber.DebugTree());
         viewModel.initPaymentManager(paymentEngine.newPaymentManager(this))
         viewModel.initRefundManager(paymentEngine.newRefundManager(this))
         viewModel.initReversalManager(paymentEngine.newReversalManager(this))

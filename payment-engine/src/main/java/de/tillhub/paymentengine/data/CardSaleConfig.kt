@@ -2,9 +2,10 @@ package de.tillhub.paymentengine.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.util.Objects
 
 @Parcelize
-data class CardSaleConfig(
+class CardSaleConfig(
     val applicationName: String = DEFAULT_APPLICATION_NAME,
     val operatorId: String = DEFAULT_OPERATOR_ID,
     val saleId: String = DEFAULT_SALE_ID, // Unique cash register ID
@@ -12,6 +13,33 @@ data class CardSaleConfig(
     val poiId: String = DEFAULT_POI_ID, // Unique terminal ID
     val poiSerialNumber: String = DEFAULT_POI_SERIAL, // Unique terminal serial
 ) : Parcelable {
+
+    override fun toString() = "CardSaleConfig(" +
+            "applicationName=$applicationName, " +
+            "operatorId=$operatorId, " +
+            "saleId=$saleId, " +
+            "pin=$pin, " +
+            "poiId=$poiId, " +
+            "poiSerialNumber=$poiSerialNumber" +
+            ")"
+
+    override fun equals(other: Any?) = other is CardSaleConfig &&
+            applicationName == other.applicationName &&
+            operatorId == other.operatorId &&
+            saleId == other.saleId &&
+            pin == other.pin &&
+            poiId == other.poiId &&
+            poiSerialNumber == other.poiSerialNumber
+
+    override fun hashCode() = Objects.hash(
+        applicationName,
+        operatorId,
+        saleId,
+        pin,
+        poiId,
+        poiSerialNumber
+    )
+
     companion object {
         private const val DEFAULT_APPLICATION_NAME = "Tillhub GO"
         private const val DEFAULT_OPERATOR_ID = "ah"

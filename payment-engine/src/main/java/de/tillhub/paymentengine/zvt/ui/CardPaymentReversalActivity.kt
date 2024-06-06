@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import android.os.Bundle
 import androidx.core.view.isGone
@@ -6,10 +6,11 @@ import androidx.core.view.isVisible
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentReversalBinding
+import de.tillhub.paymentengine.helper.viewBinding
 
-class CardPaymentReversalActivity : CardTerminalActivity() {
+internal class CardPaymentReversalActivity : CardTerminalActivity() {
 
     companion object {
         private const val TAG = "CardPaymentReversalActivity"

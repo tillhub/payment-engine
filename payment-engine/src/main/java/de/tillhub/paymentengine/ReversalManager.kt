@@ -18,7 +18,7 @@ interface ReversalManager : CardManager {
     fun startReversalTransaction(receiptNo: String, config: Terminal)
 }
 
-class ReversalManagerImpl(
+internal class ReversalManagerImpl(
     configs: MutableMap<String, Terminal>,
     transactionState: MutableStateFlow<TerminalOperationStatus>,
     resultCaller: ActivityResultCaller

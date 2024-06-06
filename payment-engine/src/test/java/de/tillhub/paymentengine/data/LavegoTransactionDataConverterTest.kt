@@ -2,6 +2,8 @@ package de.tillhub.paymentengine.data
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 
