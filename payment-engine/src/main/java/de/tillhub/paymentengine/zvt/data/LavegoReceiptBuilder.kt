@@ -1,6 +1,6 @@
-package de.tillhub.paymentengine.data
+package de.tillhub.paymentengine.zvt.data
 
-class LavegoReceiptBuilder(
+internal class LavegoReceiptBuilder(
     startWithMerchant: Boolean = true
 ) {
 

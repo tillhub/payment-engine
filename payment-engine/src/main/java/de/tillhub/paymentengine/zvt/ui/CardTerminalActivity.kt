@@ -1,15 +1,12 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
-import androidx.viewbinding.ViewBinding
 import de.lavego.sdk.PaymentProtocol
 import de.lavego.sdk.PaymentTerminalActivity
 import de.lavego.sdk.SaleConfiguration
@@ -18,10 +15,11 @@ import de.lavego.sdk.TransportConfiguration
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
-import de.tillhub.paymentengine.contract.ExtraKeys
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 
-abstract class CardTerminalActivity : PaymentTerminalActivity() {
+@Suppress("TooManyFunctions")
+internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private val viewModel by viewModels<CardTerminalViewModel>()
 
@@ -102,11 +100,13 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
             with(zvtFlags) {
                 isoCurrencyRegister(config.isoCurrencyNumber)
-                paymentType(if (config.terminalPrinterAvailable) {
-                    0b1000100.toByte() // terminal supports the printer ready bit (3)
-                } else {
-                    0b1000000.toByte() // terminal does NOT support the printer ready bit (3)
-                })
+                paymentType(
+                    if (config.terminalPrinterAvailable) {
+                        0b1000100.toByte() // terminal supports the printer ready bit (3)
+                    } else {
+                        0b1000000.toByte() // terminal does NOT support the printer ready bit (3)
+                    }
+                )
             }
         }
     }
@@ -150,17 +150,19 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation())
-        })
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
+        )
         finish()
     }
 
     private fun finishWithError(state: CardTerminalViewModel.State.Error) {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation())
-        })
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
+        )
         finish()
     }
 
@@ -172,7 +174,3 @@ abstract class CardTerminalActivity : PaymentTerminalActivity() {
         private const val TERMINAL_CONFIG_BYTE: Byte = 0b11000110.toByte()
     }
 }
-
-inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
-    crossinline bindingInflater: (LayoutInflater) -> T,
-) = lazy(LazyThreadSafetyMode.NONE) { bindingInflater.invoke(layoutInflater) }

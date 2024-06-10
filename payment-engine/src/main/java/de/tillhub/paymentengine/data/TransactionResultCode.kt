@@ -4,17 +4,202 @@ import android.os.Parcelable
 import androidx.annotation.StringRes
 import de.tillhub.paymentengine.R
 import kotlinx.parcelize.Parcelize
+import java.util.Objects
 
 @Parcelize
-data class TransactionResultCode(
+class TransactionResultCode(
     @StringRes
     val errorMessage: Int,
     @StringRes
     val recoveryMessages: List<Int> = listOf()
-) : Parcelable
+) : Parcelable {
+    override fun equals(other: Any?) = other is TransactionResultCode &&
+            errorMessage == other.errorMessage &&
+            recoveryMessages == other.recoveryMessages
+
+    override fun hashCode() = Objects.hash(
+        errorMessage,
+        recoveryMessages
+    )
+    override fun toString() = "TransactionResultCode(" +
+            "errorMessage=$errorMessage, " +
+            "recoveryMessages=$recoveryMessages" +
+            ")"
+}
 
 @SuppressWarnings("MagicNumber")
-sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
+internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
+    data object OpiResultCodes : ResultCodeSets(
+        mapOf(
+            Pair(0, TransactionResultCode(R.string.opi_error_code_00)),
+            Pair(1, TransactionResultCode(R.string.opi_error_code_01)),
+            Pair(2, TransactionResultCode(R.string.opi_error_code_02)),
+            Pair(3, TransactionResultCode(R.string.opi_error_code_03)),
+            Pair(4, TransactionResultCode(R.string.opi_error_code_04)),
+            Pair(5, TransactionResultCode(R.string.opi_error_code_05)),
+            Pair(6, TransactionResultCode(R.string.opi_error_code_06)),
+            Pair(7, TransactionResultCode(R.string.opi_error_code_07)),
+            Pair(8, TransactionResultCode(R.string.opi_error_code_08)),
+            Pair(9, TransactionResultCode(R.string.opi_error_code_09)),
+            Pair(10, TransactionResultCode(R.string.opi_error_code_10)),
+            Pair(11, TransactionResultCode(R.string.opi_error_code_11)),
+            Pair(12, TransactionResultCode(R.string.opi_error_code_12)),
+            Pair(13, TransactionResultCode(R.string.opi_error_code_13)),
+            Pair(14, TransactionResultCode(R.string.opi_error_code_14)),
+            Pair(15, TransactionResultCode(R.string.opi_error_code_15)),
+            Pair(16, TransactionResultCode(R.string.opi_error_code_16)),
+            Pair(17, TransactionResultCode(R.string.opi_error_code_17)),
+            Pair(18, TransactionResultCode(R.string.opi_error_code_18)),
+            Pair(19, TransactionResultCode(R.string.opi_error_code_19)),
+            Pair(20, TransactionResultCode(R.string.opi_error_code_20)),
+            Pair(21, TransactionResultCode(R.string.opi_error_code_21)),
+            Pair(22, TransactionResultCode(R.string.opi_error_code_22)),
+            Pair(23, TransactionResultCode(R.string.opi_error_code_23)),
+            Pair(24, TransactionResultCode(R.string.opi_error_code_24)),
+            Pair(25, TransactionResultCode(R.string.opi_error_code_25)),
+            Pair(26, TransactionResultCode(R.string.opi_error_code_26)),
+            Pair(27, TransactionResultCode(R.string.opi_error_code_27)),
+            Pair(28, TransactionResultCode(R.string.opi_error_code_28)),
+            Pair(29, TransactionResultCode(R.string.opi_error_code_29)),
+            Pair(30, TransactionResultCode(R.string.opi_error_code_30)),
+            Pair(31, TransactionResultCode(R.string.opi_error_code_31)),
+            Pair(32, TransactionResultCode(R.string.opi_error_code_32)),
+            Pair(33, TransactionResultCode(R.string.opi_error_code_33)),
+            Pair(34, TransactionResultCode(R.string.opi_error_code_34)),
+            Pair(35, TransactionResultCode(R.string.opi_error_code_35)),
+            Pair(36, TransactionResultCode(R.string.opi_error_code_36)),
+            Pair(37, TransactionResultCode(R.string.opi_error_code_37)),
+            Pair(38, TransactionResultCode(R.string.opi_error_code_38)),
+            Pair(39, TransactionResultCode(R.string.opi_error_code_39)),
+            Pair(40, TransactionResultCode(R.string.opi_error_code_40)),
+            Pair(41, TransactionResultCode(R.string.opi_error_code_41)),
+            Pair(42, TransactionResultCode(R.string.opi_error_code_42)),
+            Pair(43, TransactionResultCode(R.string.opi_error_code_43)),
+            Pair(44, TransactionResultCode(R.string.opi_error_code_44)),
+            Pair(51, TransactionResultCode(R.string.opi_error_code_51)),
+            Pair(52, TransactionResultCode(R.string.opi_error_code_52)),
+            Pair(53, TransactionResultCode(R.string.opi_error_code_53)),
+            Pair(54, TransactionResultCode(R.string.opi_error_code_54)),
+            Pair(55, TransactionResultCode(R.string.opi_error_code_55)),
+            Pair(56, TransactionResultCode(R.string.opi_error_code_56)),
+            Pair(57, TransactionResultCode(R.string.opi_error_code_57)),
+            Pair(58, TransactionResultCode(R.string.opi_error_code_58)),
+            Pair(59, TransactionResultCode(R.string.opi_error_code_59)),
+            Pair(60, TransactionResultCode(R.string.opi_error_code_60)),
+            Pair(61, TransactionResultCode(R.string.opi_error_code_61)),
+            Pair(62, TransactionResultCode(R.string.opi_error_code_62)),
+            Pair(63, TransactionResultCode(R.string.opi_error_code_63)),
+            Pair(64, TransactionResultCode(R.string.opi_error_code_64)),
+            Pair(65, TransactionResultCode(R.string.opi_error_code_65)),
+            Pair(66, TransactionResultCode(R.string.opi_error_code_66)),
+            Pair(67, TransactionResultCode(R.string.opi_error_code_67)),
+            Pair(68, TransactionResultCode(R.string.opi_error_code_68)),
+            Pair(75, TransactionResultCode(R.string.opi_error_code_75)),
+            Pair(78, TransactionResultCode(R.string.opi_error_code_78)),
+            Pair(80, TransactionResultCode(R.string.opi_error_code_80)),
+            Pair(82, TransactionResultCode(R.string.opi_error_code_82)),
+            Pair(85, TransactionResultCode(R.string.opi_error_code_85)),
+            Pair(90, TransactionResultCode(R.string.opi_error_code_90)),
+            Pair(91, TransactionResultCode(R.string.opi_error_code_91)),
+            Pair(92, TransactionResultCode(R.string.opi_error_code_92)),
+            Pair(93, TransactionResultCode(R.string.opi_error_code_93)),
+            Pair(94, TransactionResultCode(R.string.opi_error_code_94)),
+            Pair(95, TransactionResultCode(R.string.opi_error_code_95)),
+            Pair(96, TransactionResultCode(R.string.opi_error_code_96)),
+            Pair(100, TransactionResultCode(R.string.opi_error_code_100)),
+            Pair(101, TransactionResultCode(R.string.opi_error_code_101)),
+            Pair(102, TransactionResultCode(R.string.opi_error_code_102)),
+            Pair(103, TransactionResultCode(R.string.opi_error_code_103)),
+            Pair(104, TransactionResultCode(R.string.opi_error_code_104)),
+            Pair(105, TransactionResultCode(R.string.opi_error_code_105)),
+            Pair(106, TransactionResultCode(R.string.opi_error_code_106)),
+            Pair(107, TransactionResultCode(R.string.opi_error_code_107)),
+            Pair(108, TransactionResultCode(R.string.opi_error_code_108)),
+            Pair(109, TransactionResultCode(R.string.opi_error_code_109)),
+            Pair(110, TransactionResultCode(R.string.opi_error_code_110)),
+            Pair(111, TransactionResultCode(R.string.opi_error_code_111)),
+            Pair(112, TransactionResultCode(R.string.opi_error_code_112)),
+            Pair(113, TransactionResultCode(R.string.opi_error_code_113)),
+            Pair(114, TransactionResultCode(R.string.opi_error_code_114)),
+            Pair(115, TransactionResultCode(R.string.opi_error_code_115)),
+            Pair(116, TransactionResultCode(R.string.opi_error_code_116)),
+            Pair(117, TransactionResultCode(R.string.opi_error_code_117)),
+            Pair(118, TransactionResultCode(R.string.opi_error_code_118)),
+            Pair(119, TransactionResultCode(R.string.opi_error_code_119)),
+            Pair(120, TransactionResultCode(R.string.opi_error_code_120)),
+            Pair(121, TransactionResultCode(R.string.opi_error_code_121)),
+            Pair(122, TransactionResultCode(R.string.opi_error_code_122)),
+            Pair(123, TransactionResultCode(R.string.opi_error_code_123)),
+            Pair(124, TransactionResultCode(R.string.opi_error_code_124)),
+            Pair(125, TransactionResultCode(R.string.opi_error_code_125)),
+            Pair(126, TransactionResultCode(R.string.opi_error_code_126)),
+            Pair(127, TransactionResultCode(R.string.opi_error_code_127)),
+            Pair(128, TransactionResultCode(R.string.opi_error_code_128)),
+            Pair(129, TransactionResultCode(R.string.opi_error_code_129)),
+            Pair(200, TransactionResultCode(R.string.opi_error_code_200)),
+            Pair(201, TransactionResultCode(R.string.opi_error_code_201)),
+            Pair(202, TransactionResultCode(R.string.opi_error_code_202)),
+            Pair(203, TransactionResultCode(R.string.opi_error_code_203)),
+            Pair(204, TransactionResultCode(R.string.opi_error_code_204)),
+            Pair(205, TransactionResultCode(R.string.opi_error_code_205)),
+            Pair(206, TransactionResultCode(R.string.opi_error_code_206)),
+            Pair(207, TransactionResultCode(R.string.opi_error_code_207)),
+            Pair(208, TransactionResultCode(R.string.opi_error_code_208)),
+            Pair(209, TransactionResultCode(R.string.opi_error_code_209)),
+            Pair(210, TransactionResultCode(R.string.opi_error_code_210)),
+            Pair(300, TransactionResultCode(R.string.opi_error_code_300)),
+            Pair(301, TransactionResultCode(R.string.opi_error_code_301)),
+            Pair(302, TransactionResultCode(R.string.opi_error_code_302)),
+            Pair(303, TransactionResultCode(R.string.opi_error_code_303)),
+            Pair(304, TransactionResultCode(R.string.opi_error_code_304)),
+            Pair(305, TransactionResultCode(R.string.opi_error_code_305)),
+            Pair(306, TransactionResultCode(R.string.opi_error_code_306)),
+            Pair(307, TransactionResultCode(R.string.opi_error_code_307)),
+            Pair(308, TransactionResultCode(R.string.opi_error_code_308)),
+            Pair(309, TransactionResultCode(R.string.opi_error_code_309)),
+            Pair(400, TransactionResultCode(R.string.opi_error_code_400)),
+            Pair(500, TransactionResultCode(R.string.opi_error_code_500)),
+            Pair(501, TransactionResultCode(R.string.opi_error_code_501)),
+            Pair(502, TransactionResultCode(R.string.opi_error_code_502)),
+            Pair(503, TransactionResultCode(R.string.opi_error_code_503)),
+            Pair(504, TransactionResultCode(R.string.opi_error_code_504)),
+            Pair(600, TransactionResultCode(R.string.opi_error_code_600)),
+            Pair(601, TransactionResultCode(R.string.opi_error_code_601)),
+            Pair(602, TransactionResultCode(R.string.opi_error_code_602)),
+            Pair(603, TransactionResultCode(R.string.opi_error_code_603)),
+            Pair(604, TransactionResultCode(R.string.opi_error_code_604)),
+            Pair(605, TransactionResultCode(R.string.opi_error_code_605)),
+            Pair(606, TransactionResultCode(R.string.opi_error_code_606)),
+            Pair(700, TransactionResultCode(R.string.opi_error_code_700)),
+            Pair(800, TransactionResultCode(R.string.opi_error_code_800)),
+            Pair(900, TransactionResultCode(R.string.opi_error_code_900)),
+            Pair(901, TransactionResultCode(R.string.opi_error_code_901)),
+            Pair(902, TransactionResultCode(R.string.opi_error_code_902)),
+            Pair(903, TransactionResultCode(R.string.opi_error_code_903)),
+            Pair(904, TransactionResultCode(R.string.opi_error_code_904)),
+            Pair(905, TransactionResultCode(R.string.opi_error_code_905)),
+            Pair(906, TransactionResultCode(R.string.opi_error_code_906)),
+            Pair(907, TransactionResultCode(R.string.opi_error_code_907)),
+            Pair(908, TransactionResultCode(R.string.opi_error_code_908)),
+            Pair(909, TransactionResultCode(R.string.opi_error_code_909)),
+            Pair(910, TransactionResultCode(R.string.opi_error_code_910)),
+            Pair(911, TransactionResultCode(R.string.opi_error_code_911)),
+            Pair(912, TransactionResultCode(R.string.opi_error_code_912)),
+            Pair(913, TransactionResultCode(R.string.opi_error_code_913)),
+            Pair(914, TransactionResultCode(R.string.opi_error_code_914)),
+            Pair(915, TransactionResultCode(R.string.opi_error_code_915)),
+            Pair(916, TransactionResultCode(R.string.opi_error_code_916)),
+            Pair(917, TransactionResultCode(R.string.opi_error_code_917)),
+            Pair(918, TransactionResultCode(R.string.opi_error_code_918)),
+            Pair(919, TransactionResultCode(R.string.opi_error_code_919)),
+            Pair(920, TransactionResultCode(R.string.opi_error_code_920)),
+            Pair(921, TransactionResultCode(R.string.opi_error_code_921)),
+            Pair(922, TransactionResultCode(R.string.opi_error_code_922)),
+            Pair(923, TransactionResultCode(R.string.opi_error_code_923)),
+            Pair(950, TransactionResultCode(R.string.opi_error_code_950)),
+        )
+    )
+
     data object ZvtResultCodes : ResultCodeSets(
         mapOf(
             Pair(
@@ -273,7 +458,8 @@ sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
             Pair(75, TransactionResultCode(R.string.lavego_result_code_75_pin_try_limit_exceeded)),
             Pair(80, TransactionResultCode(R.string.lavego_result_code_80_referenced_tx_unknown)),
             Pair(
-                81, TransactionResultCode(
+                81,
+                TransactionResultCode(
                     errorMessage = R.string.lavego_result_code_81_initialisation_required,
                     recoveryMessages = listOf(R.string.recovery_message_initialisation)
                 )
@@ -287,14 +473,20 @@ sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
     )
 
     companion object {
-        fun get(resultCode: Int?): TransactionResultCode {
+        fun getZVTCode(resultCode: Int?): TransactionResultCode {
             return LavegoResultCodes.mapping.getOrDefault(
-                resultCode, ZvtResultCodes.mapping.getOrDefault(
-                    resultCode, TransactionResultCode(
-                        errorMessage = R.string.zvt_error_code_unknown,
-                        recoveryMessages = emptyList()
-                    )
+                resultCode,
+                ZvtResultCodes.mapping.getOrDefault(
+                    resultCode,
+                    TransactionResultCode(errorMessage = R.string.zvt_error_code_unknown)
                 )
+            )
+        }
+
+        fun getOPICode(resultCode: Int?): TransactionResultCode {
+            return OpiResultCodes.mapping.getOrDefault(
+                resultCode,
+                TransactionResultCode(errorMessage = R.string.zvt_error_code_unknown)
             )
         }
     }

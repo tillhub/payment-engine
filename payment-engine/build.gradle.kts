@@ -1,3 +1,6 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
@@ -19,7 +22,7 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -49,6 +52,12 @@ android {
     }
 }
 
+detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    allRules = false // activate all available (even unstable) rules.
+    config.setFrom("$projectDir/config/detekt.yml")
+}
+
 dependencies {
 
     // Core Dependencies
@@ -61,9 +70,17 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.timber)
     detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.detekt.libraries)
 
     // Lavego
     implementation(libs.bundles.lavego)
+
+    // OPI
+    implementation(libs.retrofit.simplexml) {
+        exclude(module = "stax")
+        exclude(module = "stax-api")
+        exclude(module = "xpp3")
+    }
 
     // Unit tests
     testImplementation(libs.bundles.testing)

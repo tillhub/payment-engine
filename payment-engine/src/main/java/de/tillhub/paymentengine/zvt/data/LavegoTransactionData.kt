@@ -1,11 +1,12 @@
-package de.tillhub.paymentengine.data
+package de.tillhub.paymentengine.zvt.data
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
 
+@Suppress("LongParameterList")
 @Parcelize
-data class LavegoTransactionData(
+internal data class LavegoTransactionData(
     val additionalText: String,
     val aid: String,
     val amount: BigInteger,

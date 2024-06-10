@@ -1,14 +1,15 @@
-package de.tillhub.paymentengine.ui
+package de.tillhub.paymentengine.zvt.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.tillhub.paymentengine.data.LavegoReceiptBuilder
-import de.tillhub.paymentengine.data.LavegoTransactionData
-import de.tillhub.paymentengine.data.LavegoTransactionDataConverter
+import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionData
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.data.getOrNull
 import de.tillhub.paymentengine.helper.TerminalConfig
@@ -17,7 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 
-class CardTerminalViewModel(
+internal class CardTerminalViewModel(
     private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
     private val lavegoTransactionDataConverter: LavegoTransactionDataConverter = LavegoTransactionDataConverter()
 ) : ViewModel() {
@@ -86,12 +87,12 @@ class CardTerminalViewModel(
                 merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
                 rawData = lastData.orEmpty(),
                 data = data,
-                resultCode = ResultCodeSets.get(data?.resultCode)
+                resultCode = ResultCodeSets.getZVTCode(data?.resultCode)
             )
         }
     }
 
-    sealed class State {
+    internal sealed class State {
         data object Idle : State()
         data object Setup : State()
         data object Operation : State()
@@ -105,7 +106,20 @@ class CardTerminalViewModel(
         ) : State() {
             fun toTerminalOperation() =
                 TerminalOperationStatus.Error.ZVT(
-                    date, customerReceipt, merchantReceipt, rawData, data, resultCode
+                    date = date,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    rawData = rawData,
+                    data = data?.let {
+                        TransactionData(
+                            terminalId = it.tid,
+                            transactionId = it.receiptNo.toString(),
+                            cardCircuit = it.cardName,
+                            cardPan = it.chipData,
+                            paymentProvider = it.additionalText
+                        )
+                    },
+                    resultCode = resultCode
                 )
         }
         data class Success(
@@ -117,7 +131,19 @@ class CardTerminalViewModel(
         ) : State() {
             fun toTerminalOperation() =
                 TerminalOperationStatus.Success.ZVT(
-                    date, customerReceipt, merchantReceipt, rawData, data
+                    date = date,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    rawData = rawData,
+                    data = data?.let {
+                        TransactionData(
+                            terminalId = it.tid,
+                            transactionId = it.receiptNo.toString(),
+                            cardCircuit = it.cardName,
+                            cardPan = it.chipData,
+                            paymentProvider = it.additionalText
+                        )
+                    }
                 )
         }
     }

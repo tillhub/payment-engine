@@ -20,7 +20,7 @@ interface RefundManager : CardManager {
     fun startRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, config: Terminal)
 }
 
-class RefundManagerImpl(
+internal class RefundManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
     resultCaller: ActivityResultCaller

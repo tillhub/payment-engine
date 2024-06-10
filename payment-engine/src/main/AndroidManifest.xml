@@ -13,27 +13,52 @@
             tools:node="merge" />
 
         <activity
-            android:name=".ui.CardPaymentActivity"
+            android:name=".zvt.ui.CardPaymentActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
             android:exported="false" />
 
         <activity
-            android:name=".ui.CardPaymentReversalActivity"
+            android:name=".zvt.ui.CardPaymentReversalActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
             android:exported="false"/>
 
         <activity
-            android:name=".ui.CardPaymentPartialRefundActivity"
+            android:name=".zvt.ui.CardPaymentPartialRefundActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
             android:exported="false"/>
 
         <activity
-            android:name=".ui.TerminalReconciliationActivity"
+            android:name=".zvt.ui.TerminalReconciliationActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
             android:exported="false"/>
+
+        <activity
+            android:name=".opi.ui.OPIPaymentActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".opi.ui.OPIPaymentReversalActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".opi.ui.OPIPartialRefundActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".opi.ui.OPIReconciliationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
     </application>
 </manifest>
