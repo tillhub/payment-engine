@@ -52,6 +52,42 @@
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
 
+# Communication classes
+-keep class de.tillhub.paymentengine.opi.data.CardServiceRequest { *; }
+-keep class de.tillhub.paymentengine.opi.data.PosData { *; }
+-keep class de.tillhub.paymentengine.opi.data.TotalAmount { *; }
+-keep class de.tillhub.paymentengine.opi.data.OriginalTransaction { *; }
+-keep class de.tillhub.paymentengine.opi.data.ServiceRequestType { *; }
+-keep class de.tillhub.paymentengine.opi.data.CardServiceResponse { *; }
+-keep class de.tillhub.paymentengine.opi.data.Terminal { *; }
+-keep class de.tillhub.paymentengine.opi.data.Tender { *; }
+-keep class de.tillhub.paymentengine.opi.data.CardDetails { *; }
+-keep class de.tillhub.paymentengine.opi.data.CardValue { *; }
+-keep class de.tillhub.paymentengine.opi.data.PrivateData { *; }
+-keep class de.tillhub.paymentengine.opi.data.Authorisation { *; }
+-keep class de.tillhub.paymentengine.opi.data.ValueElement { *; }
+-keep class de.tillhub.paymentengine.opi.data.OverallResult { *; }
+-keep class de.tillhub.paymentengine.opi.data.DeviceRequest { *; }
+-keep class de.tillhub.paymentengine.opi.data.Output { *; }
+-keep class de.tillhub.paymentengine.opi.data.TextLine { *; }
+-keep class de.tillhub.paymentengine.opi.data.DeviceType { *; }
+-keep class de.tillhub.paymentengine.opi.data.DeviceRequestType { *; }
+-keep class de.tillhub.paymentengine.opi.data.DeviceResponse { *; }
+-keep class de.tillhub.paymentengine.opi.data.ServiceRequest { *; }
+-keep class de.tillhub.paymentengine.opi.data.ServiceResponse { *; }
+-keep class de.tillhub.paymentengine.opi.data.Reconciliation { *; }
+
+-keep public class org.simpleframework.**{ *; }
+-keep class org.simpleframework.xml.**{ *; }
+-keep class org.simpleframework.xml.core.**{ *; }
+-keep class org.simpleframework.xml.util.**{ *; }
+-keepattributes *Annotation*
+-keepattributes Signature
+
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+
 # Breaking changes with AGP 8.0
 # R8 upgrade documentation
 -dontwarn java.lang.invoke.StringConcatFactory
