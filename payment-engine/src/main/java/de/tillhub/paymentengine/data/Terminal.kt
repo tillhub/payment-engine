@@ -47,9 +47,9 @@ sealed class Terminal : Parcelable {
 
         companion object {
             private const val DEFAULT_NAME = "Default:ZVT"
-            private const val DEFAULT_IP_ADDRESS = "127.0.0.1"
-            private const val DEFAULT_PORT = 40007
-            private const val DEFAULT_CURRENCY_CODE = "0978"
+            const val DEFAULT_IP_ADDRESS = "127.0.0.1"
+            const val DEFAULT_PORT = 40007
+            const val DEFAULT_CURRENCY_CODE = "0978"
             private const val DEFAULT_PRINTER_AVAILABLE = true
         }
     }
@@ -90,10 +90,10 @@ sealed class Terminal : Parcelable {
 
         companion object {
             private const val DEFAULT_NAME = "Default:OPI"
-            private const val DEFAULT_IP_ADDRESS = "127.0.0.1"
-            private const val DEFAULT_PORT_1 = 20002
-            private const val DEFAULT_PORT_2 = 20007
-            private const val DEFAULT_CURRENCY_CODE = "EUR"
+            const val DEFAULT_IP_ADDRESS = "127.0.0.1"
+            const val DEFAULT_PORT_1 = 20002
+            const val DEFAULT_PORT_2 = 20007
+            const val DEFAULT_CURRENCY_CODE = "EUR"
         }
     }
 }
