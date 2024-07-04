@@ -140,16 +140,15 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onCompletion(completion: String) {
         super.onCompletion(completion)
-        viewModel.onCompletion()
+        viewModel.onCompletion(::moveAppToFront)
     }
 
     override fun onError(error: String) {
         super.onError(error)
-        viewModel.onError()
+        viewModel.onError(::moveAppToFront)
     }
 
     private fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(
             Activity.RESULT_OK,
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
@@ -158,12 +157,15 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     }
 
     private fun finishWithError(state: CardTerminalViewModel.State.Error) {
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(
             Activity.RESULT_OK,
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
         )
         finish()
+    }
+
+    private fun moveAppToFront() {
+        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
     }
 
     companion object {

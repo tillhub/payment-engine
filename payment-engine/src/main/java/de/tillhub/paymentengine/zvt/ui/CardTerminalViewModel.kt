@@ -58,25 +58,29 @@ internal class CardTerminalViewModel(
         }
     }
 
-    fun onCompletion() {
+    fun onCompletion(moveToFront: () -> Unit) {
         viewModelScope.launch {
             _terminalOperationState.value = when (_terminalOperationState.value) {
                 State.Setup -> State.Operation
-                State.Operation -> State.Success(
-                    date = terminalConfig.timeNow(),
-                    customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
-                    merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
-                    rawData = lastData.orEmpty(),
-                    data = lastData?.let {
-                        lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
-                    }
-                )
+                State.Operation -> {
+                    moveToFront()
+                    State.Success(
+                        date = terminalConfig.timeNow(),
+                        customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
+                        merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
+                        rawData = lastData.orEmpty(),
+                        data = lastData?.let {
+                            lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+                        }
+                    )
+                }
                 else -> throw IllegalStateException("Illegal state: ${terminalOperationState.value}")
             }
         }
     }
 
-    fun onError() {
+    fun onError(moveToFront: () -> Unit) {
+        moveToFront()
         viewModelScope.launch {
             val data = lastData?.let {
                 lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
