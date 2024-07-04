@@ -12,6 +12,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
@@ -26,6 +27,8 @@ class CardTerminalViewModelTest : FunSpec({
     lateinit var terminalConfig: TerminalConfig
     lateinit var viewModel: CardTerminalViewModel
 
+    lateinit var callback: Callback
+
     val instantTaskExecutor = InstantTaskExecutor()
 
     beforeSpec {
@@ -37,6 +40,9 @@ class CardTerminalViewModelTest : FunSpec({
         terminalConfig = mockk {
             every { timeNow() } returns date
         }
+
+        callback = mockk(relaxed = true)
+
         viewModel = CardTerminalViewModel(terminalConfig)
     }
 
@@ -56,13 +62,17 @@ class CardTerminalViewModelTest : FunSpec({
 
     test("onCompletion").config(coroutineDebugProbes = true) {
         viewModel.init()
-        viewModel.onCompletion()
+        viewModel.onCompletion(callback::moveToFront)
 
         viewModel.terminalOperationState.value shouldBe CardTerminalViewModel.State.Operation
 
         viewModel.onStatus(TRANSACTION_DATA)
         viewModel.onReceipt("receipt")
-        viewModel.onCompletion()
+        viewModel.onCompletion(callback::moveToFront)
+
+        verify(exactly = 1) {
+            callback.moveToFront()
+        }
 
         eventually(1.seconds) {
             viewModel.terminalOperationState.value shouldBe CardTerminalViewModel.State.Success(
@@ -106,7 +116,11 @@ class CardTerminalViewModelTest : FunSpec({
         viewModel.init()
         viewModel.onStatus(TRANSACTION_DATA)
         viewModel.onReceipt("receipt")
-        viewModel.onError()
+        viewModel.onError(callback::moveToFront)
+
+        verify(exactly = 1) {
+            callback.moveToFront()
+        }
 
         eventually(1.seconds) {
             viewModel.terminalOperationState.value shouldBe CardTerminalViewModel.State.Error(
@@ -147,6 +161,11 @@ class CardTerminalViewModelTest : FunSpec({
         }
     }
 }) {
+
+    interface Callback {
+        fun moveToFront()
+    }
+
     companion object {
         internal const val TRANSACTION_DATA: String = """
 {
