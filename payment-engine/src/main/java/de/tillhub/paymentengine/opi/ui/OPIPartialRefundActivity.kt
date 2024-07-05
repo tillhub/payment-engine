@@ -9,6 +9,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
+import java.util.Currency
 
 internal class OPIPartialRefundActivity : OPITerminalActivity() {
 
@@ -51,7 +52,10 @@ internal class OPIPartialRefundActivity : OPITerminalActivity() {
     }
 
     override fun startOperation() {
-        viewModel.startPartialRefund(amount, currency)
+        val modifiedAmount = amount.scaleByPowerOfTen(
+            Currency.getInstance(currency.value).defaultFractionDigits.unaryMinus()
+        )
+        viewModel.startPartialRefund(modifiedAmount, currency)
     }
 
     companion object {
