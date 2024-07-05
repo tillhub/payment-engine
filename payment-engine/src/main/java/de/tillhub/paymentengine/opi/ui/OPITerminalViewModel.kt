@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.opi.ui
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.math.BigDecimal
+import java.util.Currency
 
 internal class OPITerminalViewModel(
     private val opiChannelController: OPIChannelController = OPIChannelControllerImpl()
@@ -63,7 +65,8 @@ internal class OPITerminalViewModel(
 
     fun startPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
         viewModelScope.launch {
-            opiChannelController.initiateCardPayment(amount, currency)
+            val modifiedAmount = modifyAmountForOpi(amount, currency)
+            opiChannelController.initiateCardPayment(modifiedAmount, currency)
         }
     }
 
@@ -75,7 +78,8 @@ internal class OPITerminalViewModel(
 
     fun startPartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) {
         viewModelScope.launch {
-            opiChannelController.initiatePartialRefund(amount, currency)
+            val modifiedAmount = modifyAmountForOpi(amount, currency)
+            opiChannelController.initiatePartialRefund(modifiedAmount, currency)
         }
     }
 
@@ -84,6 +88,12 @@ internal class OPITerminalViewModel(
             opiChannelController.initiateReconciliation()
         }
     }
+
+    @VisibleForTesting
+    fun modifyAmountForOpi(amount: BigDecimal, currency: ISOAlphaCurrency): BigDecimal =
+        amount.scaleByPowerOfTen(
+            Currency.getInstance(currency.value).defaultFractionDigits.unaryMinus()
+        )
 
     internal sealed class State {
         data object Idle : State()

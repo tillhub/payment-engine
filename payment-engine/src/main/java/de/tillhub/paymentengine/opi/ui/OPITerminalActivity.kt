@@ -40,9 +40,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
                 }
                 OPITerminalViewModel.State.Pending.Login -> Unit
                 OPITerminalViewModel.State.LoggedIn -> startOperation()
-                is OPITerminalViewModel.State.OperationError -> showOperationErrorStatus(
-                    state.message
-                )
+                is OPITerminalViewModel.State.OperationError -> handleErrorState(state)
                 is OPITerminalViewModel.State.ResultError -> finishWithError(state)
                 is OPITerminalViewModel.State.ResultSuccess -> finishWithSuccess(state)
             }
@@ -75,6 +73,11 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation()) }
         )
         finish()
+    }
+
+    private fun handleErrorState(state: OPITerminalViewModel.State.OperationError) {
+        showInstructions()
+        showOperationErrorStatus(state.message)
     }
 
     abstract fun showLoader()
