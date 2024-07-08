@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.OPIChannelController
 import de.tillhub.paymentengine.opi.OPIChannelControllerImpl
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
@@ -46,8 +47,12 @@ internal class OPITerminalViewModel(
                         status,
                         status.message
                     )
-                    is OPIOperationStatus.Result.Error -> State.ResultError(status)
-                    is OPIOperationStatus.Result.Success -> State.ResultSuccess(status)
+                    is OPIOperationStatus.Result.Error -> State.ResultError(
+                        data = status.toTerminalOperation()
+                    )
+                    is OPIOperationStatus.Result.Success -> State.ResultSuccess(
+                        data = status.toTerminalOperation()
+                    )
                 }
             }
         }
@@ -112,11 +117,11 @@ internal class OPITerminalViewModel(
         ) : State()
 
         data class ResultError(
-            val data: OPIOperationStatus.Result.Error,
+            val data: TerminalOperationStatus.Error,
         ) : State()
 
         data class ResultSuccess(
-            val data: OPIOperationStatus.Result.Success
+            val data: TerminalOperationStatus.Success
         ) : State()
     }
 }

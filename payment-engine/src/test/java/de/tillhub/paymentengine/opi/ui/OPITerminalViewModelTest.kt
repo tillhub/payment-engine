@@ -1,7 +1,10 @@
 package de.tillhub.paymentengine.opi.ui
 
+import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.opi.OPIChannelController
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPITerminalViewModel.State
@@ -130,11 +133,16 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
             rawData = "rawData",
         )
         target.opiOperationState.getOrAwaitValue() shouldBe State.ResultError(
-            data = OPIOperationStatus.Result.Error(
+            data = TerminalOperationStatus.Error.OPI(
                 date = instant,
                 customerReceipt = "customerReceipt",
                 merchantReceipt = "merchantReceipt",
                 rawData = "rawData",
+                data = null,
+                resultCode = TransactionResultCode.Unknown(
+                    resultCode = -1,
+                    errorMessage = R.string.zvt_error_code_unknown
+                )
             )
         )
 
@@ -145,11 +153,12 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
             rawData = "rawData",
         )
         target.opiOperationState.getOrAwaitValue() shouldBe State.ResultSuccess(
-            data = OPIOperationStatus.Result.Success(
+            data = TerminalOperationStatus.Success.OPI(
                 date = instant,
                 customerReceipt = "customerReceipt",
                 merchantReceipt = "merchantReceipt",
                 rawData = "rawData",
+                data = null
             )
         )
     }

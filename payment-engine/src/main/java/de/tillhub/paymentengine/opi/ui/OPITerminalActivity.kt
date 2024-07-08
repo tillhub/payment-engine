@@ -61,7 +61,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation()) }
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
         )
         finish()
     }
@@ -70,7 +70,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data.toTerminalOperation()) }
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
         )
         finish()
     }

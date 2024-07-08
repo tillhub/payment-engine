@@ -156,7 +156,9 @@ class CardTerminalViewModelTest : FunSpec({
                     track3 = "track3",
                     vu = "vu",
                 ),
-                resultCode = TransactionResultCode(R.string.lavego_result_code_2_call_merchant)
+                resultCode = TransactionResultCode.Known(
+                    errorMessage = R.string.lavego_result_code_2_call_merchant
+                )
             )
         }
     }
