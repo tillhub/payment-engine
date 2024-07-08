@@ -15,16 +15,16 @@ import org.simpleframework.xml.Text
 internal data class DeviceRequest(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
-    var applicationSender: String,
+    var applicationSender: String = "",
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
-    var requestId: String,
+    var requestId: String = "",
     @field:Attribute(name = "RequestType")
     @param:Attribute(name = "RequestType")
-    var requestType: String,
+    var requestType: String = "",
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationId: String,
+    var workstationId: String = "",
 
     @field:ElementList(inline = true, required = false)
     @param:ElementList(inline = true, required = false)

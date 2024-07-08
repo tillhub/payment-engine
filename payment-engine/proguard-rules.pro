@@ -51,6 +51,7 @@
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus$* { *; }
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
+-keep class de.tillhub.paymentengine.data.TransactionResultCode$* { *; }
 
 # Communication classes
 -keep class de.tillhub.paymentengine.opi.data.CardServiceRequest { *; }
