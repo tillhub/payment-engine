@@ -19,10 +19,13 @@ internal class DtoToStringConverter<T>(
             serializer.write(value, osw)
             osw.flush()
         } catch (e: RuntimeException) {
+            e.printStackTrace()
             throw e
         } catch (e: IOException) {
+            e.printStackTrace()
             throw e
         } catch (e: Exception) {
+            e.printStackTrace()
             throw RuntimeException(e)
         }
 

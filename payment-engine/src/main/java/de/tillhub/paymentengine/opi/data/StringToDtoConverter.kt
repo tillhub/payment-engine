@@ -15,10 +15,13 @@ internal class StringToDtoConverter<T>(
             ?: throw IllegalStateException("Could not deserialize body as $clazz")
         read
     } catch (e: RuntimeException) {
+        e.printStackTrace()
         throw e
     } catch (e: IOException) {
+        e.printStackTrace()
         throw e
     } catch (e: Exception) {
+        e.printStackTrace()
         throw RuntimeException(e)
     }
 }
