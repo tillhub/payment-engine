@@ -35,7 +35,7 @@ internal data class DeviceRequest(
 internal data class Output(
     @field:Attribute(name = "OutDeviceTarget")
     @param:Attribute(name = "OutDeviceTarget")
-    var outDeviceTarget: String,
+    var outDeviceTarget: String = "",
 
     @field:Attribute(name = "OutResult", required = false)
     @param:Attribute(name = "OutResult", required = false)

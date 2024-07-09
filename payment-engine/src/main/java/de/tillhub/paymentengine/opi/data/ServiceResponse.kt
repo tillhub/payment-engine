@@ -18,16 +18,16 @@ import org.simpleframework.xml.Root
 internal data class ServiceResponse(
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
-    var requestId: String,
+    var requestId: String = "",
     @field:Attribute(name = "RequestType")
     @param:Attribute(name = "RequestType")
-    var requestType: String,
+    var requestType: String = "",
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationID: String,
+    var workstationID: String = "",
     @field:Attribute(name = "OverallResult")
     @param:Attribute(name = "OverallResult")
-    override var overallResult: String,
+    override var overallResult: String = "",
 
     @field:Element(name = "Terminal", required = false)
     @param:Element(name = "Terminal", required = false)

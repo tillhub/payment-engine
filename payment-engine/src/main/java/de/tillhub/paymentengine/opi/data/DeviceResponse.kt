@@ -14,22 +14,22 @@ import org.simpleframework.xml.Root
 internal data class DeviceResponse(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
-    var applicationSender: String,
+    var applicationSender: String = "",
     @field:Attribute(name = "POPID")
     @param:Attribute(name = "POPID")
-    var popId: String,
+    var popId: String = "",
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
-    var requestId: String,
+    var requestId: String = "",
     @field:Attribute(name = "RequestType")
     @param:Attribute(name = "RequestType")
-    var requestType: String,
+    var requestType: String = "",
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationID: String,
+    var workstationID: String = "",
     @field:Attribute(name = "OverallResult")
     @param:Attribute(name = "OverallResult")
-    var overallResult: String,
+    var overallResult: String = "",
 
     @field:ElementList(inline = true, required = false)
     @param:ElementList(inline = true, required = false)
