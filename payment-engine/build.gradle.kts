@@ -27,6 +27,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            consumerProguardFiles(
+                "consumer-rules.pro"
+            )
         }
     }
 
@@ -92,7 +95,7 @@ afterEvaluate {
             create<MavenPublication>("payment-engine") {
                 groupId = "de.tillhub.paymentengine"
                 artifactId = "payment-engine"
-                version = "2.0.4"
+                version = "2.0.5"
 
                 from(components.getByName("release"))
             }

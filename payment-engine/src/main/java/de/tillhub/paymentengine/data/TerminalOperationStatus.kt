@@ -66,12 +66,32 @@ sealed class TerminalOperationStatus : Parcelable {
             override val data: TransactionData?
         ) : Success()
 
-        override fun equals(other: Any?) = other is ZVT &&
-                date == other.date &&
-                customerReceipt == other.customerReceipt &&
-                merchantReceipt == other.merchantReceipt &&
-                rawData == other.rawData &&
-                data == other.data
+        override fun toString() = "Success(" +
+                "date=$date, " +
+                "customerReceipt=$customerReceipt, " +
+                "merchantReceipt=$merchantReceipt, " +
+                "rawData=$rawData, " +
+                "data=$data" +
+                ")"
+
+        override fun equals(other: Any?) = when (this) {
+            is OPI -> {
+                other is OPI &&
+                        date == other.date &&
+                        customerReceipt == other.customerReceipt &&
+                        merchantReceipt == other.merchantReceipt &&
+                        rawData == other.rawData &&
+                        data == other.data
+            }
+            is ZVT -> {
+                other is ZVT &&
+                        date == other.date &&
+                        customerReceipt == other.customerReceipt &&
+                        merchantReceipt == other.merchantReceipt &&
+                        rawData == other.rawData &&
+                        data == other.data
+            }
+        }
 
         override fun hashCode() = Objects.hash(
             date,
@@ -80,13 +100,6 @@ sealed class TerminalOperationStatus : Parcelable {
             rawData,
             data
         )
-        override fun toString() = "Success(" +
-                "date=$date, " +
-                "customerReceipt=$customerReceipt, " +
-                "merchantReceipt=$merchantReceipt, " +
-                "rawData=$rawData, " +
-                "data=$data" +
-                ")"
     }
 
     @Parcelize
