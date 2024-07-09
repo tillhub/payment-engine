@@ -18,19 +18,19 @@ import java.math.BigDecimal
 internal data class CardServiceRequest(
     @field:Attribute(name = "ApplicationSender")
     @param:Attribute(name = "ApplicationSender")
-    var applicationSender: String,
+    var applicationSender: String = "",
     @field:Attribute(name = "POPID")
     @param:Attribute(name = "POPID")
-    var popId: String,
+    var popId: String = "",
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
-    var requestId: String,
+    var requestId: String = "",
     @field:Attribute(name = "RequestType")
     @param:Attribute(name = "RequestType")
-    var requestType: String,
+    var requestType: String = "",
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationId: String,
+    var workstationId: String = "",
 
     @field:Element(name = "POSdata", required = false)
     @param:Element(name = "POSdata", required = false)
@@ -49,7 +49,7 @@ internal data class CardServiceRequest(
 internal data class PosData(
     @field:Element(name = "POSTimeStamp")
     @param:Element(name = "POSTimeStamp")
-    var timestamp: String
+    var timestamp: String = ""
 )
 
 @Parcelize
@@ -57,10 +57,10 @@ internal data class PosData(
 internal data class TotalAmount(
     @field:Text
     @param:Text
-    var value: BigDecimal,
+    var value: BigDecimal = BigDecimal.ZERO,
     @field:Attribute(name = "Currency")
     @param:Attribute(name = "Currency")
-    var currency: String,
+    var currency: String = "",
 
     @field:Attribute(name = "CardCircuit", required = false)
     @param:Attribute(name = "CardCircuit", required = false)
@@ -79,7 +79,7 @@ internal data class TotalAmount(
 internal data class OriginalTransaction(
     @field:Attribute(name = "STAN")
     @param:Attribute(name = "STAN")
-    var stan: String,
+    var stan: String = "",
 )
 
 internal enum class ServiceRequestType(val value: String) {

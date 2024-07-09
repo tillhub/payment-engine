@@ -18,16 +18,16 @@ import org.simpleframework.xml.Text
 internal data class CardServiceResponse(
     @field:Attribute(name = "RequestID")
     @param:Attribute(name = "RequestID")
-    var requestId: String,
+    var requestId: String = "",
     @field:Attribute(name = "RequestType")
     @param:Attribute(name = "RequestType")
-    var requestType: String,
+    var requestType: String = "",
     @field:Attribute(name = "WorkstationID")
     @param:Attribute(name = "WorkstationID")
-    var workstationId: String,
+    var workstationId: String = "",
     @field:Attribute(name = "OverallResult")
     @param:Attribute(name = "OverallResult")
-    override var overallResult: String,
+    override var overallResult: String = "",
 
     @field:Element(name = "Terminal", required = false)
     @param:Element(name = "Terminal", required = false)
@@ -113,7 +113,7 @@ internal data class Authorisation(
 internal data class CardDetails(
     @field:Element(name = "ExpiryDate")
     @param:Element(name = "ExpiryDate")
-    var expiryDate: ValueElement
+    var expiryDate: ValueElement = ValueElement()
 ) : Parcelable
 
 @Parcelize
