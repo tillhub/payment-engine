@@ -20,9 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class de.lavego.** {
-    *;
-}
+-keep class de.lavego.** { *; }
+-keep class org.simpleframework.** { *; }
 
 -keeppackagenames de.tillhub.paymentengine.**
 
@@ -52,8 +51,6 @@
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode$* { *; }
-
--keep class org.simpleframework.** { *; }
 
 -keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);
