@@ -48,6 +48,7 @@ internal data class ServiceResponse(
     var reconciliation: Reconciliation? = null,
 ) : Parcelable, OPIResponse
 
+@Keep
 @Parcelize
 @Root(name = "Reconciliation", strict = false)
 internal data class Reconciliation(
