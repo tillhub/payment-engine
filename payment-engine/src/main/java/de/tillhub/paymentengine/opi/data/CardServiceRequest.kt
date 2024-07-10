@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine.opi.data
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
@@ -10,6 +11,7 @@ import org.simpleframework.xml.Root
 import org.simpleframework.xml.Text
 import java.math.BigDecimal
 
+@Keep
 @Root(name = "CardServiceRequest", strict = false)
 @NamespaceList(
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
@@ -45,6 +47,7 @@ internal data class CardServiceRequest(
     var originalTransaction: OriginalTransaction? = null,
 )
 
+@Keep
 @Root(name = "POSdata", strict = false)
 internal data class PosData(
     @field:Element(name = "POSTimeStamp")
@@ -52,6 +55,7 @@ internal data class PosData(
     var timestamp: String = ""
 )
 
+@Keep
 @Parcelize
 @Root(name = "TotalAmount", strict = false)
 internal data class TotalAmount(
@@ -76,6 +80,7 @@ internal data class TotalAmount(
     var paymentAmount: String? = null,
 ) : Parcelable
 
+@Keep
 internal data class OriginalTransaction(
     @field:Attribute(name = "STAN")
     @param:Attribute(name = "STAN")

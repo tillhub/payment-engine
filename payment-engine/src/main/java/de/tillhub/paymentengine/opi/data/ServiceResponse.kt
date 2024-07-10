@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine.opi.data
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
@@ -9,6 +10,7 @@ import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
 
+@Keep
 @Parcelize
 @Root(name = "ServiceResponse", strict = false)
 @NamespaceList(
@@ -46,6 +48,7 @@ internal data class ServiceResponse(
     var reconciliation: Reconciliation? = null,
 ) : Parcelable, OPIResponse
 
+@Keep
 @Parcelize
 @Root(name = "Reconciliation", strict = false)
 internal data class Reconciliation(

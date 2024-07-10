@@ -1,11 +1,13 @@
 package de.tillhub.paymentengine.opi.data
 
+import androidx.annotation.Keep
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
 
+@Keep
 @Root(name = "DeviceResponse", strict = false)
 @NamespaceList(
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),

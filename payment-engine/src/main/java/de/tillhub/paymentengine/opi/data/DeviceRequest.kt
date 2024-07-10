@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.opi.data
 
+import androidx.annotation.Keep
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
@@ -7,6 +8,7 @@ import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
 import org.simpleframework.xml.Text
 
+@Keep
 @Root(name = "DeviceRequest", strict = false)
 @NamespaceList(
     Namespace(reference = "http://www.nrf-arts.org/IXRetail/namespace"),
@@ -31,6 +33,7 @@ internal data class DeviceRequest(
     var output: List<Output>? = null,
 )
 
+@Keep
 @Root(name = "Output", strict = false)
 internal data class Output(
     @field:Attribute(name = "OutDeviceTarget")
@@ -46,6 +49,7 @@ internal data class Output(
     var textLines: List<TextLine>? = null
 )
 
+@Keep
 @Root(name = "TextLine", strict = false)
 internal data class TextLine(
     @field:Attribute(name = "TimeOut", required = false)
