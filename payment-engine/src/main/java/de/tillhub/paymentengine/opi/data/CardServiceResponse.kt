@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine.opi.data
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
@@ -9,6 +10,7 @@ import org.simpleframework.xml.NamespaceList
 import org.simpleframework.xml.Root
 import org.simpleframework.xml.Text
 
+@Keep
 @Parcelize
 @Root(name = "CardServiceResponse", strict = false)
 @NamespaceList(
@@ -50,6 +52,7 @@ internal data class CardServiceResponse(
     var privateData: PrivateData? = null,
 ) : Parcelable, OPIResponse
 
+@Keep
 @Parcelize
 @Root(name = "Terminal", strict = false)
 internal data class Terminal(
@@ -61,6 +64,7 @@ internal data class Terminal(
     var terminalId: String? = null,
 ) : Parcelable
 
+@Keep
 @Parcelize
 @Root(name = "Tender", strict = false)
 internal data class Tender(
@@ -73,6 +77,7 @@ internal data class Tender(
     var totalAmount: TotalAmount? = null
 ) : Parcelable
 
+@Keep
 @Parcelize
 @Root(name = "Authorisation", strict = false)
 internal data class Authorisation(
@@ -108,6 +113,7 @@ internal data class Authorisation(
     var authorisationType: String? = null,
 ) : Parcelable
 
+@Keep
 @Parcelize
 @Root(name = "CardDetails", strict = false)
 internal data class CardDetails(
@@ -116,6 +122,7 @@ internal data class CardDetails(
     var expiryDate: ValueElement = ValueElement()
 ) : Parcelable
 
+@Keep
 @Parcelize
 @Root(name = "CardValue", strict = false)
 internal data class CardValue(
@@ -130,6 +137,7 @@ internal data class CardValue(
     var cardPAN: ValueElement? = null,
 ) : Parcelable
 
+@Keep
 @Parcelize
 @Root(name = "PrivateData", strict = false)
 internal data class PrivateData(
@@ -153,6 +161,7 @@ internal data class PrivateData(
     var rebootInfo: ValueElement? = null,
 ) : Parcelable
 
+@Keep
 @Parcelize
 internal data class ValueElement(
     @field:Text(required = false)

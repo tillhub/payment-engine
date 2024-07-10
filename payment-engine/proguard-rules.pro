@@ -78,12 +78,7 @@
 -keep class de.tillhub.paymentengine.opi.data.ServiceResponse { *; }
 -keep class de.tillhub.paymentengine.opi.data.Reconciliation { *; }
 
--keep public class org.simpleframework.**{ *; }
--keep class org.simpleframework.xml.**{ *; }
--keep class org.simpleframework.xml.core.**{ *; }
--keep class org.simpleframework.xml.util.**{ *; }
--keepattributes *Annotation*
--keepattributes Signature
+-keep class org.simpleframework.** { *; }
 
 -keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);

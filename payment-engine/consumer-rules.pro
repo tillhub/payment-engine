@@ -1,7 +1,4 @@
--keep public class org.simpleframework.**{ *; }
--keep class org.simpleframework.xml.**{ *; }
--keep class org.simpleframework.xml.core.**{ *; }
--keep class org.simpleframework.xml.util.**{ *; }
+-keep class org.simpleframework.** { *; }
 
 # Communication classes
 -keep class de.tillhub.paymentengine.opi.data.CardServiceRequest { *; }
