@@ -38,8 +38,13 @@ internal class OPIChannel1(
 
         working.set(true)
         coroutineScope.launch {
-            webSocket = socketFactory.createServerSocket(socketPort)
-            Timber.tag("OPI_CHANNEL_1").d("channel opened ${webSocket!!.isBound}")
+            try {
+                webSocket = socketFactory.createServerSocket(socketPort)
+                Timber.tag("OPI_CHANNEL_1").d("channel opened ${webSocket!!.isBound}")
+            } catch (e: IOException) {
+                onError(e, "Channel 1 Socket setup failed: Port already in use")
+                close()
+            }
 
             while (working.get()) {
                 webSocket?.let {

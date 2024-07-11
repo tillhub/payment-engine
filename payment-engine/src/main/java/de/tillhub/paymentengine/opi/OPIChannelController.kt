@@ -418,6 +418,10 @@ internal class OPIChannelControllerImpl(
         requestConverter: DtoToStringConverter<U>,
         responseConverter: StringToDtoConverter<V>
     ) {
+        if (_operationState.value is OPIOperationStatus.Error) {
+            return
+        }
+
         channel0.setOnError(::communicationErrorHandler)
 
         channel0.open()
