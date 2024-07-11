@@ -28,6 +28,8 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.setBringToFront(::moveAppToFront)
+
         viewModel.opiOperationState.observe(this) { state ->
             when (state) {
                 OPITerminalViewModel.State.Idle -> {
@@ -58,7 +60,6 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     }
 
     private fun finishWithSuccess(state: OPITerminalViewModel.State.ResultSuccess) {
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(
             Activity.RESULT_OK,
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
@@ -67,7 +68,6 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     }
 
     private fun finishWithError(state: OPITerminalViewModel.State.ResultError) {
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
         setResult(
             Activity.RESULT_OK,
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
@@ -78,6 +78,10 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     private fun handleErrorState(state: OPITerminalViewModel.State.OperationError) {
         showInstructions()
         showOperationErrorStatus(state.message)
+    }
+
+    private fun moveAppToFront() {
+        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
     }
 
     abstract fun showLoader()

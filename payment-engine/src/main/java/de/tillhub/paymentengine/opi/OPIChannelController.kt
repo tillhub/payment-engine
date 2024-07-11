@@ -41,6 +41,8 @@ internal interface OPIChannelController {
     fun init(terminal: Terminal.OPI)
     fun close()
 
+    fun setBringToFront(bringToFront: () -> Unit)
+
     suspend fun login()
 
     suspend fun initiateCardPayment(
@@ -66,6 +68,8 @@ internal class OPIChannelControllerImpl(
     private lateinit var terminal: Terminal.OPI
     private lateinit var channel0: OPIChannel0
     private lateinit var channel1: OPIChannel1
+
+    private var bringToFront: (() -> Unit)? = null
 
     private val initialized: Boolean
         get() = this@OPIChannelControllerImpl::terminal.isInitialized &&
@@ -95,6 +99,10 @@ internal class OPIChannelControllerImpl(
 
             _operationState.value = OPIOperationStatus.Idle
         }
+    }
+
+    override fun setBringToFront(bringToFront: () -> Unit) {
+        this.bringToFront = bringToFront
     }
 
     override suspend fun login() {
@@ -140,7 +148,7 @@ internal class OPIChannelControllerImpl(
 
             // here the app waits for the channel 0 socket to connect to the terminal.
             while (!channel0.isConnected) {
-                delay(CONNECTION_WAIT_DELAY)
+                delay(WAIT_DELAY)
             }
 
             channel0.sendMessage(xml) { responseXml ->
@@ -440,7 +448,7 @@ internal class OPIChannelControllerImpl(
 
         // here the app waits for the channel 0 socket to connect to the terminal.
         while (!channel0.isConnected) {
-            delay(CONNECTION_WAIT_DELAY)
+            delay(WAIT_DELAY)
         }
 
         channel0.sendMessage(xml) { responseXml ->
@@ -462,6 +470,12 @@ internal class OPIChannelControllerImpl(
             val merchantReceipt =
                 (_operationState.value as? OPIOperationStatus.Pending.Operation)
                     ?.merchantReceipt.orEmpty()
+
+            bringToFront?.let {
+                it.invoke()
+
+                delay(WAIT_DELAY)
+            }
 
             _operationState.value = when (OverallResult.find(response.overallResult)) {
                 OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
@@ -538,6 +552,6 @@ internal class OPIChannelControllerImpl(
     }
 
     companion object {
-        private const val CONNECTION_WAIT_DELAY = 100L
+        private const val WAIT_DELAY = 100L
     }
 }

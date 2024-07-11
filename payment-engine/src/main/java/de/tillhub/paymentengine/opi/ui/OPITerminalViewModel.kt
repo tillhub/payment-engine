@@ -94,6 +94,10 @@ internal class OPITerminalViewModel(
         }
     }
 
+    fun setBringToFront(bringToFront: () -> Unit) {
+        opiChannelController.setBringToFront(bringToFront)
+    }
+
     @VisibleForTesting
     fun modifyAmountForOpi(amount: BigDecimal, currency: ISOAlphaCurrency): BigDecimal =
         amount.scaleByPowerOfTen(
