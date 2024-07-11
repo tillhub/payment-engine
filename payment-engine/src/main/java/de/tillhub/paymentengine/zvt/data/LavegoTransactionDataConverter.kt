@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.zvt.data
 
-import android.util.Log
 import androidx.annotation.Keep
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
@@ -27,9 +26,6 @@ internal class LavegoTransactionDataConverter(
                 createJsonAdapter().fromJson(json)?.toDomain()
             }.errorIfNull("data could not be converted to transaction data: $json")
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Log.d("TX_DATA", "data could not be converted to transaction data: $json")
-            e.printStackTrace()
-
             Timber.v(e, "data could not be converted to transaction data: %s", json)
             Payment.Error("data could not be converted to transaction data: $json")
         }
