@@ -331,6 +331,8 @@ internal class OPIChannelControllerImpl(
     private fun finishOperation() {
         channel0.close()
         channel1.close()
+
+        bringToFront = null
     }
 
     /**
