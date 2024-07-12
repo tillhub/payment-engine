@@ -9,19 +9,16 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.OPIChannelController
-import de.tillhub.paymentengine.opi.OPIChannelControllerImpl
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 import java.math.BigDecimal
 import java.util.Currency
 
-internal class OPITerminalViewModel(
-    private val opiChannelController: OPIChannelController = OPIChannelControllerImpl()
-) : ViewModel() {
+internal class OPITerminalViewModel : ViewModel() {
 
-    private val _opiOperationState: MutableLiveData<State> =
-        MutableLiveData(State.Idle)
+    private lateinit var opiChannelController: OPIChannelController
+
+    private val _opiOperationState: MutableLiveData<State> = MutableLiveData(State.Waiting)
     val opiOperationState: LiveData<State> = _opiOperationState
 
     fun init(terminal: Terminal.OPI) {
@@ -56,6 +53,10 @@ internal class OPITerminalViewModel(
                 }
             }
         }
+    }
+
+    fun setController(opiChannelController: OPIChannelController) {
+        this.opiChannelController = opiChannelController
     }
 
     fun onDestroy() {
@@ -94,10 +95,6 @@ internal class OPITerminalViewModel(
         }
     }
 
-    fun setBringToFront(bringToFront: () -> Unit) {
-        opiChannelController.setBringToFront(bringToFront)
-    }
-
     @VisibleForTesting
     fun modifyAmountForOpi(amount: BigDecimal, currency: ISOAlphaCurrency): BigDecimal =
         amount.scaleByPowerOfTen(
@@ -105,6 +102,7 @@ internal class OPITerminalViewModel(
         )
 
     internal sealed class State {
+        data object Waiting : State()
         data object Idle : State()
 
         data object LoggedIn : State()

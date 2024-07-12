@@ -1,10 +1,19 @@
 package de.tillhub.paymentengine.opi
 
+import android.app.Service
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
+import androidx.core.app.ServiceCompat
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.helper.toISOString
+import de.tillhub.paymentengine.opi.common.NotificationsHelper
+import de.tillhub.paymentengine.opi.common.withOPIContext
 import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1
 import de.tillhub.paymentengine.opi.communication.OPIChannelFactory
@@ -63,7 +72,9 @@ internal class OPIChannelControllerImpl(
     private val channelFactory: OPIChannelFactory = OPIChannelFactory(),
     private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
     private val requestIdFactory: RequestIdFactory = RequestIdFactory()
-) : OPIChannelController {
+) : OPIChannelController, Service() {
+
+    private val binder = OPIChannelControllerLocalBinder(this)
 
     private lateinit var terminal: Terminal.OPI
     private lateinit var channel0: OPIChannel0
@@ -80,7 +91,11 @@ internal class OPIChannelControllerImpl(
     override val operationState: StateFlow<OPIOperationStatus>
         get() = _operationState
 
+    override fun onBind(intent: Intent?): IBinder = binder
+
     override fun init(terminal: Terminal.OPI) {
+        startAsForegroundService()
+
         this.terminal = terminal
 
         if (initialized) {
@@ -105,9 +120,9 @@ internal class OPIChannelControllerImpl(
         this.bringToFront = bringToFront
     }
 
-    override suspend fun login() {
+    override suspend fun login() = withOPIContext {
         // If the state is not Idle, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.Idle) return
+        if (_operationState.value !is OPIOperationStatus.Idle) return@withOPIContext
 
         _operationState.value = OPIOperationStatus.Pending.Login
 
@@ -138,7 +153,7 @@ internal class OPIChannelControllerImpl(
                     message = "Channel 0 request object could not be converted to XML.",
                     error = e
                 )
-                return
+                return@withOPIContext
             }
 
             // setup C0 communication
@@ -184,47 +199,48 @@ internal class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiateCardPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
-        // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+    override suspend fun initiateCardPayment(amount: BigDecimal, currency: ISOAlphaCurrency) =
+        withOPIContext {
+            // If the state is not LoggedIn, then we should drop the new request
+            if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
-        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
+            _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
-        // checks if the controller is initialized
-        if (initialized) {
-            // setup C1 communication, it has to be setup before C0,
-            // because once C0 request is sent, C1 needs to handle the intermediate communication
-            handleChannel1Communication()
+            // checks if the controller is initialized
+            if (initialized) {
+                // setup C1 communication, it has to be setup before C0,
+                // because once C0 request is sent, C1 needs to handle the intermediate communication
+                handleChannel1Communication()
 
-            val payload = CardServiceRequest(
-                applicationSender = terminal.saleConfig.applicationName,
-                popId = terminal.saleConfig.poiId,
-                requestId = requestIdFactory.generateRequestId(),
-                requestType = ServiceRequestType.CARD_PAYMENT.value,
-                workstationId = terminal.saleConfig.saleId,
-                posData = PosData(terminalConfig.timeNow().toISOString()),
-                totalAmount = TotalAmount(
-                    value = amount.setScale(2),
-                    currency = currency.value
+                val payload = CardServiceRequest(
+                    applicationSender = terminal.saleConfig.applicationName,
+                    popId = terminal.saleConfig.poiId,
+                    requestId = requestIdFactory.generateRequestId(),
+                    requestType = ServiceRequestType.CARD_PAYMENT.value,
+                    workstationId = terminal.saleConfig.saleId,
+                    posData = PosData(terminalConfig.timeNow().toISOString()),
+                    totalAmount = TotalAmount(
+                        value = amount.setScale(2),
+                        currency = currency.value
+                    )
                 )
-            )
 
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
+                val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
+                val responseConverter = converterFactory.newStringToDtoConverter(
+                    clazz = CardServiceResponse::class.java
+                )
 
-            // setup C0 communication
-            handleC0Communication(payload, requestConverter, responseConverter)
-        } else {
-            // in case the controller is not initialized set the state to `Error.NotInitialised`
-            _operationState.value = OPIOperationStatus.Error.NotInitialised
+                // setup C0 communication
+                handleC0Communication(payload, requestConverter, responseConverter)
+            } else {
+                // in case the controller is not initialized set the state to `Error.NotInitialised`
+                _operationState.value = OPIOperationStatus.Error.NotInitialised
+            }
         }
-    }
 
-    override suspend fun initiatePaymentReversal(stan: String) {
+    override suspend fun initiatePaymentReversal(stan: String) = withOPIContext {
         // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
         _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
@@ -257,47 +273,49 @@ internal class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiatePartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) {
-        // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+    override suspend fun initiatePartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) =
+        withOPIContext {
+            // If the state is not LoggedIn, then we should drop the new request
+            if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
-        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
+            _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
-        // checks if the controller is initialized
-        if (initialized) {
-            // setup C1 communication, it has to be setup before C0,
-            // because once C0 request is sent, C1 needs to handle the intermediate communication
-            handleChannel1Communication()
+            // checks if the controller is initialized
+            if (initialized) {
+                // setup C1 communication, it has to be setup before C0,
+                // because once C0 request is sent, C1 needs to handle the intermediate communication
+                handleChannel1Communication()
 
-            val payload = CardServiceRequest(
-                applicationSender = terminal.saleConfig.applicationName,
-                popId = terminal.saleConfig.poiId,
-                requestId = requestIdFactory.generateRequestId(),
-                requestType = ServiceRequestType.PAYMENT_REFUND.value,
-                workstationId = terminal.saleConfig.saleId,
-                posData = PosData(terminalConfig.timeNow().toISOString()),
-                totalAmount = TotalAmount(
-                    value = amount.setScale(2),
-                    currency = currency.value
+                val payload = CardServiceRequest(
+                    applicationSender = terminal.saleConfig.applicationName,
+                    popId = terminal.saleConfig.poiId,
+                    requestId = requestIdFactory.generateRequestId(),
+                    requestType = ServiceRequestType.PAYMENT_REFUND.value,
+                    workstationId = terminal.saleConfig.saleId,
+                    posData = PosData(terminalConfig.timeNow().toISOString()),
+                    totalAmount = TotalAmount(
+                        value = amount.setScale(2),
+                        currency = currency.value
+                    )
                 )
-            )
 
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
+                val requestConverter = converterFactory
+                    .newDtoToStringConverter<CardServiceRequest>()
+                val responseConverter = converterFactory.newStringToDtoConverter(
+                    clazz = CardServiceResponse::class.java
+                )
 
-            // setup C0 communication
-            handleC0Communication(payload, requestConverter, responseConverter)
-        } else {
-            // in case the controller is not initialized set the state to `Error.NotInitialised`
-            _operationState.value = OPIOperationStatus.Error.NotInitialised
+                // setup C0 communication
+                handleC0Communication(payload, requestConverter, responseConverter)
+            } else {
+                // in case the controller is not initialized set the state to `Error.NotInitialised`
+                _operationState.value = OPIOperationStatus.Error.NotInitialised
+            }
         }
-    }
 
-    override suspend fun initiateReconciliation() {
+    override suspend fun initiateReconciliation() = withOPIContext {
         // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
         _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
@@ -328,11 +346,26 @@ internal class OPIChannelControllerImpl(
         }
     }
 
+    private fun startAsForegroundService() {
+        // create the notification channel
+        NotificationsHelper.createNotificationChannel(this)
+
+        // promote service to foreground service
+        ServiceCompat.startForeground(
+            this,
+            1,
+            NotificationsHelper.buildNotification(this),
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
+            } else {
+                0
+            }
+        )
+    }
+
     private fun finishOperation() {
         channel0.close()
         channel1.close()
-
-        bringToFront = null
     }
 
     /**
@@ -473,11 +506,7 @@ internal class OPIChannelControllerImpl(
                 (_operationState.value as? OPIOperationStatus.Pending.Operation)
                     ?.merchantReceipt.orEmpty()
 
-            bringToFront?.let {
-                it.invoke()
-
-                delay(WAIT_DELAY)
-            }
+            moveAppToFront()
 
             _operationState.value = when (OverallResult.find(response.overallResult)) {
                 OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
@@ -501,6 +530,10 @@ internal class OPIChannelControllerImpl(
 
             // as per protocol, both channels are closed after C0 response
             finishOperation()
+
+            // clear after finish
+            bringToFront = null
+            stopSelf()
         }
     }
 
@@ -508,6 +541,7 @@ internal class OPIChannelControllerImpl(
         if (_operationState.value is OPIOperationStatus.Result) {
             Timber.tag("OPI_CHANNEL_CONTROLLER")
                 .d("Operation done, error ignored.\nError: $message\n$error")
+            return
         }
 
         _operationState.value = OPIOperationStatus.Error.Communication(message, error)
@@ -551,6 +585,23 @@ internal class OPIChannelControllerImpl(
         )
 
         else -> currentState // TODO> Not handled yet
+    }
+
+    class OPIChannelControllerLocalBinder(
+        private val instance: OPIChannelControllerImpl
+    ) : Binder() {
+
+        fun service(): OPIChannelControllerImpl {
+            // Return this instance of LocalService so clients can call public methods
+            return instance
+        }
+    }
+
+    private suspend fun moveAppToFront() {
+        bringToFront?.let {
+            it.invoke()
+            delay(WAIT_DELAY)
+        }
     }
 
     companion object {

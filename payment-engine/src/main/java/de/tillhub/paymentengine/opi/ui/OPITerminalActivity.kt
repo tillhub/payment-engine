@@ -2,16 +2,34 @@ package de.tillhub.paymentengine.opi.ui
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.opi.OPIChannelControllerImpl
 
 internal abstract class OPITerminalActivity : AppCompatActivity() {
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as OPIChannelControllerImpl.OPIChannelControllerLocalBinder
+            val opiController = binder.service()
+
+            opiController.setBringToFront(::moveAppToFront)
+            viewModel.setController(opiController)
+            viewModel.init(config)
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) = Unit
+    }
 
     internal val viewModel by viewModels<OPITerminalViewModel>()
 
@@ -28,10 +46,9 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.setBringToFront(::moveAppToFront)
-
         viewModel.opiOperationState.observe(this) { state ->
             when (state) {
+                OPITerminalViewModel.State.Waiting -> Unit
                 OPITerminalViewModel.State.Idle -> {
                     showLoader()
                     viewModel.loginToTerminal()
@@ -51,7 +68,16 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.init(config)
+
+        val intent = Intent(this, OPIChannelControllerImpl::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+
+        bindService(intent, connection, 0)
     }
 
     override fun onDestroy() {
