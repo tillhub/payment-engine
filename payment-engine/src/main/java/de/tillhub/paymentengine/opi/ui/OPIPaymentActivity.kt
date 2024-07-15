@@ -51,7 +51,7 @@ internal class OPIPaymentActivity : OPITerminalActivity() {
     }
 
     override fun startOperation() {
-        viewModel.startPayment(amount, currency)
+        opiService.startPayment(amount, currency)
     }
 
     companion object {

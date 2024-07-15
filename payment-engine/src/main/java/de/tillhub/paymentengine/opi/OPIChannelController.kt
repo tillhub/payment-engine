@@ -5,6 +5,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.helper.toISOString
+import de.tillhub.paymentengine.opi.common.withOPIContext
 import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1
 import de.tillhub.paymentengine.opi.communication.OPIChannelFactory
@@ -97,9 +98,9 @@ internal class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun login() {
+    override suspend fun login() = withOPIContext {
         // If the state is not Idle, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.Idle) return
+        if (_operationState.value !is OPIOperationStatus.Idle) return@withOPIContext
 
         _operationState.value = OPIOperationStatus.Pending.Login
 
@@ -130,7 +131,7 @@ internal class OPIChannelControllerImpl(
                     message = "Channel 0 request object could not be converted to XML.",
                     error = e
                 )
-                return
+                return@withOPIContext
             }
 
             // setup C0 communication
@@ -140,7 +141,7 @@ internal class OPIChannelControllerImpl(
 
             // here the app waits for the channel 0 socket to connect to the terminal.
             while (!channel0.isConnected) {
-                delay(CONNECTION_WAIT_DELAY)
+                delay(WAIT_DELAY)
             }
 
             channel0.sendMessage(xml) { responseXml ->
@@ -176,47 +177,48 @@ internal class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiateCardPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
-        // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+    override suspend fun initiateCardPayment(amount: BigDecimal, currency: ISOAlphaCurrency) =
+        withOPIContext {
+            // If the state is not LoggedIn, then we should drop the new request
+            if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
-        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
+            _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
-        // checks if the controller is initialized
-        if (initialized) {
-            // setup C1 communication, it has to be setup before C0,
-            // because once C0 request is sent, C1 needs to handle the intermediate communication
-            handleChannel1Communication()
+            // checks if the controller is initialized
+            if (initialized) {
+                // setup C1 communication, it has to be setup before C0,
+                // because once C0 request is sent, C1 needs to handle the intermediate communication
+                handleChannel1Communication()
 
-            val payload = CardServiceRequest(
-                applicationSender = terminal.saleConfig.applicationName,
-                popId = terminal.saleConfig.poiId,
-                requestId = requestIdFactory.generateRequestId(),
-                requestType = ServiceRequestType.CARD_PAYMENT.value,
-                workstationId = terminal.saleConfig.saleId,
-                posData = PosData(terminalConfig.timeNow().toISOString()),
-                totalAmount = TotalAmount(
-                    value = amount.setScale(2),
-                    currency = currency.value
+                val payload = CardServiceRequest(
+                    applicationSender = terminal.saleConfig.applicationName,
+                    popId = terminal.saleConfig.poiId,
+                    requestId = requestIdFactory.generateRequestId(),
+                    requestType = ServiceRequestType.CARD_PAYMENT.value,
+                    workstationId = terminal.saleConfig.saleId,
+                    posData = PosData(terminalConfig.timeNow().toISOString()),
+                    totalAmount = TotalAmount(
+                        value = amount.setScale(2),
+                        currency = currency.value
+                    )
                 )
-            )
 
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
+                val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
+                val responseConverter = converterFactory.newStringToDtoConverter(
+                    clazz = CardServiceResponse::class.java
+                )
 
-            // setup C0 communication
-            handleC0Communication(payload, requestConverter, responseConverter)
-        } else {
-            // in case the controller is not initialized set the state to `Error.NotInitialised`
-            _operationState.value = OPIOperationStatus.Error.NotInitialised
+                // setup C0 communication
+                handleC0Communication(payload, requestConverter, responseConverter)
+            } else {
+                // in case the controller is not initialized set the state to `Error.NotInitialised`
+                _operationState.value = OPIOperationStatus.Error.NotInitialised
+            }
         }
-    }
 
-    override suspend fun initiatePaymentReversal(stan: String) {
+    override suspend fun initiatePaymentReversal(stan: String) = withOPIContext {
         // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
         _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
@@ -249,47 +251,49 @@ internal class OPIChannelControllerImpl(
         }
     }
 
-    override suspend fun initiatePartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) {
-        // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+    override suspend fun initiatePartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) =
+        withOPIContext {
+            // If the state is not LoggedIn, then we should drop the new request
+            if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
-        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
+            _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
-        // checks if the controller is initialized
-        if (initialized) {
-            // setup C1 communication, it has to be setup before C0,
-            // because once C0 request is sent, C1 needs to handle the intermediate communication
-            handleChannel1Communication()
+            // checks if the controller is initialized
+            if (initialized) {
+                // setup C1 communication, it has to be setup before C0,
+                // because once C0 request is sent, C1 needs to handle the intermediate communication
+                handleChannel1Communication()
 
-            val payload = CardServiceRequest(
-                applicationSender = terminal.saleConfig.applicationName,
-                popId = terminal.saleConfig.poiId,
-                requestId = requestIdFactory.generateRequestId(),
-                requestType = ServiceRequestType.PAYMENT_REFUND.value,
-                workstationId = terminal.saleConfig.saleId,
-                posData = PosData(terminalConfig.timeNow().toISOString()),
-                totalAmount = TotalAmount(
-                    value = amount.setScale(2),
-                    currency = currency.value
+                val payload = CardServiceRequest(
+                    applicationSender = terminal.saleConfig.applicationName,
+                    popId = terminal.saleConfig.poiId,
+                    requestId = requestIdFactory.generateRequestId(),
+                    requestType = ServiceRequestType.PAYMENT_REFUND.value,
+                    workstationId = terminal.saleConfig.saleId,
+                    posData = PosData(terminalConfig.timeNow().toISOString()),
+                    totalAmount = TotalAmount(
+                        value = amount.setScale(2),
+                        currency = currency.value
+                    )
                 )
-            )
 
-            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
-            val responseConverter = converterFactory.newStringToDtoConverter(
-                clazz = CardServiceResponse::class.java
-            )
+                val requestConverter = converterFactory
+                    .newDtoToStringConverter<CardServiceRequest>()
+                val responseConverter = converterFactory.newStringToDtoConverter(
+                    clazz = CardServiceResponse::class.java
+                )
 
-            // setup C0 communication
-            handleC0Communication(payload, requestConverter, responseConverter)
-        } else {
-            // in case the controller is not initialized set the state to `Error.NotInitialised`
-            _operationState.value = OPIOperationStatus.Error.NotInitialised
+                // setup C0 communication
+                handleC0Communication(payload, requestConverter, responseConverter)
+            } else {
+                // in case the controller is not initialized set the state to `Error.NotInitialised`
+                _operationState.value = OPIOperationStatus.Error.NotInitialised
+            }
         }
-    }
 
-    override suspend fun initiateReconciliation() {
+    override suspend fun initiateReconciliation() = withOPIContext {
         // If the state is not LoggedIn, then we should drop the new request
-        if (_operationState.value !is OPIOperationStatus.LoggedIn) return
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
 
         _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
 
@@ -440,7 +444,7 @@ internal class OPIChannelControllerImpl(
 
         // here the app waits for the channel 0 socket to connect to the terminal.
         while (!channel0.isConnected) {
-            delay(CONNECTION_WAIT_DELAY)
+            delay(WAIT_DELAY)
         }
 
         channel0.sendMessage(xml) { responseXml ->
@@ -492,6 +496,7 @@ internal class OPIChannelControllerImpl(
         if (_operationState.value is OPIOperationStatus.Result) {
             Timber.tag("OPI_CHANNEL_CONTROLLER")
                 .d("Operation done, error ignored.\nError: $message\n$error")
+            return
         }
 
         _operationState.value = OPIOperationStatus.Error.Communication(message, error)
@@ -538,6 +543,6 @@ internal class OPIChannelControllerImpl(
     }
 
     companion object {
-        private const val CONNECTION_WAIT_DELAY = 100L
+        private const val WAIT_DELAY = 100L
     }
 }

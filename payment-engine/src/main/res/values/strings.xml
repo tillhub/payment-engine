@@ -10,6 +10,9 @@
     <string name="transaction_cancel_card_partial_refund_error_title">Payment partial refund error</string>
     <string name="transaction_cancel_card_partial_refund_nexo_error">NexoFAST currently does not support payment partial refund</string>
 
+    <string name="opi_foreground_service_title">OPI Foreground service</string>
+    <string name="opi_foreground_service_message">OPI transaction in progress</string>
+
     <string name="common_result_code_system_malfunction">System malfunction</string>
     <string name="common_result_code_tx_number_error">Transaction number missing or incorrect</string>
 

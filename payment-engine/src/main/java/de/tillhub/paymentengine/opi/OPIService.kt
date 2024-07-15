@@ -1,34 +1,57 @@
-package de.tillhub.paymentengine.opi.ui
+package de.tillhub.paymentengine.opi
 
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.content.Intent
+import android.os.Binder
+import android.os.IBinder
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.OPIChannelController
-import de.tillhub.paymentengine.opi.OPIChannelControllerImpl
+import de.tillhub.paymentengine.opi.common.modifyAmountForOpi
+import de.tillhub.paymentengine.opi.common.startAsForegroundService
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 import java.math.BigDecimal
-import java.util.Currency
 
-internal class OPITerminalViewModel(
-    private val opiChannelController: OPIChannelController = OPIChannelControllerImpl()
-) : ViewModel() {
+internal class OPIService(
+    private val opiController: OPIChannelController = OPIChannelControllerImpl()
+) : LifecycleService() {
 
-    private val _opiOperationState: MutableLiveData<State> =
-        MutableLiveData(State.Idle)
-    val opiOperationState: LiveData<State> = _opiOperationState
+    private val binder = OPIServiceLocalBinder(this)
+
+    private val _opiOperationState: MutableStateFlow<State> = MutableStateFlow(State.NotInitialized)
+    val opiOperationState: StateFlow<State> = _opiOperationState
+
+    private var bringToFront: (() -> Unit)? = null
+
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        return binder
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        startAsForegroundService()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        opiController.close()
+        bringToFront = null
+    }
+
+    fun setBringToFront(bringToFront: () -> Unit) {
+        this.bringToFront = bringToFront
+    }
 
     fun init(terminal: Terminal.OPI) {
-        opiChannelController.init(terminal)
+        opiController.init(terminal)
 
-        viewModelScope.launch {
-            opiChannelController.operationState.collect { status ->
+        lifecycleScope.launch {
+            opiController.operationState.collect { status ->
                 _opiOperationState.value = when (status) {
                     OPIOperationStatus.Idle -> State.Idle
                     is OPIOperationStatus.Pending.Operation -> {
@@ -53,54 +76,56 @@ internal class OPITerminalViewModel(
                     is OPIOperationStatus.Result.Success -> State.ResultSuccess(
                         data = status.toTerminalOperation()
                     )
+                }.also {
+                    if (status is OPIOperationStatus.Result) {
+                        bringToFront?.invoke()
+                    }
                 }
             }
         }
     }
 
-    fun onDestroy() {
-        opiChannelController.close()
-    }
-
     fun loginToTerminal() {
-        viewModelScope.launch {
-            opiChannelController.login()
+        lifecycleScope.launch {
+            opiController.login()
         }
     }
 
     fun startPayment(amount: BigDecimal, currency: ISOAlphaCurrency) {
-        viewModelScope.launch {
-            val modifiedAmount = modifyAmountForOpi(amount, currency)
-            opiChannelController.initiateCardPayment(modifiedAmount, currency)
+        lifecycleScope.launch {
+            val modifiedAmount = amount.modifyAmountForOpi(currency)
+            opiController.initiateCardPayment(modifiedAmount, currency)
         }
     }
 
     fun startPaymentReversal(stan: String) {
-        viewModelScope.launch {
-            opiChannelController.initiatePaymentReversal(stan)
+        lifecycleScope.launch {
+            opiController.initiatePaymentReversal(stan)
         }
     }
 
     fun startPartialRefund(amount: BigDecimal, currency: ISOAlphaCurrency) {
-        viewModelScope.launch {
-            val modifiedAmount = modifyAmountForOpi(amount, currency)
-            opiChannelController.initiatePartialRefund(modifiedAmount, currency)
+        lifecycleScope.launch {
+            val modifiedAmount = amount.modifyAmountForOpi(currency)
+            opiController.initiatePartialRefund(modifiedAmount, currency)
         }
     }
 
     fun startReconciliation() {
-        viewModelScope.launch {
-            opiChannelController.initiateReconciliation()
+        lifecycleScope.launch {
+            opiController.initiateReconciliation()
         }
     }
 
-    @VisibleForTesting
-    fun modifyAmountForOpi(amount: BigDecimal, currency: ISOAlphaCurrency): BigDecimal =
-        amount.scaleByPowerOfTen(
-            Currency.getInstance(currency.value).defaultFractionDigits.unaryMinus()
-        )
+    class OPIServiceLocalBinder(
+        private val instance: OPIService
+    ) : Binder() {
+        // Return this instance of LocalService so clients can call public methods
+        fun service(): OPIService = instance
+    }
 
     internal sealed class State {
+        data object NotInitialized : State()
         data object Idle : State()
 
         data object LoggedIn : State()

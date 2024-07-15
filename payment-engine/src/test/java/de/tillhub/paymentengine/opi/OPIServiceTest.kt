@@ -1,15 +1,12 @@
-package de.tillhub.paymentengine.opi.ui
+package de.tillhub.paymentengine.opi
 
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionResultCode
-import de.tillhub.paymentengine.opi.OPIChannelController
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
-import de.tillhub.paymentengine.opi.ui.OPITerminalViewModel.State
-import de.tillhub.paymentengine.testing.ViewModelFunSpecs
-import de.tillhub.paymentengine.testing.getOrAwaitValue
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.Ordering
 import io.mockk.Runs
@@ -19,24 +16,28 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.setMain
 import java.time.Instant
 
 @ExperimentalCoroutinesApi
-class OPITerminalViewModelTest : ViewModelFunSpecs({
-
+class OPIServiceTest : FunSpec({
     lateinit var terminal: Terminal.OPI
     lateinit var instant: Instant
     lateinit var throwable: Throwable
 
     lateinit var opiChannelController: OPIChannelController
 
-    lateinit var target: OPITerminalViewModel
+    lateinit var target: OPIService
 
     val mutableOperationFlow = MutableStateFlow<OPIOperationStatus>(OPIOperationStatus.Idle)
 
     beforeTest {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+
         terminal = mockk()
         instant = mockk()
         throwable = mockk()
@@ -52,22 +53,7 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
             coEvery { initiateReconciliation() } just Runs
         }
 
-        target = OPITerminalViewModel(opiChannelController)
-    }
-
-    test("modifyAmountForOpi") {
-        // https://en.wikipedia.org/wiki/ISO_4217 to check decimal places for currency
-
-        // Icelandic krona has 0 decimal places
-        val isk = target.modifyAmountForOpi(100.0.toBigDecimal(), ISOAlphaCurrency("ISK"))
-        // Iraqi dinar has 3 decimal places
-        val iqd = target.modifyAmountForOpi(100.0.toBigDecimal(), ISOAlphaCurrency("IQD"))
-        // Euro has 2 decimal places
-        val eur = target.modifyAmountForOpi(100.0.toBigDecimal(), ISOAlphaCurrency("EUR"))
-
-        isk shouldBe 100.0.toBigDecimal()
-        iqd shouldBe 0.1.toBigDecimal().setScale(4)
-        eur shouldBe 1.0.toBigDecimal().setScale(3)
+        target = OPIService(opiChannelController)
     }
 
     test("init") {
@@ -80,18 +66,21 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
     }
 
     test("opiOperationState") {
+        val callback: Callback = mockk(relaxed = true)
+        target.setBringToFront(callback::method)
+
         target.init(terminal)
 
-        target.opiOperationState.getOrAwaitValue() shouldBe State.Idle
+        target.opiOperationState.value shouldBe OPIService.State.Idle
 
         mutableOperationFlow.value = OPIOperationStatus.Pending.Login
-        target.opiOperationState.getOrAwaitValue() shouldBe State.Pending.Login
+        target.opiOperationState.value shouldBe OPIService.State.Pending.Login
 
         mutableOperationFlow.value = OPIOperationStatus.Pending.Operation(
             date = instant,
             messageLines = emptyList()
         )
-        target.opiOperationState.getOrAwaitValue() shouldBe State.Pending.NoMessage
+        target.opiOperationState.value shouldBe OPIService.State.Pending.NoMessage
 
         mutableOperationFlow.value = OPIOperationStatus.Pending.Operation(
             date = instant,
@@ -101,27 +90,27 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
                 "line 3"
             )
         )
-        target.opiOperationState.getOrAwaitValue() shouldBe State.Pending.WithMessage(
+        target.opiOperationState.value shouldBe OPIService.State.Pending.WithMessage(
             "line 1\nline 2\nline 3\n"
         )
 
         mutableOperationFlow.value = OPIOperationStatus.LoggedIn
-        target.opiOperationState.getOrAwaitValue() shouldBe State.LoggedIn
+        target.opiOperationState.value shouldBe OPIService.State.LoggedIn
 
         mutableOperationFlow.value = OPIOperationStatus.Error.NotInitialised
-        target.opiOperationState.getOrAwaitValue() shouldBe State.OperationError(
+        target.opiOperationState.value shouldBe OPIService.State.OperationError(
             data = OPIOperationStatus.Error.NotInitialised,
             message = "OPI Communication controller not initialised."
         )
 
         mutableOperationFlow.value = OPIOperationStatus.Error.Communication("comms err", throwable)
-        target.opiOperationState.getOrAwaitValue() shouldBe State.OperationError(
+        target.opiOperationState.value shouldBe OPIService.State.OperationError(
             data = OPIOperationStatus.Error.Communication("comms err", throwable),
             message = "comms err"
         )
 
         mutableOperationFlow.value = OPIOperationStatus.Error.DataHandling("data err", throwable)
-        target.opiOperationState.getOrAwaitValue() shouldBe State.OperationError(
+        target.opiOperationState.value shouldBe OPIService.State.OperationError(
             data = OPIOperationStatus.Error.DataHandling("data err", throwable),
             message = "data err"
         )
@@ -132,7 +121,7 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
             merchantReceipt = "merchantReceipt",
             rawData = "rawData",
         )
-        target.opiOperationState.getOrAwaitValue() shouldBe State.ResultError(
+        target.opiOperationState.value shouldBe OPIService.State.ResultError(
             data = TerminalOperationStatus.Error.OPI(
                 date = instant,
                 customerReceipt = "customerReceipt",
@@ -152,7 +141,7 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
             merchantReceipt = "merchantReceipt",
             rawData = "rawData",
         )
-        target.opiOperationState.getOrAwaitValue() shouldBe State.ResultSuccess(
+        target.opiOperationState.value shouldBe OPIService.State.ResultSuccess(
             data = TerminalOperationStatus.Success.OPI(
                 date = instant,
                 customerReceipt = "customerReceipt",
@@ -161,13 +150,9 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
                 data = null
             )
         )
-    }
 
-    test("onDestroy") {
-        target.onDestroy()
-
-        verify {
-            opiChannelController.close()
+        verify(exactly = 2) {
+            callback.method()
         }
     }
 
@@ -216,4 +201,8 @@ class OPITerminalViewModelTest : ViewModelFunSpecs({
             opiChannelController.initiateReconciliation()
         }
     }
-})
+}) {
+    interface Callback {
+        fun method()
+    }
+}

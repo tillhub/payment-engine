@@ -58,7 +58,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
     lateinit var opiChannel0: OPIChannel0
     lateinit var opiChannel1: OPIChannel1
 
-    var c0OnMessage: ((String) -> Unit)? = null
+    var c0OnMessage: (suspend (String) -> Unit)? = null
     var c1OnMessage: ((String) -> Unit)? = null
 
     var c0OnError: ((Throwable, String) -> Unit)? = null
@@ -92,7 +92,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             every { close() } just Runs
             every { isConnected } returns true
             every { sendMessage(any(), any()) } answers {
-                val callback = secondArg<(String) -> Unit>()
+                val callback = secondArg<suspend (String) -> Unit>()
 
                 c0OnMessage = callback
             }

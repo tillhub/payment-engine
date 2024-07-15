@@ -62,9 +62,9 @@ class MainViewModel : ViewModel() {
     private fun setupTerminalConfigs(cardManager: CardManager) {
         cardManager.putTerminalConfig(Terminal.OPI(
             name = "opi",
-            ipAddress = "192.168.1.7",
+            ipAddress = "127.0.0.1",
             port = 20002,
-            port2 = 20007
+            port2 = 20006
         ))
 //        cardManager.putTerminalConfig(Terminal.ZVT(
 //            name = "zvt-local",
@@ -82,7 +82,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun startReversal() {
-        reversalManager.startReversalTransaction("244", "opi")
+        reversalManager.startReversalTransaction("374", "opi")
     }
 
     fun startReconciliation() {

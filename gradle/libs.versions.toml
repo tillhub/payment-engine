@@ -21,7 +21,7 @@ junit = "4.13.2"
 mockk = "1.13.8"
 kotest = "5.8.0"
 
-lifecycle = "2.7.0"
+lifecycle = "2.8.3"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
 compose-bom = "2024.02.02"
@@ -55,6 +55,7 @@ androidx-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-r
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "lifecycle" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle" }
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 
 # Lavego
@@ -96,6 +97,7 @@ lifecycle = [
     "androidx.lifecycle.viewmodel",
     "androidx.lifecycle.livedata",
     "androidx.lifecycle.compiler",
+    "androidx.lifecycle.service",
 ]
 lavego = [
     "lavego.sale.sdk",

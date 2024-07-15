@@ -23,7 +23,7 @@ internal class OPIChannel0(
     private var webSocket: Socket? = null
     private var working: AtomicBoolean = AtomicBoolean(false)
 
-    private var onMessage: ((String) -> Unit)? = null
+    private var onMessage: (suspend (String) -> Unit)? = null
     private var onError: (Throwable, String) -> Unit = { _, _ -> }
 
     private var dataOutputStream: DataOutputStream? = null
@@ -57,7 +57,7 @@ internal class OPIChannel0(
         webSocket = null
     }
 
-    fun sendMessage(message: String, onResponse: (String) -> Unit) {
+    fun sendMessage(message: String, onResponse: suspend (String) -> Unit) {
         onMessage = onResponse
 
         // for now lets play safe - would really like to see utf8 capabilities though
