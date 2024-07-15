@@ -9,7 +9,9 @@ import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.zvt.ui.CardTerminalViewModel
 import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -110,6 +112,19 @@ class CardTerminalViewModelTest : FunSpec({
                 )
             )
         }
+    }
+
+    test("parseTransactionNumber: Failure") {
+        val result = viewModel.parseTransactionNumber("notANumber")
+        result.isFailure.shouldBeTrue()
+        result.onFailure {
+            it.shouldBeInstanceOf<NumberFormatException>()
+        }
+    }
+
+    test("parseTransactionNumber: Success") {
+        val result = viewModel.parseTransactionNumber("1234")
+        result.isSuccess.shouldBeTrue()
     }
 
     test("onError") {

@@ -11,6 +11,7 @@
     <string name="transaction_cancel_card_partial_refund_nexo_error">NexoFAST currently does not support payment partial refund</string>
 
     <string name="common_result_code_system_malfunction">System malfunction</string>
+    <string name="common_result_code_tx_number_error">Transaction number missing or incorrect</string>
 
     <string name="lavego_result_code_2_call_merchant">Call merchant service</string>
     <string name="lavego_result_code_3_invalid_merchant_number">Invalid merchant number</string>

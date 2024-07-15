@@ -46,7 +46,9 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
-        doCancellation(receiptNo)
+        viewModel.parseTransactionNumber(receiptNo).onSuccess {
+            doCancellation(it)
+        }
     }
 
     /**
@@ -54,11 +56,11 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
      *
      * @param receiptNo the receipt number of the transaction we want to reverse
      */
-    private fun doCancellation(receiptNo: String) {
+    private fun doCancellation(receiptNo: Long) {
         val cancellation = Apdu(Commons.Command.CMD_0630).apply {
             val password = config.saleConfig.pin
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
-            add(Bmp(0x87.toByte(), Commons.NumberToBCD(receiptNo.toLong(), RECEIPT_NO_BYTE_COUNT)))
+            add(Bmp(0x87.toByte(), Commons.NumberToBCD(receiptNo, RECEIPT_NO_BYTE_COUNT)))
         }
 
         doCustom(cancellation.apdu())

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
@@ -55,6 +56,23 @@ internal class CardTerminalViewModel(
             lastReceipt!!.addBlock(receipt)
         } else {
             lastReceipt!!.addLine(receipt)
+        }
+    }
+
+    fun parseTransactionNumber(receiptNo: String): Result<Long> {
+        return try {
+            Result.success(receiptNo.toLong())
+        } catch (e: NumberFormatException) {
+            Result.failure<Long>(e).also {
+                _terminalOperationState.value = State.Error(
+                    date = terminalConfig.timeNow(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    resultCode = TransactionResultCode.Known(R.string.common_result_code_tx_number_error)
+                )
+            }
         }
     }
 

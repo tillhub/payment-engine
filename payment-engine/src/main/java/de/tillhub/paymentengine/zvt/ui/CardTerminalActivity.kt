@@ -21,7 +21,7 @@ import de.tillhub.paymentengine.data.Terminal
 @Suppress("TooManyFunctions")
 internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
-    private val viewModel by viewModels<CardTerminalViewModel>()
+    protected val viewModel by viewModels<CardTerminalViewModel>()
 
     private val activityManager: ActivityManager by lazy {
         applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
