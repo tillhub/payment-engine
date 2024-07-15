@@ -46,7 +46,16 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        bindService()
+    }
 
+    override fun onDestroy() {
+        unbindService(opiServiceConnection)
+        opiService.stopSelf()
+        super.onDestroy()
+    }
+
+    private fun bindService() {
         val intent = Intent(this, OPIService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -56,12 +65,6 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         }
 
         bindService(intent, opiServiceConnection, 0)
-    }
-
-    override fun onDestroy() {
-        unbindService(opiServiceConnection)
-        opiService.stopSelf()
-        super.onDestroy()
     }
 
     private fun collectState() {
@@ -83,7 +86,6 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
                     is OPIService.State.ResultError -> finishWithError(state)
                     is OPIService.State.ResultSuccess -> finishWithSuccess(state)
                 }
-
             }
         }
     }

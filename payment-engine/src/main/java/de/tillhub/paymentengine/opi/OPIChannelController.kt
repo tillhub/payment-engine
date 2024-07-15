@@ -1,18 +1,10 @@
 package de.tillhub.paymentengine.opi
 
-import android.app.Service
-import android.content.Intent
-import android.content.pm.ServiceInfo
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
-import androidx.core.app.ServiceCompat
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.helper.toISOString
-import de.tillhub.paymentengine.opi.common.NotificationsHelper
 import de.tillhub.paymentengine.opi.common.withOPIContext
 import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1

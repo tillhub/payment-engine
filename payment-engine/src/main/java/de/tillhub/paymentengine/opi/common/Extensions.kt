@@ -8,12 +8,12 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import java.math.BigDecimal
 import java.util.Currency
 
-fun BigDecimal.modifyAmountForOpi(currency: ISOAlphaCurrency): BigDecimal =
+internal fun BigDecimal.modifyAmountForOpi(currency: ISOAlphaCurrency): BigDecimal =
     scaleByPowerOfTen(
         Currency.getInstance(currency.value).defaultFractionDigits.unaryMinus()
     )
 
-fun Service.startAsForegroundService() {
+internal fun Service.startAsForegroundService() {
     // create the notification channel
     NotificationsHelper.createNotificationChannel(this)
 
