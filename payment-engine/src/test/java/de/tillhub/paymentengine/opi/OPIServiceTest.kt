@@ -51,20 +51,9 @@ class OPIServiceTest : FunSpec({
             coEvery { initiatePaymentReversal(any()) } just Runs
             coEvery { initiatePartialRefund(any(), ISOAlphaCurrency("EUR")) } just Runs
             coEvery { initiateReconciliation() } just Runs
-            coEvery { setBringToFront(any()) } just Runs
         }
 
         target = OPIService(opiChannelController)
-    }
-
-    test("passBringToFront") {
-        val callback: () -> Unit = {}
-
-        target.passBringToFront(callback)
-
-        verify {
-            opiChannelController.setBringToFront(callback)
-        }
     }
 
     test("init") {
@@ -77,6 +66,9 @@ class OPIServiceTest : FunSpec({
     }
 
     test("opiOperationState") {
+        val callback: Callback = mockk(relaxed = true)
+        target.setBringToFront(callback::method)
+
         target.init(terminal)
 
         target.opiOperationState.value shouldBe OPIService.State.Idle
@@ -158,6 +150,10 @@ class OPIServiceTest : FunSpec({
                 data = null
             )
         )
+
+        verify(exactly = 2) {
+            callback.method()
+        }
     }
 
     test("loginToTerminal") {
@@ -205,4 +201,8 @@ class OPIServiceTest : FunSpec({
             opiChannelController.initiateReconciliation()
         }
     }
-})
+}) {
+    interface Callback {
+        fun method()
+    }
+}

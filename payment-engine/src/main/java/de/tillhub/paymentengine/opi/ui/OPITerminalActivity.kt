@@ -25,7 +25,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
             opiService = binder.service()
 
             collectState()
-            opiService.passBringToFront(::moveAppToFront)
+            opiService.setBringToFront(::moveAppToFront)
             opiService.init(config)
         }
 

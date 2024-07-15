@@ -42,8 +42,6 @@ internal interface OPIChannelController {
     fun init(terminal: Terminal.OPI)
     fun close()
 
-    fun setBringToFront(bringToFront: () -> Unit)
-
     suspend fun login()
 
     suspend fun initiateCardPayment(
@@ -69,8 +67,6 @@ internal class OPIChannelControllerImpl(
     private lateinit var terminal: Terminal.OPI
     private lateinit var channel0: OPIChannel0
     private lateinit var channel1: OPIChannel1
-
-    private var bringToFront: (() -> Unit)? = null
 
     private val initialized: Boolean
         get() = this@OPIChannelControllerImpl::terminal.isInitialized &&
@@ -100,10 +96,6 @@ internal class OPIChannelControllerImpl(
 
             _operationState.value = OPIOperationStatus.Idle
         }
-    }
-
-    override fun setBringToFront(bringToFront: () -> Unit) {
-        this.bringToFront = bringToFront
     }
 
     override suspend fun login() = withOPIContext {
@@ -475,8 +467,6 @@ internal class OPIChannelControllerImpl(
                 (_operationState.value as? OPIOperationStatus.Pending.Operation)
                     ?.merchantReceipt.orEmpty()
 
-            bringToFront?.invoke()
-
             _operationState.value = when (OverallResult.find(response.overallResult)) {
                 OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
                     date = terminalConfig.timeNow(),
@@ -499,9 +489,6 @@ internal class OPIChannelControllerImpl(
 
             // as per protocol, both channels are closed after C0 response
             finishOperation()
-
-            // clear after finish
-            bringToFront = null
         }
     }
 

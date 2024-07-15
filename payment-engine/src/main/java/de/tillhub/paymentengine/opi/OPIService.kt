@@ -25,6 +25,8 @@ internal class OPIService(
     private val _opiOperationState: MutableStateFlow<State> = MutableStateFlow(State.NotInitialized)
     val opiOperationState: StateFlow<State> = _opiOperationState
 
+    private var bringToFront: (() -> Unit)? = null
+
     override fun onBind(intent: Intent): IBinder {
         super.onBind(intent)
         return binder
@@ -38,10 +40,11 @@ internal class OPIService(
     override fun onDestroy() {
         super.onDestroy()
         opiController.close()
+        bringToFront = null
     }
 
-    fun passBringToFront(bringToFront: () -> Unit) {
-        opiController.setBringToFront(bringToFront)
+    fun setBringToFront(bringToFront: () -> Unit) {
+        this.bringToFront = bringToFront
     }
 
     fun init(terminal: Terminal.OPI) {
@@ -73,6 +76,10 @@ internal class OPIService(
                     is OPIOperationStatus.Result.Success -> State.ResultSuccess(
                         data = status.toTerminalOperation()
                     )
+                }.also {
+                    if (status is OPIOperationStatus.Result) {
+                        bringToFront?.invoke()
+                    }
                 }
             }
         }
