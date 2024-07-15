@@ -9,29 +9,30 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
+import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.opi.OPIChannelControllerImpl
+import de.tillhub.paymentengine.opi.OPIService
+import kotlinx.coroutines.launch
 
 internal abstract class OPITerminalActivity : AppCompatActivity() {
 
-    private val connection = object : ServiceConnection {
+    private val opiServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as OPIChannelControllerImpl.OPIChannelControllerLocalBinder
-            val opiController = binder.service()
+            val binder = service as OPIService.OPIServiceLocalBinder
+            opiService = binder.service()
 
-            opiController.setBringToFront(::moveAppToFront)
-            viewModel.setController(opiController)
-            viewModel.init(config)
+            collectState()
+            opiService.passBringToFront(::moveAppToFront)
+            opiService.init(config)
         }
 
-        override fun onServiceDisconnected(arg0: ComponentName) = Unit
+        override fun onServiceDisconnected(className: ComponentName) = Unit
     }
 
-    internal val viewModel by viewModels<OPITerminalViewModel>()
+    protected lateinit var opiService: OPIService
 
     private val activityManager: ActivityManager by lazy {
         applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -46,30 +47,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.opiOperationState.observe(this) { state ->
-            when (state) {
-                OPITerminalViewModel.State.Waiting -> Unit
-                OPITerminalViewModel.State.Idle -> {
-                    showLoader()
-                    viewModel.loginToTerminal()
-                }
-                OPITerminalViewModel.State.Pending.NoMessage -> showInstructions()
-                is OPITerminalViewModel.State.Pending.WithMessage -> {
-                    showIntermediateStatus(state.message)
-                }
-                OPITerminalViewModel.State.Pending.Login -> Unit
-                OPITerminalViewModel.State.LoggedIn -> startOperation()
-                is OPITerminalViewModel.State.OperationError -> handleErrorState(state)
-                is OPITerminalViewModel.State.ResultError -> finishWithError(state)
-                is OPITerminalViewModel.State.ResultSuccess -> finishWithSuccess(state)
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        val intent = Intent(this, OPIChannelControllerImpl::class.java)
+        val intent = Intent(this, OPIService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)
@@ -77,15 +55,40 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
             startService(intent)
         }
 
-        bindService(intent, connection, 0)
+        bindService(intent, opiServiceConnection, 0)
     }
 
     override fun onDestroy() {
-        viewModel.onDestroy()
+        unbindService(opiServiceConnection)
+        opiService.stopSelf()
         super.onDestroy()
     }
 
-    private fun finishWithSuccess(state: OPITerminalViewModel.State.ResultSuccess) {
+    private fun collectState() {
+        lifecycleScope.launch {
+            opiService.opiOperationState.collect { state ->
+                when (state) {
+                    OPIService.State.NotInitialized -> Unit
+                    OPIService.State.Idle -> {
+                        showLoader()
+                        opiService.loginToTerminal()
+                    }
+                    OPIService.State.Pending.NoMessage -> showInstructions()
+                    is OPIService.State.Pending.WithMessage -> {
+                        showIntermediateStatus(state.message)
+                    }
+                    OPIService.State.Pending.Login -> Unit
+                    OPIService.State.LoggedIn -> startOperation()
+                    is OPIService.State.OperationError -> handleErrorState(state)
+                    is OPIService.State.ResultError -> finishWithError(state)
+                    is OPIService.State.ResultSuccess -> finishWithSuccess(state)
+                }
+
+            }
+        }
+    }
+
+    private fun finishWithSuccess(state: OPIService.State.ResultSuccess) {
         setResult(
             Activity.RESULT_OK,
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
@@ -93,7 +96,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun finishWithError(state: OPITerminalViewModel.State.ResultError) {
+    private fun finishWithError(state: OPIService.State.ResultError) {
         setResult(
             Activity.RESULT_OK,
             Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
@@ -101,7 +104,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun handleErrorState(state: OPITerminalViewModel.State.OperationError) {
+    private fun handleErrorState(state: OPIService.State.OperationError) {
         showInstructions()
         showOperationErrorStatus(state.message)
     }

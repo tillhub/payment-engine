@@ -72,9 +72,7 @@ internal class OPIChannelControllerImpl(
     private val channelFactory: OPIChannelFactory = OPIChannelFactory(),
     private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
     private val requestIdFactory: RequestIdFactory = RequestIdFactory()
-) : OPIChannelController, Service() {
-
-    private val binder = OPIChannelControllerLocalBinder(this)
+) : OPIChannelController {
 
     private lateinit var terminal: Terminal.OPI
     private lateinit var channel0: OPIChannel0
@@ -91,11 +89,7 @@ internal class OPIChannelControllerImpl(
     override val operationState: StateFlow<OPIOperationStatus>
         get() = _operationState
 
-    override fun onBind(intent: Intent?): IBinder = binder
-
     override fun init(terminal: Terminal.OPI) {
-        startAsForegroundService()
-
         this.terminal = terminal
 
         if (initialized) {
@@ -346,23 +340,6 @@ internal class OPIChannelControllerImpl(
         }
     }
 
-    private fun startAsForegroundService() {
-        // create the notification channel
-        NotificationsHelper.createNotificationChannel(this)
-
-        // promote service to foreground service
-        ServiceCompat.startForeground(
-            this,
-            1,
-            NotificationsHelper.buildNotification(this),
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE
-            } else {
-                0
-            }
-        )
-    }
-
     private fun finishOperation() {
         channel0.close()
         channel1.close()
@@ -506,7 +483,7 @@ internal class OPIChannelControllerImpl(
                 (_operationState.value as? OPIOperationStatus.Pending.Operation)
                     ?.merchantReceipt.orEmpty()
 
-            moveAppToFront()
+            bringToFront?.invoke()
 
             _operationState.value = when (OverallResult.find(response.overallResult)) {
                 OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
@@ -533,7 +510,6 @@ internal class OPIChannelControllerImpl(
 
             // clear after finish
             bringToFront = null
-            stopSelf()
         }
     }
 
@@ -585,23 +561,6 @@ internal class OPIChannelControllerImpl(
         )
 
         else -> currentState // TODO> Not handled yet
-    }
-
-    class OPIChannelControllerLocalBinder(
-        private val instance: OPIChannelControllerImpl
-    ) : Binder() {
-
-        fun service(): OPIChannelControllerImpl {
-            // Return this instance of LocalService so clients can call public methods
-            return instance
-        }
-    }
-
-    private suspend fun moveAppToFront() {
-        bringToFront?.let {
-            it.invoke()
-            delay(WAIT_DELAY)
-        }
     }
 
     companion object {

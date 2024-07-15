@@ -34,6 +34,6 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
     }
 
     override fun startOperation() {
-        viewModel.startReconciliation()
+        opiService.startReconciliation()
     }
 }

@@ -51,7 +51,7 @@ internal class OPIPartialRefundActivity : OPITerminalActivity() {
     }
 
     override fun startOperation() {
-        viewModel.startPartialRefund(amount, currency)
+        opiService.startPartialRefund(amount, currency)
     }
 
     companion object {

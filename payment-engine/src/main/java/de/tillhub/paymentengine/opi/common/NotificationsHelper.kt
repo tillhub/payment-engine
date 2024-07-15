@@ -21,7 +21,7 @@ internal object NotificationsHelper {
                 NOTIFICATION_CHANNEL_ID,
                 NotificationManager.IMPORTANCE_DEFAULT
             )
-            .setName("OPI Foreground service")
+            .setName(context.getString(R.string.opi_foreground_service_title))
             .build()
 
         notificationManager.createNotificationChannel(channel)
@@ -29,8 +29,8 @@ internal object NotificationsHelper {
 
     fun buildNotification(context: Context): Notification {
         return NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("OPI Foreground service")
-            .setContentText("OPI transaction in progress")
+            .setContentTitle(context.getString(R.string.opi_foreground_service_title))
+            .setContentText(context.getString(R.string.opi_foreground_service_message))
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_card)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)

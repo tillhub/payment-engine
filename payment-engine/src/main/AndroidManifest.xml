@@ -15,7 +15,7 @@
             tools:node="merge" />
 
         <service
-            android:name="de.tillhub.paymentengine.opi.OPIChannelControllerImpl"
+            android:name="de.tillhub.paymentengine.opi.OPIService"
             android:exported="false"
             android:foregroundServiceType="shortService"
             tools:node="merge" />

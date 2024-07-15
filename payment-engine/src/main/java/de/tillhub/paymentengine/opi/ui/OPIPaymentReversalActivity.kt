@@ -40,7 +40,7 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
     }
 
     override fun startOperation() {
-        viewModel.startPaymentReversal(stan)
+        opiService.startPaymentReversal(stan)
     }
 
     companion object {
