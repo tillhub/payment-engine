@@ -30,6 +30,8 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
+        analytics?.logOperation("Operation: RECONCILIATION\n$config")
+
         doReconciliation()
     }
 }

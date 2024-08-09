@@ -1,5 +1,7 @@
 package de.tillhub.paymentengine.opi
 
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TerminalConfig
@@ -61,7 +63,8 @@ internal class OPIChannelControllerImpl(
     private val converterFactory: ConverterFactory = ConverterFactory(),
     private val channelFactory: OPIChannelFactory = OPIChannelFactory(),
     private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
-    private val requestIdFactory: RequestIdFactory = RequestIdFactory()
+    private val requestIdFactory: RequestIdFactory = RequestIdFactory(),
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().getAnalytics()
 ) : OPIChannelController {
 
     private lateinit var terminal: Terminal.OPI
@@ -98,6 +101,7 @@ internal class OPIChannelControllerImpl(
         }
     }
 
+    @Suppress("LongMethod")
     override suspend fun login() = withOPIContext {
         // If the state is not Idle, then we should drop the new request
         if (_operationState.value !is OPIOperationStatus.Idle) return@withOPIContext
@@ -106,6 +110,8 @@ internal class OPIChannelControllerImpl(
 
         // checks if the controller is initialized
         if (initialized) {
+            analytics?.logOperation("Operation: LOGIN\n$terminal")
+
             val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
             val responseConverter = converterFactory.newStringToDtoConverter(
                 clazz = ServiceResponse::class.java
@@ -134,6 +140,11 @@ internal class OPIChannelControllerImpl(
                 return@withOPIContext
             }
 
+            analytics?.logCommunication(
+                protocol = PROTOCOL_C0,
+                message = "SENT:\n$xml"
+            )
+
             // setup C0 communication
             channel0.setOnError(::communicationErrorHandler)
 
@@ -145,6 +156,11 @@ internal class OPIChannelControllerImpl(
             }
 
             channel0.sendMessage(xml) { responseXml ->
+                analytics?.logCommunication(
+                    protocol = PROTOCOL_C0,
+                    message = "RECEIVED:\n$responseXml"
+                )
+
                 val response = try {
                     responseConverter.convert(responseXml)
                 } catch (e: Exception) {
@@ -186,6 +202,13 @@ internal class OPIChannelControllerImpl(
 
             // checks if the controller is initialized
             if (initialized) {
+                analytics?.logOperation(
+                    "Operation: CARD_PAYMENT(" +
+                            "amount: $amount, " +
+                            "currency: $currency)" +
+                            "\n$terminal"
+                )
+
                 // setup C1 communication, it has to be setup before C0,
                 // because once C0 request is sent, C1 needs to handle the intermediate communication
                 handleChannel1Communication()
@@ -224,6 +247,12 @@ internal class OPIChannelControllerImpl(
 
         // checks if the controller is initialized
         if (initialized) {
+            analytics?.logOperation(
+                "Operation: CARD_PAYMENT_REVERSAL(" +
+                        "stan: $stan)" +
+                        "\n$terminal"
+            )
+
             // setup C1 communication, it has to be setup before C0,
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
@@ -260,6 +289,13 @@ internal class OPIChannelControllerImpl(
 
             // checks if the controller is initialized
             if (initialized) {
+                analytics?.logOperation(
+                    "Operation: PARTIAL_REFUND(" +
+                            "amount: $amount, " +
+                            "currency: $currency)" +
+                            "\n$terminal"
+                )
+
                 // setup C1 communication, it has to be setup before C0,
                 // because once C0 request is sent, C1 needs to handle the intermediate communication
                 handleChannel1Communication()
@@ -299,6 +335,8 @@ internal class OPIChannelControllerImpl(
 
         // checks if the controller is initialized
         if (initialized) {
+            analytics?.logOperation("Operation: RECONCILIATION\n$terminal")
+
             // setup C1 communication, it has to be setup before C0,
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
@@ -356,6 +394,11 @@ internal class OPIChannelControllerImpl(
         requestConverter: StringToDtoConverter<DeviceRequest>,
         responseConverter: DtoToStringConverter<DeviceResponse>
     ): (String) -> Unit = { requestXml ->
+        analytics?.logCommunication(
+            protocol = PROTOCOL_C1,
+            message = "RECEIVED:\n$requestXml"
+        )
+
         try {
             requestConverter.convert(requestXml)
         } catch (e: Exception) {
@@ -408,7 +451,13 @@ internal class OPIChannelControllerImpl(
                     error = e
                 )
                 null
-            }?.let { channel1.sendMessage(it) }
+            }?.let {
+                analytics?.logCommunication(
+                    protocol = PROTOCOL_C1,
+                    message = "SENT:\n$it"
+                )
+                channel1.sendMessage(it)
+            }
         }
     }
 
@@ -417,6 +466,7 @@ internal class OPIChannelControllerImpl(
      * it opens the socket, sets up the error listener, converts to payload,
      * and sends the XML payload.
      */
+    @Suppress("LongMethod")
     private suspend fun <U, V : OPIResponse> handleC0Communication(
         payload: U,
         requestConverter: DtoToStringConverter<U>,
@@ -442,12 +492,22 @@ internal class OPIChannelControllerImpl(
             return
         }
 
+        analytics?.logCommunication(
+            protocol = PROTOCOL_C0,
+            message = "SENT:\n$xml"
+        )
+
         // here the app waits for the channel 0 socket to connect to the terminal.
         while (!channel0.isConnected) {
             delay(WAIT_DELAY)
         }
 
         channel0.sendMessage(xml) { responseXml ->
+            analytics?.logCommunication(
+                protocol = PROTOCOL_C0,
+                message = "RECEIVED:\n$responseXml"
+            )
+
             val response = try {
                 responseConverter.convert(responseXml)
             } catch (e: Exception) {
@@ -544,5 +604,7 @@ internal class OPIChannelControllerImpl(
 
     companion object {
         private const val WAIT_DELAY = 100L
+        private const val PROTOCOL_C0 = "OPI: Channel 0"
+        private const val PROTOCOL_C1 = "OPI: Channel 1"
     }
 }

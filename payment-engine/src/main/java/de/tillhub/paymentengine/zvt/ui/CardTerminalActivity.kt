@@ -15,6 +15,8 @@ import de.lavego.sdk.TransportConfiguration
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 
@@ -31,6 +33,10 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
         intent.extras?.let {
             BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, Terminal.ZVT::class.java)
         } ?: throw IllegalArgumentException("CardTerminalActivity: Extras is null")
+    }
+
+    protected val analytics: PaymentAnalytics? by lazy {
+        PaymentEngine.getInstance().getAnalytics()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +64,8 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     }
 
     private fun doZVTSetup() {
+        analytics?.logOperation("Operation: LOGIN\n$config")
+
         val register = Apdu(Commons.Command.CMD_0600).apply {
             val password = config.saleConfig.pin
             val currency = (config as? Terminal.ZVT)?.isoCurrencyNumber
@@ -125,6 +133,12 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onStatus(status: String) {
         super.onStatus(status)
+
+        analytics?.logCommunication(
+            protocol = "ZVT",
+            message = "RECEIVED:\n$status"
+        )
+
         viewModel.onStatus(status)
     }
 
