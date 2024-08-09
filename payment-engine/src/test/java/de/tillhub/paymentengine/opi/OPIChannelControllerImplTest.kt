@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.opi
 
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TerminalConfig
@@ -45,6 +46,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
     lateinit var channelFactory: OPIChannelFactory
     lateinit var terminalConfig: TerminalConfig
     lateinit var requestIdFactory: RequestIdFactory
+    lateinit var analytics: PaymentAnalytics
 
     lateinit var target: OPIChannelControllerImpl
 
@@ -82,6 +84,10 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
         }
         deviceRequestConverter = mockk {
             every { convert(any()) } returns ConvertersTest.DEVICE_REQUEST
+        }
+        analytics = mockk {
+            every { logOperation(any()) } just Runs
+            every { logCommunication(any(), any()) } just Runs
         }
 
         opiChannel0 = mockk {
@@ -128,7 +134,8 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             converterFactory,
             channelFactory,
             terminalConfig,
-            requestIdFactory
+            requestIdFactory,
+            analytics
         )
     }
 
@@ -167,6 +174,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 target.operationState.value shouldBe OPIOperationStatus.Pending.Login
 
                 verify(Ordering.ORDERED) {
+                    analytics.logOperation("Operation: LOGIN\n$TERMINAL_STRING")
                     converterFactory.newDtoToStringConverter<ServiceRequest>()
                     converterFactory.newStringToDtoConverter(ServiceResponse::class.java)
                     requestIdFactory.generateRequestId()
@@ -183,6 +191,10 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                             ),
                         )
                     )
+                    analytics.logCommunication(
+                        protocol = "OPI: Channel 0",
+                        message = "SENT:\n${ConvertersTest.SERVICE_REQUEST_XML}"
+                    )
                     opiChannel0.setOnError(any())
                     opiChannel0.open()
                     opiChannel0.sendMessage(ConvertersTest.SERVICE_REQUEST_XML, any())
@@ -193,6 +205,10 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 target.operationState.value shouldBe OPIOperationStatus.LoggedIn
 
                 verify(Ordering.ORDERED) {
+                    analytics.logCommunication(
+                        protocol = "OPI: Channel 0",
+                        message = "RECEIVED:\n${ConvertersTest.SERVICE_RESPONSE_XML}"
+                    )
                     serviceResponseConverter.convert(ConvertersTest.SERVICE_RESPONSE_XML)
                     opiChannel0.close()
                     opiChannel1.close()
@@ -206,6 +222,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 target.operationState.value shouldBe OPIOperationStatus.Pending.Login
 
                 verify(Ordering.ORDERED) {
+                    analytics.logOperation("Operation: LOGIN\n$TERMINAL_STRING")
                     converterFactory.newDtoToStringConverter<ServiceRequest>()
                     converterFactory.newStringToDtoConverter(ServiceResponse::class.java)
                     requestIdFactory.generateRequestId()
@@ -221,6 +238,10 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                                 timestamp = "2024-02-09T09:36:36Z"
                             ),
                         )
+                    )
+                    analytics.logCommunication(
+                        protocol = "OPI: Channel 0",
+                        message = "SENT:\n${ConvertersTest.SERVICE_REQUEST_XML}"
                     )
                     opiChannel0.setOnError(any())
                     opiChannel0.open()
@@ -237,6 +258,10 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 )
 
                 verify(Ordering.ORDERED) {
+                    analytics.logCommunication(
+                        protocol = "OPI: Channel 0",
+                        message = "RECEIVED:\n${ConvertersTest.SERVICE_RESPONSE_XML}"
+                    )
                     serviceResponseConverter.convert(ConvertersTest.SERVICE_RESPONSE_XML)
                     opiChannel0.close()
                     opiChannel1.close()
@@ -269,6 +294,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
+                analytics.logOperation("Operation: CARD_PAYMENT(amount: 6.0, currency: ISOAlphaCurrency(value=EUR))\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -294,6 +320,10 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                         )
                     )
                 )
+                analytics.logCommunication(
+                    protocol = "OPI: Channel 0",
+                    message = "SENT:\n${ConvertersTest.CARD_SERVICE_REQUEST_XML}"
+                )
                 opiChannel0.isConnected
                 opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
             }
@@ -308,6 +338,17 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                     "bearbeitet"
                 )
             )
+
+            verify {
+                analytics.logCommunication(
+                    protocol = "OPI: Channel 1",
+                    message = "RECEIVED:\n${ConvertersTest.DEVICE_REQUEST_XML}"
+                )
+                analytics.logCommunication(
+                    protocol = "OPI: Channel 1",
+                    message = "SENT:\n${ConvertersTest.DEVICE_RESPONSE_XML}"
+                )
+            }
 
             every { deviceRequestConverter.convert(any()) } returns CUSTOMER_RECEIPT_DEVICE_REQUEST
             c1OnMessage?.invoke(ConvertersTest.DEVICE_REQUEST_XML)
@@ -344,6 +385,13 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
                 reconciliationData = null
             )
+
+            verify {
+                analytics.logCommunication(
+                    protocol = "OPI: Channel 0",
+                    message = "RECEIVED:\n${ConvertersTest.CARD_SERVICE_RESPONSE_XML}"
+                )
+            }
         }
 
         it("ERROR") {
@@ -427,6 +475,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
+                analytics.logOperation("Operation: CARD_PAYMENT_REVERSAL(stan: 223)\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -579,6 +628,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
+                analytics.logOperation("Operation: PARTIAL_REFUND(amount: 6.0, currency: ISOAlphaCurrency(value=EUR))\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -736,6 +786,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
+                analytics.logOperation("Operation: RECONCILIATION\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -917,6 +968,8 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             port = 20002,
             port2 = 20007
         )
+
+        val TERMINAL_STRING = TERMINAL.toString()
 
         val ERROR_SERVICE_RESPONSE = ServiceResponse(
             requestId = "20792",

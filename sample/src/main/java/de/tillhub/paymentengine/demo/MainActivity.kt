@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.demo.ui.theme.DemoPaymentTheme
 import timber.log.Timber
@@ -39,6 +40,17 @@ class MainActivity : ComponentActivity() {
         viewModel.initRefundManager(paymentEngine.newRefundManager(this))
         viewModel.initReversalManager(paymentEngine.newReversalManager(this))
         viewModel.initReconciliationManager(paymentEngine.newReconciliationManager(this))
+
+        paymentEngine.setAnalytics(object : PaymentAnalytics {
+            override fun logOperation(request: String) {
+                Timber.tag("PaymentAnalytics").d(request)
+            }
+
+            override fun logCommunication(protocol: String, message: String) {
+                Timber.tag("PaymentAnalytics").d("$protocol\n$message")
+            }
+
+        })
 
         setContent {
             DemoPaymentTheme {

@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine
 
 import androidx.activity.result.ActivityResultCaller
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.SingletonHolder
@@ -11,6 +12,13 @@ class PaymentEngine private constructor() {
 
     private val configs = mutableMapOf<String, Terminal>()
     private val terminalState = MutableStateFlow<TerminalOperationStatus>(TerminalOperationStatus.Waiting)
+    internal var paymentAnalytics: PaymentAnalytics? = null
+        private set
+
+    fun setAnalytics(paymentAnalytics: PaymentAnalytics): PaymentEngine {
+        this.paymentAnalytics = paymentAnalytics
+        return this
+    }
 
     fun observeTerminalState(): StateFlow<TerminalOperationStatus> = terminalState
 
