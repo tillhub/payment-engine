@@ -64,7 +64,7 @@ internal class OPIChannelControllerImpl(
     private val channelFactory: OPIChannelFactory = OPIChannelFactory(),
     private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
     private val requestIdFactory: RequestIdFactory = RequestIdFactory(),
-    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().getAnalytics()
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : OPIChannelController {
 
     private lateinit var terminal: Terminal.OPI

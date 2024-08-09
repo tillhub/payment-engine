@@ -36,7 +36,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     }
 
     protected val analytics: PaymentAnalytics? by lazy {
-        PaymentEngine.getInstance().getAnalytics()
+        PaymentEngine.getInstance().paymentAnalytics
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
