@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.os.BundleCompat
 import de.lavego.sdk.PaymentProtocol
@@ -19,6 +20,7 @@ import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.helper.TimeoutManager
 
 @Suppress("TooManyFunctions")
 internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
@@ -39,21 +41,43 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
         PaymentEngine.getInstance().paymentAnalytics
     }
 
+    private lateinit var timeoutManager: TimeoutManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel.terminalOperationState.observe(this) { state ->
             when (state) {
-                CardTerminalViewModel.State.Idle -> showLoader()
+                CardTerminalViewModel.State.Idle -> {
+                    timeoutManager.processStarted()
+                    showLoader()
+                }
                 CardTerminalViewModel.State.Setup -> doSetup()
                 CardTerminalViewModel.State.Operation -> {
                     showInstructions()
                     startOperation()
                 }
-                is CardTerminalViewModel.State.Error -> finishWithError(state)
-                is CardTerminalViewModel.State.Success -> finishWithSuccess(state)
+                is CardTerminalViewModel.State.Error -> {
+                    timeoutManager.processFinishedWithResult()
+                    finishWithError(state)
+                }
+                is CardTerminalViewModel.State.Success -> {
+                    timeoutManager.processFinishedWithResult()
+                    finishWithSuccess(state)
+                }
             }
         }
+
+        timeoutManager = TimeoutManager(this) {
+            showCancel()
+        }
+
+        onBackPressedDispatcher.addCallback(
+            owner = this,
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = Unit
+            }
+        )
 
         bindService()
     }
@@ -88,6 +112,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     abstract fun showInstructions()
     abstract fun showIntermediateStatus(status: String)
     abstract fun startOperation()
+    abstract fun showCancel()
 
     override fun transportConfiguration(): TransportConfiguration {
         return TransportConfiguration().apply {
@@ -133,6 +158,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onStatus(status: String) {
         super.onStatus(status)
+        timeoutManager.processUpdated()
 
         analytics?.logCommunication(
             protocol = "ZVT",
@@ -180,6 +206,20 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     private fun moveAppToFront() {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
+    }
+
+    /**
+     * This method is called to abort a pending card transaction
+     */
+    protected fun doAbortOperation() {
+        if (viewModel.terminalOperationState.value is CardTerminalViewModel.State.Operation) {
+            val cancellation = Apdu(Commons.Command.CMD_06B0).apply {
+                val password = config.saleConfig.pin
+                add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
+            }
+
+            doCustom(cancellation.apdu())
+        }
     }
 
     companion object {

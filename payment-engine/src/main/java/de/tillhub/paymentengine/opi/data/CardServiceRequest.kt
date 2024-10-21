@@ -93,6 +93,7 @@ internal enum class ServiceRequestType(val value: String) {
     PAYMENT_REFUND("PaymentRefund"),
     RECONCILIATION("ReconciliationWithClosure"),
     LOGIN("Login"),
+    ABORT_REQUEST("AbortRequest"),
 }
 
 /***

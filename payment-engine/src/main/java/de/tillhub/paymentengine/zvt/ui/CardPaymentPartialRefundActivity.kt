@@ -39,6 +39,11 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.buttonCancel.setOnClickListener {
+            doAbortOperation()
+            finish()
+        }
     }
 
     override fun showLoader() {
@@ -55,6 +60,10 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
 
     override fun showIntermediateStatus(status: String) {
         binding.statusMessage.text = status
+    }
+
+    override fun showCancel() {
+        binding.buttonCancel.isVisible = true
     }
 
     override fun startOperation() {

@@ -9,14 +9,17 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.helper.TimeoutManager
 import de.tillhub.paymentengine.opi.OPIService
 import kotlinx.coroutines.launch
 
+@Suppress("TooManyFunctions")
 internal abstract class OPITerminalActivity : AppCompatActivity() {
 
     private val opiServiceConnection = object : ServiceConnection {
@@ -34,6 +37,8 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
 
     protected lateinit var opiService: OPIService
 
+    private lateinit var timeoutManager: TimeoutManager
+
     private val activityManager: ActivityManager by lazy {
         applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     }
@@ -47,6 +52,17 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindService()
+
+        timeoutManager = TimeoutManager(this) {
+            showCancel()
+        }
+
+        onBackPressedDispatcher.addCallback(
+            owner = this,
+            onBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = Unit
+            }
+        )
     }
 
     override fun onDestroy() {
@@ -73,18 +89,38 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
                 when (state) {
                     OPIService.State.NotInitialized -> Unit
                     OPIService.State.Idle -> {
+                        timeoutManager.processStarted()
+
                         showLoader()
                         opiService.loginToTerminal()
                     }
-                    OPIService.State.Pending.NoMessage -> showInstructions()
+                    OPIService.State.Pending.NoMessage -> {
+                        timeoutManager.processUpdated()
+                        showInstructions()
+                    }
                     is OPIService.State.Pending.WithMessage -> {
+                        timeoutManager.processUpdated()
                         showIntermediateStatus(state.message)
                     }
-                    OPIService.State.Pending.Login -> Unit
-                    OPIService.State.LoggedIn -> startOperation()
-                    is OPIService.State.OperationError -> handleErrorState(state)
-                    is OPIService.State.ResultError -> finishWithError(state)
-                    is OPIService.State.ResultSuccess -> finishWithSuccess(state)
+                    OPIService.State.Pending.Login -> {
+                        timeoutManager.processUpdated()
+                    }
+                    OPIService.State.LoggedIn -> {
+                        timeoutManager.processUpdated()
+                        startOperation()
+                    }
+                    is OPIService.State.OperationError -> {
+                        timeoutManager.processFinishedWithError()
+                        handleErrorState(state)
+                    }
+                    is OPIService.State.ResultError -> {
+                        timeoutManager.processFinishedWithResult()
+                        finishWithError(state)
+                    }
+                    is OPIService.State.ResultSuccess -> {
+                        timeoutManager.processFinishedWithResult()
+                        finishWithSuccess(state)
+                    }
                 }
             }
         }
@@ -120,4 +156,5 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     abstract fun showIntermediateStatus(status: String)
     abstract fun showOperationErrorStatus(status: String)
     abstract fun startOperation()
+    abstract fun showCancel()
 }

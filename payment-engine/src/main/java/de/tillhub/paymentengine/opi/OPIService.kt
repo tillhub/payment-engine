@@ -117,6 +117,12 @@ internal class OPIService(
         }
     }
 
+    fun abortRequest() {
+        lifecycleScope.launch {
+            opiController.abortRequest()
+        }
+    }
+
     class OPIServiceLocalBinder(
         private val instance: OPIService
     ) : Binder() {

@@ -56,6 +56,7 @@ internal interface OPIChannelController {
         currency: ISOAlphaCurrency
     )
     suspend fun initiateReconciliation()
+    suspend fun abortRequest()
 }
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "TooManyFunctions")
@@ -352,6 +353,42 @@ internal class OPIChannelControllerImpl(
             val requestConverter = converterFactory.newDtoToStringConverter<ServiceRequest>()
             val responseConverter = converterFactory.newStringToDtoConverter(
                 clazz = ServiceResponse::class.java
+            )
+
+            // setup C0 communication
+            handleC0Communication(payload, requestConverter, responseConverter)
+        } else {
+            // in case the controller is not initialized set the state to `Error.NotInitialised`
+            _operationState.value = OPIOperationStatus.Error.NotInitialised
+        }
+    }
+
+    override suspend fun abortRequest() = withOPIContext {
+        if (_operationState.value !is OPIOperationStatus.Pending) return@withOPIContext
+
+        // checks if the controller is initialized
+        if (initialized) {
+            analytics?.logOperation(
+                "Operation: ABORT_REQUEST" +
+                        "\n$terminal"
+            )
+
+            // setup C1 communication, it has to be setup before C0,
+            // because once C0 request is sent, C1 needs to handle the intermediate communication
+            handleChannel1Communication()
+
+            val payload = CardServiceRequest(
+                applicationSender = terminal.saleConfig.applicationName,
+                popId = terminal.saleConfig.poiId,
+                requestId = requestIdFactory.generateRequestId(),
+                requestType = ServiceRequestType.ABORT_REQUEST.value,
+                workstationId = terminal.saleConfig.saleId,
+                posData = PosData(terminalConfig.timeNow().toISOString()),
+            )
+
+            val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
+            val responseConverter = converterFactory.newStringToDtoConverter(
+                clazz = CardServiceResponse::class.java
             )
 
             // setup C0 communication
