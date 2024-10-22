@@ -37,7 +37,7 @@ class TimeoutManagerTest : FunSpec({
     lateinit var testScope: TestScope
     lateinit var dispatcher: TestDispatcher
 
-    var currentTask: TimerTask? = null
+    var currentTask: TimerTask?
     var currentTaskJob: Job? = null
 
     beforeTest {
@@ -98,6 +98,7 @@ class TimeoutManagerTest : FunSpec({
             }
             verify {
                 timerFactory.createTimer()
+                timer.schedule(any(), 30_000)
             }
 
             advanceTimeBy(15_101)
@@ -123,6 +124,7 @@ class TimeoutManagerTest : FunSpec({
             verify {
                 timer.cancel()
                 timerFactory.createTimer()
+                timer.schedule(any(), 30_000)
             }
 
             advanceTimeBy(15_001)
@@ -184,6 +186,7 @@ class TimeoutManagerTest : FunSpec({
             verify {
                 timer.cancel()
                 timerFactory.createTimer()
+                timer.schedule(any(), 5_000)
             }
 
             advanceTimeBy(2_501)
@@ -223,6 +226,7 @@ class TimeoutManagerTest : FunSpec({
             verify {
                 timer.cancel()
                 timerFactory.createTimer()
+                timer.schedule(any(), 30_000)
             }
 
             advanceTimeBy(30_001)

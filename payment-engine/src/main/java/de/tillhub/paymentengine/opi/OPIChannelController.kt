@@ -363,6 +363,7 @@ internal class OPIChannelControllerImpl(
         }
     }
 
+    @Suppress("LongMethod")
     override suspend fun abortRequest() = withOPIContext {
         if (_operationState.value !is OPIOperationStatus.Pending) return@withOPIContext
 
@@ -377,22 +378,80 @@ internal class OPIChannelControllerImpl(
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
 
-            val payload = CardServiceRequest(
-                applicationSender = terminal.saleConfig.applicationName,
-                popId = terminal.saleConfig.poiId,
-                requestId = requestIdFactory.generateRequestId(),
-                requestType = ServiceRequestType.ABORT_REQUEST.value,
-                workstationId = terminal.saleConfig.saleId,
-                posData = PosData(terminalConfig.timeNow().toISOString()),
-            )
-
             val requestConverter = converterFactory.newDtoToStringConverter<CardServiceRequest>()
             val responseConverter = converterFactory.newStringToDtoConverter(
                 clazz = CardServiceResponse::class.java
             )
 
+            val xml = try {
+                requestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = terminal.saleConfig.applicationName,
+                        popId = terminal.saleConfig.poiId,
+                        requestId = requestIdFactory.generateRequestId(),
+                        requestType = ServiceRequestType.ABORT_REQUEST.value,
+                        workstationId = terminal.saleConfig.saleId,
+                        posData = PosData(terminalConfig.timeNow().toISOString()),
+                    )
+                )
+            } catch (e: Exception) {
+                // In case of an exception when converting the TDO to XML we
+                // set the state to `Error.DataHandling`.
+                _operationState.value = OPIOperationStatus.Error.DataHandling(
+                    message = "Channel 0 request object could not be converted to XML.",
+                    error = e
+                )
+                return@withOPIContext
+            }
+
+            analytics?.logCommunication(
+                protocol = PROTOCOL_C0,
+                message = "SENT:\n$xml"
+            )
+
             // setup C0 communication
-            handleC0Communication(payload, requestConverter, responseConverter)
+            channel0.setOnError(::communicationErrorHandler)
+
+            channel0.open()
+
+            // here the app waits for the channel 0 socket to connect to the terminal.
+            while (!channel0.isConnected) {
+                delay(WAIT_DELAY)
+            }
+
+            channel0.sendMessage(xml) { responseXml ->
+                analytics?.logCommunication(
+                    protocol = PROTOCOL_C0,
+                    message = "RECEIVED:\n$responseXml"
+                )
+
+                val response = try {
+                    responseConverter.convert(responseXml)
+                } catch (e: Exception) {
+                    // In case of an exception when converting the XML to the DTO we
+                    // set the state to `Error.DataHandling`.
+                    _operationState.value = OPIOperationStatus.Error.DataHandling(
+                        message = "Channel 0 response XML could not be parsed.",
+                        error = e
+                    )
+                    return@sendMessage
+                }
+
+                when (OverallResult.find(response.overallResult)) {
+                    OverallResult.SUCCESS -> Unit
+                    else -> {
+                        _operationState.value = OPIOperationStatus.Result.Error(
+                            date = terminalConfig.timeNow(),
+                            customerReceipt = "",
+                            merchantReceipt = "",
+                            rawData = responseXml
+                        )
+                    }
+                }
+
+                // as per protocol, both channels are closed after C0 response
+                finishOperation()
+            }
         } else {
             // in case the controller is not initialized set the state to `Error.NotInitialised`
             _operationState.value = OPIOperationStatus.Error.NotInitialised

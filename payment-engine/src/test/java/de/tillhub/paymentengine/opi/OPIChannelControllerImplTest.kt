@@ -910,6 +910,128 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
         }
     }
 
+    describe("abortRequest") {
+        beforeTest {
+            every { converterFactory.newDtoToStringConverter<ServiceRequest>() } returns serviceRequestConverter
+            every { converterFactory.newStringToDtoConverter(ServiceResponse::class.java) } returns serviceResponseConverter
+
+            target.init(TERMINAL)
+            target.login()
+            c0OnMessage?.invoke(ConvertersTest.SERVICE_RESPONSE_XML)
+
+            every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
+                every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
+
+                deviceResponseConverter
+            }
+            every { converterFactory.newStringToDtoConverter(DeviceRequest::class.java) } returns deviceRequestConverter
+
+            target.initiateCardPayment(6.0.toBigDecimal(), ISOAlphaCurrency("EUR"))
+        }
+
+        it("SUCCESS") {
+            every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
+                every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
+
+                deviceResponseConverter
+            }
+            every { converterFactory.newStringToDtoConverter(DeviceRequest::class.java) } returns deviceRequestConverter
+
+            target.abortRequest()
+
+            verify(Ordering.ORDERED) {
+                converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
+                converterFactory.newDtoToStringConverter<DeviceResponse>()
+                opiChannel1.setOnError(any())
+                opiChannel1.setOnMessage(any())
+                opiChannel1.open()
+                converterFactory.newDtoToStringConverter<CardServiceRequest>()
+                converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
+                opiChannel0.setOnError(any())
+                opiChannel0.open()
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "AbortRequest",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        ),
+                    )
+                )
+                analytics.logCommunication(
+                    protocol = "OPI: Channel 0",
+                    message = "SENT:\n${ConvertersTest.CARD_SERVICE_REQUEST_XML}"
+                )
+                opiChannel0.isConnected
+                opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
+            }
+
+            c0OnMessage?.invoke(ConvertersTest.CARD_SERVICE_RESPONSE_XML)
+
+            verify {
+                analytics.logCommunication(
+                    protocol = "OPI: Channel 0",
+                    message = "RECEIVED:\n${ConvertersTest.CARD_SERVICE_RESPONSE_XML}"
+                )
+            }
+        }
+
+        it("ERROR") {
+            every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
+            every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
+                every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
+
+                deviceResponseConverter
+            }
+            every { converterFactory.newStringToDtoConverter(DeviceRequest::class.java) } returns deviceRequestConverter
+
+            target.abortRequest()
+
+            verify(Ordering.ORDERED) {
+                converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
+                converterFactory.newDtoToStringConverter<DeviceResponse>()
+                opiChannel1.setOnError(any())
+                opiChannel1.setOnMessage(any())
+                opiChannel1.open()
+                converterFactory.newDtoToStringConverter<CardServiceRequest>()
+                converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
+                opiChannel0.setOnError(any())
+                opiChannel0.open()
+                cardServiceRequestConverter.convert(
+                    CardServiceRequest(
+                        applicationSender = TERMINAL.saleConfig.applicationName,
+                        popId = TERMINAL.saleConfig.poiId,
+                        requestId = "12345678",
+                        requestType = "AbortRequest",
+                        workstationId = TERMINAL.saleConfig.saleId,
+                        posData = PosData(
+                            timestamp = "2024-02-09T09:36:36Z"
+                        )
+                    )
+                )
+                opiChannel0.isConnected
+                opiChannel0.sendMessage(ConvertersTest.CARD_SERVICE_REQUEST_XML, any())
+            }
+
+            every { cardServiceResponseConverter.convert(any()) } returns ERROR_CARD_SERVICE_RESPONSE
+            c0OnMessage?.invoke(ConvertersTest.CARD_SERVICE_RESPONSE_XML)
+
+            target.operationState.value shouldBe OPIOperationStatus.Result.Error(
+                date = NOW,
+                customerReceipt = "",
+                merchantReceipt = "",
+                rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
+                data = null,
+                reconciliationData = null
+            )
+        }
+    }
+
     describe("channel errors") {
         beforeTest {
             every { converterFactory.newDtoToStringConverter<ServiceRequest>() } returns serviceRequestConverter
