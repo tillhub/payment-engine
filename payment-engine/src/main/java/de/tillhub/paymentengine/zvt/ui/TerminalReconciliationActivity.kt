@@ -16,7 +16,6 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
 
         binding.buttonCancel.setOnClickListener {
             doAbortOperation()
-            finish()
         }
     }
 
@@ -40,7 +39,7 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
         doReconciliation()
     }
 
-    override fun showCancel() {
-        binding.buttonCancel.isVisible = true
+    override fun setCancelVisibility(visible: Boolean) {
+        binding.buttonCancel.isVisible = visible
     }
 }

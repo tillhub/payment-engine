@@ -12,33 +12,23 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import java.util.Timer
-import java.util.TimerTask
 
 @ExperimentalCoroutinesApi
 class TimeoutManagerTest : FunSpec({
 
     lateinit var owner: TestLifecycleOwner
-    lateinit var timerFactory: TimerFactory
     lateinit var target: TimeoutManager
 
     lateinit var callback: Callback
-    lateinit var timer: Timer
 
     lateinit var testScope: TestScope
     lateinit var dispatcher: TestDispatcher
-
-    var currentTask: TimerTask?
-    var currentTaskJob: Job? = null
 
     beforeTest {
         dispatcher = StandardTestDispatcher()
@@ -49,38 +39,14 @@ class TimeoutManagerTest : FunSpec({
         callback = mockk {
             every { cancelEnabled() } just Runs
         }
-        timer = mockk {
-            every { schedule(any<TimerTask>(), any<Long>()) } answers {
-                currentTask = firstArg<TimerTask>()
-                val taskDelay = secondArg<Long>()
-
-                currentTaskJob = testScope.launch {
-                    delay(taskDelay)
-                    currentTask?.run()
-                }
-            }
-
-            every { cancel() } answers {
-                currentTaskJob?.cancel()
-            }
-        }
-
         owner = spyk(
             TestLifecycleOwner(
                 coroutineDispatcher = dispatcher,
                 initialState = Lifecycle.State.RESUMED
             )
         )
-        timerFactory = mockk {
-            every { createTimer() } returns timer
-        }
 
-        target = TimeoutManager(owner, timerFactory, callback::cancelEnabled)
-    }
-
-    afterTest {
-        currentTask = null
-        currentTaskJob = null
+        target = TimeoutManager(owner, callback::cancelEnabled)
     }
 
     test("init") {
@@ -95,10 +61,6 @@ class TimeoutManagerTest : FunSpec({
 
             verify(inverse = true) {
                 callback.cancelEnabled()
-            }
-            verify {
-                timerFactory.createTimer()
-                timer.schedule(any(), 30_000)
             }
 
             advanceTimeBy(15_101)
@@ -120,12 +82,6 @@ class TimeoutManagerTest : FunSpec({
             }
 
             target.processUpdated()
-
-            verify {
-                timer.cancel()
-                timerFactory.createTimer()
-                timer.schedule(any(), 30_000)
-            }
 
             advanceTimeBy(15_001)
 
@@ -153,10 +109,6 @@ class TimeoutManagerTest : FunSpec({
 
             target.processFinishedWithResult()
 
-            verify {
-                timer.cancel()
-            }
-
             advanceTimeBy(15_001)
 
             verify(inverse = true) {
@@ -183,12 +135,6 @@ class TimeoutManagerTest : FunSpec({
 
             target.processFinishedWithError()
 
-            verify {
-                timer.cancel()
-                timerFactory.createTimer()
-                timer.schedule(any(), 5_000)
-            }
-
             advanceTimeBy(2_501)
 
             verify(inverse = true) {
@@ -211,10 +157,6 @@ class TimeoutManagerTest : FunSpec({
 
             owner.setCurrentState(Lifecycle.State.STARTED)
 
-            verify {
-                timer.cancel()
-            }
-
             advanceTimeBy(1_001)
 
             verify(inverse = true) {
@@ -222,12 +164,6 @@ class TimeoutManagerTest : FunSpec({
             }
 
             owner.setCurrentState(Lifecycle.State.RESUMED)
-
-            verify {
-                timer.cancel()
-                timerFactory.createTimer()
-                timer.schedule(any(), 30_000)
-            }
 
             advanceTimeBy(30_001)
 
@@ -245,15 +181,13 @@ class TimeoutManagerTest : FunSpec({
 
             owner.setCurrentState(Lifecycle.State.DESTROYED)
 
-            verify {
-                timer.cancel()
-            }
-
             advanceTimeBy(1_001)
 
             verify(inverse = true) {
                 callback.cancelEnabled()
             }
+
+            owner.observerCount shouldBe 0
         }
     }
 }) {

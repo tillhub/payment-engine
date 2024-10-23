@@ -42,7 +42,6 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
 
         binding.buttonCancel.setOnClickListener {
             doAbortOperation()
-            finish()
         }
     }
 
@@ -62,8 +61,8 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
         binding.statusMessage.text = status
     }
 
-    override fun showCancel() {
-        binding.buttonCancel.isVisible = true
+    override fun setCancelVisibility(visible: Boolean) {
+        binding.buttonCancel.isVisible = visible
     }
 
     override fun startOperation() {

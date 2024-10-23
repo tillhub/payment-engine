@@ -30,7 +30,6 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
 
         binding.buttonCancel.setOnClickListener {
             doAbortOperation()
-            finish()
         }
     }
 
@@ -61,8 +60,8 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
         }
     }
 
-    override fun showCancel() {
-        binding.buttonCancel.isVisible = true
+    override fun setCancelVisibility(visible: Boolean) {
+        binding.buttonCancel.isVisible = visible
     }
 
     /**

@@ -65,11 +65,12 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
                     timeoutManager.processFinishedWithResult()
                     finishWithSuccess(state)
                 }
+                CardTerminalViewModel.State.OperationAborted -> finish()
             }
         }
 
         timeoutManager = TimeoutManager(this) {
-            showCancel()
+            setCancelVisibility(true)
         }
 
         onBackPressedDispatcher.addCallback(
@@ -112,7 +113,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     abstract fun showInstructions()
     abstract fun showIntermediateStatus(status: String)
     abstract fun startOperation()
-    abstract fun showCancel()
+    abstract fun setCancelVisibility(visible: Boolean)
 
     override fun transportConfiguration(): TransportConfiguration {
         return TransportConfiguration().apply {
@@ -212,13 +213,19 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
      * This method is called to abort a pending card transaction
      */
     protected fun doAbortOperation() {
-        if (viewModel.terminalOperationState.value is CardTerminalViewModel.State.Operation) {
-            val cancellation = Apdu(Commons.Command.CMD_06B0).apply {
-                val password = config.saleConfig.pin
-                add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
-            }
+        viewModel.abortOperation {
+            showLoader()
+            setCancelVisibility(false)
 
-            doCustom(cancellation.apdu())
+            val abort = Apdu(Commons.Command.CMD_06B0).apply {
+                add(Bmp(0xD2.toByte(), byteArrayOf(0.toByte())))
+                add(Bmp(0xFA.toByte(), byteArrayOf(0xFF.toByte())))
+            }
+            doCustom(abort.apdu())
+
+            // On certain ZVT terminals the abort command (06 B0) does nothing.
+            // For now we will leave the implementation as is, but if it happens to be
+            // blocking the app, the implementation will change
         }
     }
 
