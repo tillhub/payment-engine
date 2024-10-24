@@ -2,6 +2,7 @@
 <resources>
     <string name="checkout_card_payment_follow_instructions">Follow instructions on the terminal</string>
     <string name="transaction_cancel_card_reversal_follow_instructions">Follow instructions on the terminal</string>
+    <string name="transaction_cancel">Cancel</string>
 
     <string name="transaction_cancel_card_reversal_error_title">Payment reversal error</string>
     <string name="transaction_cancel_card_reversal_success_title">Payment reversal success</string>

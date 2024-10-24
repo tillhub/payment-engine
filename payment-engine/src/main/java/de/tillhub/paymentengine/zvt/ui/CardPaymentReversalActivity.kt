@@ -27,6 +27,10 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.buttonCancel.setOnClickListener {
+            doAbortOperation()
+        }
     }
 
     override fun showLoader() {
@@ -54,6 +58,10 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
             )
             doCancellation(it)
         }
+    }
+
+    override fun setCancelVisibility(visible: Boolean) {
+        binding.buttonCancel.isVisible = visible
     }
 
     /**

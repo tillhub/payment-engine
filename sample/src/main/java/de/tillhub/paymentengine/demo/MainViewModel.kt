@@ -60,21 +60,23 @@ class MainViewModel : ViewModel() {
     }
 
     private fun setupTerminalConfigs(cardManager: CardManager) {
-        cardManager.putTerminalConfig(Terminal.OPI(
-            name = "opi",
-            ipAddress = "127.0.0.1",
-            port = 20002,
-            port2 = 20006
-        ))
-//        cardManager.putTerminalConfig(Terminal.ZVT(
-//            name = "zvt-local",
+//        cardManager.putTerminalConfig(Terminal.OPI(
+//            name = "opi",
+//            ipAddress = "127.0.0.1",
+//            port = 20002,
+//            port2 = 20006
+//        ))
+        cardManager.putTerminalConfig(Terminal.ZVT(
+            name = "zvt-local",
+            ipAddress = "192.168.1.121",
+            port = 20007
 //            ipAddress = "127.0.0.1",
 //            port = 40007
-//        ))
+        ))
     }
 
     fun startPayment() {
-        paymentManager.startPaymentTransaction(500.toBigDecimal(), ISOAlphaCurrency("EUR"), "opi")
+        paymentManager.startPaymentTransaction(500.toBigDecimal(), ISOAlphaCurrency("EUR"), "zvt-local")
     }
 
     fun startRefund() {

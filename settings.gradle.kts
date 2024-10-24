@@ -18,7 +18,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "payment-engine"
+rootProject.name = "Tillhub Payment Engine"
 include(":sample")
 include(":payment-engine")
  

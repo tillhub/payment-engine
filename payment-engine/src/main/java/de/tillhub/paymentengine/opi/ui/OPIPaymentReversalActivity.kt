@@ -19,6 +19,11 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.buttonCancel.setOnClickListener {
+            opiService.abortRequest()
+            finish()
+        }
     }
 
     override fun showLoader() {
@@ -41,6 +46,10 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
 
     override fun startOperation() {
         opiService.startPaymentReversal(stan)
+    }
+
+    override fun showCancel() {
+        binding.buttonCancel.isVisible = true
     }
 
     companion object {

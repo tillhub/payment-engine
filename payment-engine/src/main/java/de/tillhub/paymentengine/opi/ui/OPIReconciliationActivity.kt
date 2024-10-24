@@ -18,6 +18,11 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
     override fun showLoader() {
         binding.loader.isVisible = true
         binding.instructions.isGone = true
+
+        binding.buttonCancel.setOnClickListener {
+            opiService.abortRequest()
+            finish()
+        }
     }
 
     override fun showInstructions() {
@@ -31,6 +36,10 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
 
     override fun showOperationErrorStatus(status: String) {
         binding.message.text = status
+    }
+
+    override fun showCancel() {
+        binding.buttonCancel.isVisible = true
     }
 
     override fun startOperation() {

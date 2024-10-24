@@ -13,6 +13,10 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        binding.buttonCancel.setOnClickListener {
+            doAbortOperation()
+        }
     }
 
     override fun showLoader() {
@@ -33,5 +37,9 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
         analytics?.logOperation("Operation: RECONCILIATION\n$config")
 
         doReconciliation()
+    }
+
+    override fun setCancelVisibility(visible: Boolean) {
+        binding.buttonCancel.isVisible = visible
     }
 }

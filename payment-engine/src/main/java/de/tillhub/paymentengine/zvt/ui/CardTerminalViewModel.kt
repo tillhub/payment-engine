@@ -26,10 +26,13 @@ internal class CardTerminalViewModel(
 
     companion object {
         private const val SERVICE_START_DELAY: Long = 500
+        private const val TIMEOUT_DELAY: Long = 30_000
     }
 
     private var lastReceipt: LavegoReceiptBuilder? = null
     private var lastData: String? = null
+
+    private var abortOperationTriggered: Boolean = false
 
     private val _terminalOperationState: MutableLiveData<State> =
         MutableLiveData(State.Idle)
@@ -78,21 +81,27 @@ internal class CardTerminalViewModel(
 
     fun onCompletion(moveToFront: () -> Unit) {
         viewModelScope.launch {
-            _terminalOperationState.value = when (_terminalOperationState.value) {
-                State.Setup -> State.Operation
-                State.Operation -> {
-                    moveToFront()
-                    State.Success(
-                        date = terminalConfig.timeNow(),
-                        customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
-                        merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
-                        rawData = lastData.orEmpty(),
-                        data = lastData?.let {
-                            lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
-                        }
-                    )
+            _terminalOperationState.value = if (abortOperationTriggered) {
+                moveToFront()
+                State.OperationAborted
+            } else {
+                when (_terminalOperationState.value) {
+                    State.Setup -> State.Operation
+                    State.Operation -> {
+                        moveToFront()
+                        State.Success(
+                            date = terminalConfig.timeNow(),
+                            customerReceipt = lastReceipt?.customerReceipt.orEmpty(),
+                            merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
+                            rawData = lastData.orEmpty(),
+                            data = lastData?.let {
+                                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+                            }
+                        )
+                    }
+
+                    else -> throw IllegalStateException("Illegal state: ${terminalOperationState.value}")
                 }
-                else -> throw IllegalStateException("Illegal state: ${terminalOperationState.value}")
             }
         }
     }
@@ -111,6 +120,18 @@ internal class CardTerminalViewModel(
                 data = data,
                 resultCode = ResultCodeSets.getZVTCode(data?.resultCode)
             )
+        }
+    }
+
+    fun abortOperation(triggerAbort: () -> Unit) {
+        if (terminalOperationState.value is State.Operation) {
+            abortOperationTriggered = true
+            triggerAbort()
+
+            viewModelScope.launch {
+                delay(TIMEOUT_DELAY)
+                _terminalOperationState.value = State.OperationAborted
+            }
         }
     }
 
@@ -168,5 +189,7 @@ internal class CardTerminalViewModel(
                     }
                 )
         }
+
+        data object OperationAborted : State()
     }
 }
