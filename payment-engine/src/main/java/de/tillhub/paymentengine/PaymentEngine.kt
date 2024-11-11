@@ -50,5 +50,11 @@ class PaymentEngine private constructor() {
         }
     }
 
+    fun newConnectionManager(registry: ActivityResultCaller): ConnectionManager {
+        return ConnectionManagerImpl(configs, terminalState, registry).also {
+            terminalState.tryEmit(TerminalOperationStatus.Waiting)
+        }
+    }
+
     companion object : SingletonHolder<PaymentEngine>(::PaymentEngine)
 }

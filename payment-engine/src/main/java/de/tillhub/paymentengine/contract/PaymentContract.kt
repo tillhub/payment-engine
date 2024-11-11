@@ -20,14 +20,15 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
         return when (input.config) {
             is Terminal.ZVT -> Intent(context, CardPaymentActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
+                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
             is Terminal.OPI -> Intent(context, OPIPaymentActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
+                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
+            is Terminal.SPOS -> TODO()
         }
     }
 
@@ -41,12 +42,19 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
 class PaymentRequest(
     val config: Terminal,
     val amount: BigDecimal,
+    val tip: BigDecimal = BigDecimal.ZERO,
     val currency: ISOAlphaCurrency
 ) {
-    override fun toString() = "PaymentRequest(config=$config, amount=$amount, currency=$currency)"
+    override fun toString() = "PaymentRequest(" +
+            "config=$config, " +
+            "amount=$amount, " +
+            "tip=$tip, " +
+            "currency=$currency" +
+            ")"
     override fun equals(other: Any?) = other is PaymentRequest &&
             config == other.config &&
             amount == other.amount &&
+            tip == other.tip &&
             currency == other.currency
-    override fun hashCode() = Objects.hash(config, amount, currency)
+    override fun hashCode() = Objects.hash(config, amount, tip, currency)
 }

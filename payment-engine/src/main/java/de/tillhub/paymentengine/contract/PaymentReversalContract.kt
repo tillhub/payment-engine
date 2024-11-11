@@ -25,6 +25,8 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
             }
+
+            is Terminal.SPOS -> TODO()
         }
     }
 

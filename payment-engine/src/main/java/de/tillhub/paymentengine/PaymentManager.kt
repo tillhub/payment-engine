@@ -15,9 +15,23 @@ import java.math.BigDecimal
  * it sets up the manager so the data from the transaction is collected correctly.
  */
 interface PaymentManager : CardManager {
-    fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency)
-    fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, configName: String)
-    fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, config: Terminal)
+    fun startPaymentTransaction(
+        amount: BigDecimal,
+        tip: BigDecimal = BigDecimal.ZERO,
+        currency: ISOAlphaCurrency
+    )
+    fun startPaymentTransaction(
+        amount: BigDecimal,
+        tip: BigDecimal = BigDecimal.ZERO,
+        currency: ISOAlphaCurrency,
+        configName: String
+    )
+    fun startPaymentTransaction(
+        amount: BigDecimal,
+        tip: BigDecimal = BigDecimal.ZERO,
+        currency: ISOAlphaCurrency,
+        config: Terminal
+    )
 }
 
 internal class PaymentManagerImpl(
@@ -31,28 +45,34 @@ internal class PaymentManagerImpl(
             terminalState.tryEmit(result)
         }
 
-    override fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency) {
+    override fun startPaymentTransaction(
+        amount: BigDecimal,
+        tip: BigDecimal,
+        currency: ISOAlphaCurrency
+    ) {
         val configName = configs.values.firstOrNull()?.name.orEmpty()
-        startPaymentTransaction(amount, currency, configName)
+        startPaymentTransaction(amount, tip, currency, configName)
     }
 
     override fun startPaymentTransaction(
         amount: BigDecimal,
+        tip: BigDecimal,
         currency: ISOAlphaCurrency,
         configName: String
     ) {
         val terminalConfig = configs.getOrDefault(configName, defaultConfig)
-        startPaymentTransaction(amount, currency, terminalConfig)
+        startPaymentTransaction(amount, tip, currency, terminalConfig)
     }
 
     override fun startPaymentTransaction(
         amount: BigDecimal,
+        tip: BigDecimal,
         currency: ISOAlphaCurrency,
         config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Payment(amount, currency))
         paymentResultContract.launch(
-            PaymentRequest(config, amount, currency)
+            PaymentRequest(config, amount, tip, currency)
         )
     }
 }

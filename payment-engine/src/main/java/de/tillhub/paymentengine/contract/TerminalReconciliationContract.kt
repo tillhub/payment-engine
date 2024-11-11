@@ -21,6 +21,8 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
             is Terminal.OPI -> Intent(context, OPIReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
+
+            is Terminal.SPOS -> TODO()
         }
     }
 
