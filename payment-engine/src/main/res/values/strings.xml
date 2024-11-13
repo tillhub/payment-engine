@@ -320,4 +320,27 @@
     <string name="opi_error_code_922">message number out of sequence</string>
     <string name="opi_error_code_923">request in progress</string>
     <string name="opi_error_code_950">violation of business arrangement</string>
+
+    <!-- S-POS Errors -->
+    <string name="spos_error_terminal_not_connected">POS is not connected to terminal</string>
+    <string name="spos_error_terminal_not_onboarded">Terminal has not been onboarded</string>
+    <string name="spos_error_failure">Transaction failure</string>
+    <string name="spos_error_aborted">Transaction aborted</string>
+    <string name="spos_error_busy">Terminal is busy</string>
+    <string name="spos_error_communication_error">Terminal communication error</string>
+    <string name="spos_error_configuration_failure">Terminal configuration failure</string>
+    <string name="spos_error_device_unavailable">Terminal unavailable</string>
+    <string name="spos_error_format_error">Format error</string>
+    <string name="spos_error_missing_mandatory_data">Missing mandatory data</string>
+    <string name="spos_error_no_active_payment">No active payment</string>
+    <string name="spos_error_parsing_error">Parsing error</string>
+    <string name="spos_error_partial_failure">Partial failure</string>
+    <string name="spos_error_payment_ongoing">Payment ongoing</string>
+    <string name="spos_error_pc_communication_failed">PC communication failed</string>
+    <string name="spos_error_print_last_ticket">Print last ticket</string>
+    <string name="spos_error_timed_out">Transaction timed out</string>
+    <string name="spos_error_receipt_call_failed">Receipt call failed</string>
+    <string name="spos_error_terminal_already_activated">Terminal already activated</string>
+    <string name="spos_error_validation_error">Validation error</string>
+    <string name="spos_error_unknown">Unknown terminal error</string>
 </resources>

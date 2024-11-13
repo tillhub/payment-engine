@@ -10,6 +10,8 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPaymentActivity
+import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.spos.SPOSResponseHandler
 import de.tillhub.paymentengine.zvt.ui.CardPaymentActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -28,33 +30,44 @@ class PaymentResultContract : ActivityResultContract<PaymentRequest, TerminalOpe
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
-            is Terminal.SPOS -> TODO()
+            is Terminal.SPOS -> SPOSIntentFactory.createPaymentIntent(input)
         }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
-            BundleCompat.getParcelable(it, ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
-        } ?: TerminalOperationStatus.Canceled
+        return if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
+            intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
+                BundleCompat.getParcelable(
+                    it,
+                    ExtraKeys.EXTRAS_RESULT,
+                    TerminalOperationStatus::class.java
+                )
+            } ?: TerminalOperationStatus.Canceled
+        } else {
+            SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+        }
     }
 }
 
 class PaymentRequest(
     val config: Terminal,
+    val transactionId: String,
     val amount: BigDecimal,
     val tip: BigDecimal = BigDecimal.ZERO,
     val currency: ISOAlphaCurrency
 ) {
     override fun toString() = "PaymentRequest(" +
             "config=$config, " +
+            "transactionId=$transactionId, " +
             "amount=$amount, " +
             "tip=$tip, " +
             "currency=$currency" +
             ")"
     override fun equals(other: Any?) = other is PaymentRequest &&
             config == other.config &&
+            transactionId == other.transactionId &&
             amount == other.amount &&
             tip == other.tip &&
             currency == other.currency
-    override fun hashCode() = Objects.hash(config, amount, tip, currency)
+    override fun hashCode() = Objects.hash(config, transactionId, amount, tip, currency)
 }

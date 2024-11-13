@@ -16,17 +16,20 @@ import java.math.BigDecimal
  */
 interface PaymentManager : CardManager {
     fun startPaymentTransaction(
+        transactionId: String,
         amount: BigDecimal,
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency
     )
     fun startPaymentTransaction(
+        transactionId: String,
         amount: BigDecimal,
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency,
         configName: String
     )
     fun startPaymentTransaction(
+        transactionId: String,
         amount: BigDecimal,
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency,
@@ -46,25 +49,28 @@ internal class PaymentManagerImpl(
         }
 
     override fun startPaymentTransaction(
+        transactionId: String,
         amount: BigDecimal,
         tip: BigDecimal,
         currency: ISOAlphaCurrency
     ) {
         val configName = configs.values.firstOrNull()?.name.orEmpty()
-        startPaymentTransaction(amount, tip, currency, configName)
+        startPaymentTransaction(transactionId, amount, tip, currency, configName)
     }
 
     override fun startPaymentTransaction(
+        transactionId: String,
         amount: BigDecimal,
         tip: BigDecimal,
         currency: ISOAlphaCurrency,
         configName: String
     ) {
         val terminalConfig = configs.getOrDefault(configName, defaultConfig)
-        startPaymentTransaction(amount, tip, currency, terminalConfig)
+        startPaymentTransaction(transactionId, amount, tip, currency, terminalConfig)
     }
 
     override fun startPaymentTransaction(
+        transactionId: String,
         amount: BigDecimal,
         tip: BigDecimal,
         currency: ISOAlphaCurrency,
@@ -72,7 +78,7 @@ internal class PaymentManagerImpl(
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Payment(amount, currency))
         paymentResultContract.launch(
-            PaymentRequest(config, amount, tip, currency)
+            PaymentRequest(config, transactionId, amount, tip, currency)
         )
     }
 }

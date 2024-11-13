@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
+import java.util.UUID
 
 class MainViewModel : ViewModel() {
 
@@ -92,34 +93,40 @@ class MainViewModel : ViewModel() {
 
     fun startPayment() {
         paymentManager.startPaymentTransaction(
+            UUID.randomUUID().toString(),
             500.toBigDecimal(),
             100.toBigDecimal(),
             ISOAlphaCurrency("EUR"),
-            "zvt-local"
+            CONFIG_IN_USE
         )
     }
 
     fun startRefund() {
-        refundManager.startRefundTransaction(600.toBigDecimal(), ISOAlphaCurrency("EUR"), "opi")
+        refundManager.startRefundTransaction(
+            600.toBigDecimal(),
+            ISOAlphaCurrency("EUR"),
+            CONFIG_IN_USE
+        )
     }
 
     fun startReversal() {
-        reversalManager.startReversalTransaction("374", "opi")
+        reversalManager.startReversalTransaction("374", CONFIG_IN_USE)
     }
 
     fun startReconciliation() {
-        reconciliationManager.startReconciliation("opi")
+        reconciliationManager.startReconciliation(CONFIG_IN_USE)
     }
 
     fun startSPOSConnect() {
-        connectionManager.startSPOSConnect("s-pos")
+        connectionManager.startSPOSConnect(CONFIG_IN_USE)
     }
 
     fun startSPOSDisconnect() {
-        connectionManager.startSPOSDisconnect("s-pos")
+        connectionManager.startSPOSDisconnect(CONFIG_IN_USE)
     }
 
     companion object {
+        private const val CONFIG_IN_USE = "s-pos"
         private const val REMOTE_IP = "192.168.1.121"
     }
 }
