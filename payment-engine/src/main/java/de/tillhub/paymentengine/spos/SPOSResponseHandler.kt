@@ -5,9 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionData
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.spos.data.SPOSResultState
 import de.tillhub.paymentengine.spos.data.SPOSTransactionResult
+import de.tillhub.paymentengine.spos.data.StringToReceiptDtoConverter
 import java.time.Instant
 
 internal object SPOSResponseHandler {
@@ -53,8 +55,14 @@ internal object SPOSResponseHandler {
         intent: Intent?
     ): TerminalOperationStatus = if (resultCode == Activity.RESULT_OK) {
         intent?.extras?.let { extras ->
-            val merchantReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_MERCHANT).orEmpty()
-            val customerReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_CUSTOMER).orEmpty()
+            val converter = StringToReceiptDtoConverter()
+
+            val merchantReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_MERCHANT)?.let {
+                converter.convert(it).toReceiptString()
+            }.orEmpty()
+            val customerReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_CUSTOMER)?.let {
+                converter.convert(it).toReceiptString()
+            }.orEmpty()
             val resultState = SPOSResultState.find(
                 type = extras.getString(SPOSKey.ResultExtra.RESULT_STATE).orEmpty()
             )
@@ -66,18 +74,18 @@ internal object SPOSResponseHandler {
                 resultState == SPOSResultState.SUCCESS) {
                 TerminalOperationStatus.Success.SPOS(
                     date = Instant.now(),
-                    customerReceipt = merchantReceipt,
-                    merchantReceipt = customerReceipt,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
                     rawData = extras.toRawData(),
-                    data = null, // TODO
+                    data = extras.toTransactionData(),
                 )
             } else {
                 TerminalOperationStatus.Error.SPOS(
                     date = Instant.now(),
-                    customerReceipt = merchantReceipt,
-                    merchantReceipt = customerReceipt,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
                     rawData = extras.toRawData(),
-                    data = null,
+                    data = extras.toTransactionData(),
                     resultCode = ResultCodeSets.getSPOSCode(resultState.value)
                 )
             }
@@ -96,8 +104,8 @@ internal object SPOSResponseHandler {
                 date = Instant.now(),
                 customerReceipt = "",
                 merchantReceipt = "",
-                rawData = "",
-                data = null,
+                rawData = intent.extras?.toRawData().orEmpty(),
+                data = intent.extras?.toTransactionData(),
                 resultCode = ResultCodeSets.getSPOSCode(errCode)
             )
         } ?: TerminalOperationStatus.Canceled
@@ -114,4 +122,13 @@ internal object SPOSResponseHandler {
         builder.append("}")
         return builder.toString()
     }
+
+    private fun Bundle.toTransactionData(): TransactionData =
+        TransactionData(
+            terminalId = getString(SPOSKey.ResultExtra.TERMINAL_ID).orEmpty(),
+            transactionId = getString(SPOSKey.ResultExtra.TRANSACTION_DATA).orEmpty(),
+            cardCircuit = getString(SPOSKey.ResultExtra.CARD_CIRCUIT).orEmpty(),
+            cardPan = getString(SPOSKey.ResultExtra.CARD_PAN).orEmpty(),
+            paymentProvider = getString(SPOSKey.ResultExtra.MERCHANT).orEmpty(),// TODO check if it is ok
+        )
 }
