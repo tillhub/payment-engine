@@ -52,11 +52,10 @@ internal object SPOSResponseHandler {
 
     fun handleTransactionResponse(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
+        converter: StringToReceiptDtoConverter = StringToReceiptDtoConverter()
     ): TerminalOperationStatus = if (resultCode == Activity.RESULT_OK) {
         intent?.extras?.let { extras ->
-            val converter = StringToReceiptDtoConverter()
-
             val merchantReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_MERCHANT)?.let {
                 converter.convert(it).toReceiptString()
             }.orEmpty()
@@ -71,7 +70,8 @@ internal object SPOSResponseHandler {
             )
 
             if (transactionResult == SPOSTransactionResult.ACCEPTED &&
-                resultState == SPOSResultState.SUCCESS) {
+                resultState == SPOSResultState.SUCCESS
+                ) {
                 TerminalOperationStatus.Success.SPOS(
                     date = Instant.now(),
                     customerReceipt = customerReceipt,
@@ -89,7 +89,6 @@ internal object SPOSResponseHandler {
                     resultCode = ResultCodeSets.getSPOSCode(resultState.value)
                 )
             }
-
         } ?: TerminalOperationStatus.Error.SPOS(
             date = Instant.now(),
             customerReceipt = "",
@@ -129,6 +128,6 @@ internal object SPOSResponseHandler {
             transactionId = getString(SPOSKey.ResultExtra.TRANSACTION_DATA).orEmpty(),
             cardCircuit = getString(SPOSKey.ResultExtra.CARD_CIRCUIT).orEmpty(),
             cardPan = getString(SPOSKey.ResultExtra.CARD_PAN).orEmpty(),
-            paymentProvider = getString(SPOSKey.ResultExtra.MERCHANT).orEmpty(),// TODO check if it is ok
+            paymentProvider = getString(SPOSKey.ResultExtra.MERCHANT).orEmpty(), // TODO check if it is ok
         )
 }
