@@ -48,6 +48,9 @@ internal object SPOSIntentFactory {
     fun createPaymentReversalIntent(request: ReversalRequest) =
         Intent(SPOSKey.Action.TRANSACTION_ACTION).apply {
             putExtra(SPOSKey.Extra.TRANSACTION_TYPE, SPOSTransactionType.PAYMENT_REVERSAL.value)
+            putExtra(SPOSKey.Extra.CURRENCY_ISO, request.currency.value)
+            putExtra(SPOSKey.Extra.AMOUNT, request.amount.toString())
+            putExtra(SPOSKey.Extra.TIP_AMOUNT, request.tip.toString())
             putExtra(SPOSKey.Extra.TRANSACTION_DATA, request.receiptNo)
             putExtra(SPOSKey.Extra.TRANSACTION_ID, request.transactionId)
 
