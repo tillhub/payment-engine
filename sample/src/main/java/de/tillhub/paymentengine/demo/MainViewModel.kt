@@ -33,9 +33,9 @@ class MainViewModel : ViewModel() {
             reconciliationManager.observePaymentState(),
             connectionManager.observePaymentState()
         ).stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                TerminalOperationStatus.Waiting
+            viewModelScope,
+            SharingStarted.Eagerly,
+            TerminalOperationStatus.Waiting
         )
     }
 
@@ -70,25 +70,33 @@ class MainViewModel : ViewModel() {
     }
 
     private fun setupTerminalConfigs(cardManager: CardManager) {
-        cardManager.putTerminalConfig(Terminal.ZVT(
-            name = "zvt-remote",
-            ipAddress = REMOTE_IP,
-            port = 20007
-        ))
-        cardManager.putTerminalConfig(Terminal.ZVT(
-            name = "zvt-local",
-            ipAddress = "127.0.0.1",
-            port = 40007
-        ))
-        cardManager.putTerminalConfig(Terminal.OPI(
-            name = "opi",
-            ipAddress = REMOTE_IP,
-            port = 20002,
-            port2 = 20007
-        ))
-        cardManager.putTerminalConfig(Terminal.SPOS(
-            name = "s-pos",
-        ))
+        cardManager.putTerminalConfig(
+            Terminal.ZVT(
+                name = "zvt-remote",
+                ipAddress = REMOTE_IP,
+                port = 20007
+            )
+        )
+        cardManager.putTerminalConfig(
+            Terminal.ZVT(
+                name = "zvt-local",
+                ipAddress = "127.0.0.1",
+                port = 40007
+            )
+        )
+        cardManager.putTerminalConfig(
+            Terminal.OPI(
+                name = "opi",
+                ipAddress = REMOTE_IP,
+                port = 20002,
+                port2 = 20007
+            )
+        )
+        cardManager.putTerminalConfig(
+            Terminal.SPOS(
+                name = "s-pos",
+            )
+        )
     }
 
     fun startPayment() {
@@ -103,14 +111,19 @@ class MainViewModel : ViewModel() {
 
     fun startRefund() {
         refundManager.startRefundTransaction(
-            600.toBigDecimal(),
-            ISOAlphaCurrency("EUR"),
-            CONFIG_IN_USE
+            transactionId = UUID.randomUUID().toString(),
+            amount = 600.toBigDecimal(),
+            currency = ISOAlphaCurrency("EUR"),
+            configName = CONFIG_IN_USE
         )
     }
 
     fun startReversal() {
-        reversalManager.startReversalTransaction("374", CONFIG_IN_USE)
+        reversalManager.startReversalTransaction(
+            transactionId = UUID.randomUUID().toString(),
+            receiptNo = "374",
+            configName = CONFIG_IN_USE
+        )
     }
 
     fun startReconciliation() {

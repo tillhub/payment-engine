@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * it sets up the manager so the data from the transaction is collected correctly.
  */
 interface ReversalManager : CardManager {
-    fun startReversalTransaction(receiptNo: String)
-    fun startReversalTransaction(receiptNo: String, configName: String)
-    fun startReversalTransaction(receiptNo: String, config: Terminal)
+    fun startReversalTransaction(transactionId: String, receiptNo: String)
+    fun startReversalTransaction(transactionId: String, receiptNo: String, configName: String)
+    fun startReversalTransaction(transactionId: String, receiptNo: String, config: Terminal)
 }
 
 internal class ReversalManagerImpl(
@@ -29,20 +29,32 @@ internal class ReversalManagerImpl(
             terminalState.tryEmit(result)
         }
 
-    override fun startReversalTransaction(receiptNo: String) {
+    override fun startReversalTransaction(transactionId: String, receiptNo: String) {
         val configName = configs.values.firstOrNull()?.name.orEmpty()
-        startReversalTransaction(receiptNo, configName)
+        startReversalTransaction(transactionId, receiptNo, configName)
     }
 
-    override fun startReversalTransaction(receiptNo: String, configName: String) {
+    override fun startReversalTransaction(
+        transactionId: String,
+        receiptNo: String,
+        configName: String
+    ) {
         val terminalConfig = configs.getOrDefault(configName, defaultConfig)
-        startReversalTransaction(receiptNo, terminalConfig)
+        startReversalTransaction(transactionId, receiptNo, terminalConfig)
     }
 
-    override fun startReversalTransaction(receiptNo: String, config: Terminal) {
+    override fun startReversalTransaction(
+        transactionId: String,
+        receiptNo: String,
+        config: Terminal
+    ) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Reversal(receiptNo))
         reversalContract.launch(
-            ReversalRequest(config, receiptNo)
+            ReversalRequest(
+                config = config,
+                transactionId = transactionId,
+                receiptNo = receiptNo
+            )
         )
     }
 }

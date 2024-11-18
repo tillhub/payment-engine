@@ -10,6 +10,8 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
+import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.spos.SPOSResponseHandler
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -30,23 +32,28 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
 
-            is Terminal.SPOS -> TODO()
+            is Terminal.SPOS -> SPOSIntentFactory.createPaymentRefundIntent(input)
         }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
-            BundleCompat.getParcelable(
-                it,
-                ExtraKeys.EXTRAS_RESULT,
-                TerminalOperationStatus::class.java
-            )
-        } ?: TerminalOperationStatus.Canceled
+        return if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
+            intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
+                BundleCompat.getParcelable(
+                    it,
+                    ExtraKeys.EXTRAS_RESULT,
+                    TerminalOperationStatus::class.java
+                )
+            } ?: TerminalOperationStatus.Canceled
+        } else {
+            SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+        }
     }
 }
 
 class RefundRequest(
     val config: Terminal,
+    val transactionId: String,
     val amount: BigDecimal,
     val currency: ISOAlphaCurrency
 ) {
