@@ -121,6 +121,9 @@ class MainViewModel : ViewModel() {
     fun startReversal() {
         reversalManager.startReversalTransaction(
             transactionId = UUID.randomUUID().toString(),
+            amount = 500.toBigDecimal(),
+            tip = 100.toBigDecimal(),
+            currency = ISOAlphaCurrency("EUR"),
             receiptNo = "374",
             configName = CONFIG_IN_USE
         )
