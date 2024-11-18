@@ -9,6 +9,8 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
+import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.spos.SPOSResponseHandler
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
 class TerminalReconciliationContract : ActivityResultContract<Terminal, TerminalOperationStatus>() {
@@ -22,13 +24,21 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
 
-            is Terminal.SPOS -> TODO()
+            is Terminal.SPOS -> SPOSIntentFactory.createReconciliationIntent()
         }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
-            BundleCompat.getParcelable(it, ExtraKeys.EXTRAS_RESULT, TerminalOperationStatus::class.java)
-        } ?: TerminalOperationStatus.Canceled
+        return if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
+            intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
+                BundleCompat.getParcelable(
+                    it,
+                    ExtraKeys.EXTRAS_RESULT,
+                    TerminalOperationStatus::class.java
+                )
+            } ?: TerminalOperationStatus.Canceled
+        } else {
+            SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+        }
     }
 }

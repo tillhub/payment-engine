@@ -30,4 +30,7 @@ internal object SPOSIntentFactory {
             // and is reserved for future use. Value can be set to "000".
             putExtra(SPOSKey.Extra.TAX_AMOUNT, "000")
         }
+
+    fun createReconciliationIntent() =
+        Intent(SPOSKey.Action.RECONCILIATION_ACTION)
 }
