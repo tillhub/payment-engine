@@ -12,6 +12,7 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -35,16 +36,24 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
-            intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
-                BundleCompat.getParcelable(
-                    it,
-                    ExtraKeys.EXTRAS_RESULT,
-                    TerminalOperationStatus::class.java
-                )
-            } ?: TerminalOperationStatus.Canceled
+        return if (resultCode == Activity.RESULT_OK) {
+            if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
+                intent.extras?.let {
+                    BundleCompat.getParcelable(
+                        it,
+                        ExtraKeys.EXTRAS_RESULT,
+                        TerminalOperationStatus::class.java
+                    )
+                } ?: TerminalOperationStatus.Canceled
+            } else {
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+            }
         } else {
-            SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+            if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+            } else {
+                TerminalOperationStatus.Canceled
+            }
         }
     }
 }
