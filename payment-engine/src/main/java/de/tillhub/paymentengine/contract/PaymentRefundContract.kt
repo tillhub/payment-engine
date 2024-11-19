@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
@@ -17,9 +19,18 @@ import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 import java.util.Objects
 
-class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOperationStatus>() {
+class PaymentRefundContract(
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
+) : ActivityResultContract<RefundRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: RefundRequest): Intent {
+        analytics?.logOperation(
+            "Operation: PARTIAL_REFUND(" +
+                    "amount: ${input.amount}, " +
+                    "currency: ${input.currency})" +
+                    "\n${input.config}"
+        )
+
         return when (input.config) {
             is Terminal.ZVT -> Intent(context, CardPaymentPartialRefundActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
@@ -48,11 +59,11 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
             } else {
                 TerminalOperationStatus.Canceled
             }

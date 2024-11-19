@@ -203,12 +203,6 @@ internal class OPIChannelControllerImpl(
 
             // checks if the controller is initialized
             if (initialized) {
-                analytics?.logOperation(
-                    "Operation: CARD_PAYMENT(" +
-                            "amount: $amount, " +
-                            "currency: $currency)" +
-                            "\n$terminal"
-                )
 
                 // setup C1 communication, it has to be setup before C0,
                 // because once C0 request is sent, C1 needs to handle the intermediate communication
@@ -248,12 +242,6 @@ internal class OPIChannelControllerImpl(
 
         // checks if the controller is initialized
         if (initialized) {
-            analytics?.logOperation(
-                "Operation: CARD_PAYMENT_REVERSAL(" +
-                        "stan: $stan)" +
-                        "\n$terminal"
-            )
-
             // setup C1 communication, it has to be setup before C0,
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()
@@ -290,13 +278,6 @@ internal class OPIChannelControllerImpl(
 
             // checks if the controller is initialized
             if (initialized) {
-                analytics?.logOperation(
-                    "Operation: PARTIAL_REFUND(" +
-                            "amount: $amount, " +
-                            "currency: $currency)" +
-                            "\n$terminal"
-                )
-
                 // setup C1 communication, it has to be setup before C0,
                 // because once C0 request is sent, C1 needs to handle the intermediate communication
                 handleChannel1Communication()
@@ -336,8 +317,6 @@ internal class OPIChannelControllerImpl(
 
         // checks if the controller is initialized
         if (initialized) {
-            analytics?.logOperation("Operation: RECONCILIATION\n$terminal")
-
             // setup C1 communication, it has to be setup before C0,
             // because once C0 request is sent, C1 needs to handle the intermediate communication
             handleChannel1Communication()

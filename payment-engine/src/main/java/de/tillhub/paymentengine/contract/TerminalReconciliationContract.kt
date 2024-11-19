@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
@@ -14,8 +16,12 @@ import de.tillhub.paymentengine.spos.SPOSResponseHandler
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
-class TerminalReconciliationContract : ActivityResultContract<Terminal, TerminalOperationStatus>() {
+class TerminalReconciliationContract(
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
+) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
     override fun createIntent(context: Context, input: Terminal): Intent {
+        analytics?.logOperation("Operation: RECONCILIATION\n$input")
+
         return when (input) {
             is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
@@ -40,11 +46,11 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
             } else {
                 TerminalOperationStatus.Canceled
             }

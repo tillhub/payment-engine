@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
@@ -17,9 +19,17 @@ import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
 
-class PaymentReversalContract : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
+class PaymentReversalContract(
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
+) : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: ReversalRequest): Intent {
+        analytics?.logOperation(
+            "Operation: CARD_PAYMENT_REVERSAL(" +
+                    "stan: ${input.receiptNo})" +
+                    "\n${input.config}"
+        )
+
         return when (input.config) {
             is Terminal.ZVT -> Intent(context, CardPaymentReversalActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
@@ -46,11 +56,11 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
             } else {
                 TerminalOperationStatus.Canceled
             }
