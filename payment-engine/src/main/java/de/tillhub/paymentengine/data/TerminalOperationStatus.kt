@@ -40,6 +40,9 @@ sealed class TerminalOperationStatus : Parcelable {
             override fun toString() = "Pending.Refund(amount=$amount, currency=$currency)"
         }
         data object Reconciliation : Pending()
+
+        data object Connecting : Pending()
+        data object Disconnecting : Pending()
     }
 
     @Parcelize
@@ -66,6 +69,14 @@ sealed class TerminalOperationStatus : Parcelable {
             override val data: TransactionData?
         ) : Success()
 
+        class SPOS(
+            override val date: Instant,
+            override val customerReceipt: String,
+            override val merchantReceipt: String,
+            override val rawData: String,
+            override val data: TransactionData?
+        ) : Success()
+
         override fun toString() = "Success(" +
                 "date=$date, " +
                 "customerReceipt=$customerReceipt, " +
@@ -75,22 +86,9 @@ sealed class TerminalOperationStatus : Parcelable {
                 ")"
 
         override fun equals(other: Any?) = when (this) {
-            is OPI -> {
-                other is OPI &&
-                        date == other.date &&
-                        customerReceipt == other.customerReceipt &&
-                        merchantReceipt == other.merchantReceipt &&
-                        rawData == other.rawData &&
-                        data == other.data
-            }
-            is ZVT -> {
-                other is ZVT &&
-                        date == other.date &&
-                        customerReceipt == other.customerReceipt &&
-                        merchantReceipt == other.merchantReceipt &&
-                        rawData == other.rawData &&
-                        data == other.data
-            }
+            is OPI -> other is OPI && equalsVals(other)
+            is ZVT -> other is ZVT && equalsVals(other)
+            is SPOS -> other is SPOS && equalsVals(other)
         }
 
         override fun hashCode() = Objects.hash(
@@ -100,6 +98,13 @@ sealed class TerminalOperationStatus : Parcelable {
             rawData,
             data
         )
+
+        private fun equalsVals(other: Success) =
+            date == other.date &&
+                customerReceipt == other.customerReceipt &&
+                merchantReceipt == other.merchantReceipt &&
+                rawData == other.rawData &&
+                data == other.data
     }
 
     @Parcelize
@@ -121,6 +126,15 @@ sealed class TerminalOperationStatus : Parcelable {
         ) : Error()
 
         class OPI(
+            override val date: Instant,
+            override val customerReceipt: String,
+            override val merchantReceipt: String,
+            override val rawData: String,
+            override val data: TransactionData?,
+            override val resultCode: TransactionResultCode
+        ) : Error()
+
+        class SPOS(
             override val date: Instant,
             override val customerReceipt: String,
             override val merchantReceipt: String,

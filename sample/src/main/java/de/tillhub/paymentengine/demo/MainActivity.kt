@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
         viewModel.initRefundManager(paymentEngine.newRefundManager(this))
         viewModel.initReversalManager(paymentEngine.newReversalManager(this))
         viewModel.initReconciliationManager(paymentEngine.newReconciliationManager(this))
+        viewModel.initConnectionManager(paymentEngine.newConnectionManager(this))
 
         paymentEngine.setAnalytics(object : PaymentAnalytics {
             override fun logOperation(request: String) {
@@ -76,6 +77,13 @@ class MainActivity : ComponentActivity() {
                         }
                         ActionButton("Reconciliation") {
                             viewModel.startReconciliation()
+                        }
+
+                        ActionButton("S-POS connect") {
+                            viewModel.startSPOSConnect()
+                        }
+                        ActionButton("S-POS disconnect") {
+                            viewModel.startSPOSDisconnect()
                         }
                     }
                 }

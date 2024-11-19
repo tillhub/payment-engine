@@ -769,6 +769,7 @@ libraries:
             - '**/main/java/de/tillhub/paymentengine/ReconciliationManager.kt'
             - '**/main/java/de/tillhub/paymentengine/RefundManager.kt'
             - '**/main/java/de/tillhub/paymentengine/ReversalManager.kt'
+            - '**/main/java/de/tillhub/paymentengine/ConnectionManager.kt'
             - '**/main/java/de/tillhub/paymentengine/data/CardSaleConfig.kt'
             - '**/main/java/de/tillhub/paymentengine/data/ISOAlphaCurrency.kt'
             - '**/main/java/de/tillhub/paymentengine/data/Payment.kt'
