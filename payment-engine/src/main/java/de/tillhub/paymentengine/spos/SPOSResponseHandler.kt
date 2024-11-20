@@ -3,7 +3,6 @@ package de.tillhub.paymentengine.spos
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionData
@@ -17,12 +16,7 @@ internal object SPOSResponseHandler {
     fun handleTerminalConnectResponse(
         resultCode: Int,
         intent: Intent?,
-        analytics: PaymentAnalytics? = null,
     ): TerminalOperationStatus = if (resultCode == Activity.RESULT_OK) {
-        analytics?.logCommunication(
-            protocol = PROTOCOL,
-            message = "RESPONSE: RESULT OK"
-        )
         TerminalOperationStatus.Success.SPOS(
             date = Instant.now(),
             customerReceipt = "",
@@ -31,10 +25,6 @@ internal object SPOSResponseHandler {
             data = null
         )
     } else {
-        analytics?.logCommunication(
-            protocol = PROTOCOL,
-            message = "RESPONSE: RESULT CANCELED\n${intent?.extras?.toRawData()}"
-        )
         intent?.extras?.getString(SPOSKey.ResultExtra.ERROR)?.let { errCode ->
             TerminalOperationStatus.Error.SPOS(
                 date = Instant.now(),
@@ -49,14 +39,8 @@ internal object SPOSResponseHandler {
 
     fun handleTerminalDisconnectResponse(
         resultCode: Int,
-        analytics: PaymentAnalytics? = null
     ): TerminalOperationStatus =
         if (resultCode == Activity.RESULT_OK) {
-            analytics?.logCommunication(
-                protocol = PROTOCOL,
-                message = "RESPONSE: RESULT OK"
-            )
-
             TerminalOperationStatus.Success.SPOS(
                 date = Instant.now(),
                 customerReceipt = "",
@@ -65,24 +49,14 @@ internal object SPOSResponseHandler {
                 data = null
             )
         } else {
-            analytics?.logCommunication(
-                protocol = PROTOCOL,
-                message = "RESPONSE: RESULT CANCELED"
-            )
             TerminalOperationStatus.Canceled
         }
 
     fun handleTransactionResponse(
         resultCode: Int,
         intent: Intent?,
-        analytics: PaymentAnalytics? = null,
         converter: StringToReceiptDtoConverter = StringToReceiptDtoConverter()
     ): TerminalOperationStatus = if (resultCode == Activity.RESULT_OK) {
-        analytics?.logCommunication(
-            protocol = PROTOCOL,
-            message = "RESPONSE: RESULT OK\n${intent?.extras?.toRawData()}"
-        )
-
         intent?.extras?.let { extras ->
             val merchantReceipt = extras.getReceipt(SPOSKey.ResultExtra.RECEIPT_MERCHANT, converter)
             val customerReceipt = extras.getReceipt(SPOSKey.ResultExtra.RECEIPT_CUSTOMER, converter)
@@ -122,11 +96,6 @@ internal object SPOSResponseHandler {
             resultCode = ResultCodeSets.getSPOSCode(null)
         )
     } else {
-        analytics?.logCommunication(
-            protocol = PROTOCOL,
-            message = "RESPONSE: RESULT CANCELED\n${intent?.extras?.toRawData()}"
-        )
-
         intent?.extras?.getString(SPOSKey.ResultExtra.ERROR)?.let { errCode ->
             TerminalOperationStatus.Error.SPOS(
                 date = Instant.now(),
@@ -139,7 +108,7 @@ internal object SPOSResponseHandler {
         } ?: TerminalOperationStatus.Canceled
     }
 
-    private fun Bundle.toRawData(): String {
+    internal fun Bundle.toRawData(): String {
         val builder = StringBuilder()
         builder.appendLine("Extras {")
 
@@ -164,6 +133,4 @@ internal object SPOSResponseHandler {
         getString(key)?.let {
             converter.convert(it).toReceiptString()
         }.orEmpty()
-
-    private const val PROTOCOL = "SPOS"
 }

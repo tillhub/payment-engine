@@ -11,8 +11,10 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
+import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
@@ -20,8 +22,6 @@ class TerminalReconciliationContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
     override fun createIntent(context: Context, input: Terminal): Intent {
-        analytics?.logOperation("Operation: RECONCILIATION\n$input")
-
         return when (input) {
             is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
@@ -32,6 +32,8 @@ class TerminalReconciliationContract(
             }
 
             is Terminal.SPOS -> SPOSIntentFactory.createReconciliationIntent()
+        }.also {
+            analytics?.logOperation(AnalyticsMessageFactory.createReconciliationOperation(input))
         }
     }
 
@@ -46,14 +48,28 @@ class TerminalReconciliationContract(
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = "RESPONSE: RESULT OK\n${intent?.extras?.toRawData()}"
+                    )
+                }
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = "RESPONSE: RESULT CANCELED\n${intent.extras?.toRawData()}"
+                    )
+                }
             } else {
                 TerminalOperationStatus.Canceled
             }
         }
+    }
+
+    companion object {
+        private const val SPOS_PROTOCOL = "SPOS"
     }
 }

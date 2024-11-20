@@ -203,6 +203,19 @@ class PaymentRefundContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+        verify {
+            analytics.logCommunication(
+                protocol = "SPOS",
+                message = "RESPONSE: RESULT OK\nExtras {\n" +
+                        "${SPOSKey.ResultExtra.CARD_PAN} = card_pan\n" +
+                        "${SPOSKey.ResultExtra.CARD_CIRCUIT} = card_circuit\n" +
+                        "${SPOSKey.ResultExtra.TRANSACTION_DATA} = transaction_data\n" +
+                        "${SPOSKey.ResultExtra.TERMINAL_ID} = terminal_id\n" +
+                        "${SPOSKey.ResultExtra.TRANSACTION_RESULT} = ACCEPTED\n" +
+                        "${SPOSKey.ResultExtra.RESULT_STATE} = Success\n" +
+                        "}"
+            )
+        }
     }
 
     test("parseResult SPOS: result CANCELED") {
@@ -213,6 +226,15 @@ class PaymentRefundContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+
+        verify {
+            analytics.logCommunication(
+                protocol = "SPOS",
+                message = "RESPONSE: RESULT CANCELED\nExtras {\n" +
+                        "ERROR = CARD_PAYMENT_NOT_ONBOARDED\n" +
+                        "}"
+            )
+        }
     }
 
     test("parseResult OPI + ZVT: result OK") {

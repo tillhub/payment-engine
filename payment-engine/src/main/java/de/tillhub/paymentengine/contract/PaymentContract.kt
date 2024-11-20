@@ -12,8 +12,10 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPaymentActivity
+import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.CardPaymentActivity
 import java.math.BigDecimal
@@ -24,14 +26,6 @@ class PaymentResultContract(
 ) : ActivityResultContract<PaymentRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: PaymentRequest): Intent {
-        analytics?.logOperation(
-            "Operation: CARD_PAYMENT(" +
-                    "amount: ${input.amount}, " +
-                    "tip: ${input.tip}, " +
-                    "currency: ${input.currency})" +
-                    "\n${input.config}"
-        )
-
         return when (input.config) {
             is Terminal.ZVT -> Intent(context, CardPaymentActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
@@ -44,6 +38,8 @@ class PaymentResultContract(
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
             is Terminal.SPOS -> SPOSIntentFactory.createPaymentIntent(input)
+        }.also {
+            analytics?.logOperation(AnalyticsMessageFactory.createPaymentOperation(input))
         }
     }
 
@@ -58,15 +54,29 @@ class PaymentResultContract(
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = "RESPONSE: RESULT OK\n${intent?.extras?.toRawData()}"
+                    )
+                }
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = "RESPONSE: RESULT CANCELED\n${intent.extras?.toRawData()}"
+                    )
+                }
             } else {
                 TerminalOperationStatus.Canceled
             }
         }
+    }
+
+    companion object {
+        private const val SPOS_PROTOCOL = "SPOS"
     }
 }
 

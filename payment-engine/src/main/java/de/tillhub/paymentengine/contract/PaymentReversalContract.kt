@@ -12,8 +12,10 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
+import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
@@ -24,12 +26,6 @@ class PaymentReversalContract(
 ) : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: ReversalRequest): Intent {
-        analytics?.logOperation(
-            "Operation: CARD_PAYMENT_REVERSAL(" +
-                    "stan: ${input.receiptNo})" +
-                    "\n${input.config}"
-        )
-
         return when (input.config) {
             is Terminal.ZVT -> Intent(context, CardPaymentReversalActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
@@ -42,6 +38,8 @@ class PaymentReversalContract(
             }
 
             is Terminal.SPOS -> SPOSIntentFactory.createPaymentReversalIntent(input)
+        }.also {
+            analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
         }
     }
 
@@ -56,15 +54,29 @@ class PaymentReversalContract(
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = "RESPONSE: RESULT OK\n${intent?.extras?.toRawData()}"
+                    )
+                }
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent, analytics)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = "RESPONSE: RESULT CANCELED\n${intent.extras?.toRawData()}"
+                    )
+                }
             } else {
                 TerminalOperationStatus.Canceled
             }
         }
+    }
+
+    companion object {
+        private const val SPOS_PROTOCOL = "SPOS"
     }
 }
 

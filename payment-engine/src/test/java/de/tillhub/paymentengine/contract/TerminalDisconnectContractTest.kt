@@ -80,26 +80,8 @@ class TerminalDisconnectContractTest : FunSpec({
             e.shouldBeInstanceOf<UnsupportedOperationException>()
             e.message shouldBe "Disconnect only supported for S-POS terminals"
         }
-
-        verify {
-            analytics.logOperation(
-                "Operation: TERMINAL_DISCONNECT" +
-                        "\nTerminal.OPI(" +
-                        "name=opi, " +
-                        "ipAddress=127.0.0.1, " +
-                        "port=20002, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "port2=20007, " +
-                        "currencyCode=EUR" +
-                        ")"
-            )
+        verify(inverse = true) {
+            analytics.logOperation(any())
         }
     }
 
@@ -109,6 +91,12 @@ class TerminalDisconnectContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+        verify {
+            analytics.logCommunication(
+                protocol = "SPOS",
+                message = "RESPONSE: RESULT OK"
+            )
+        }
     }
 
     test("parseResult SPOS: result CANCELED") {
@@ -117,6 +105,12 @@ class TerminalDisconnectContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+        verify {
+            analytics.logCommunication(
+                protocol = "SPOS",
+                message = "RESPONSE: RESULT CANCELED"
+            )
+        }
     }
 }) {
     companion object {
