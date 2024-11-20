@@ -14,7 +14,6 @@ import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
-import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
@@ -51,7 +50,7 @@ class TerminalReconciliationContract(
                 SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
                     analytics?.logCommunication(
                         protocol = SPOS_PROTOCOL,
-                        message = "RESPONSE: RESULT OK\n${intent?.extras?.toRawData()}"
+                        message = AnalyticsMessageFactory.createResultOk(intent?.extras)
                     )
                 }
             }
@@ -60,7 +59,7 @@ class TerminalReconciliationContract(
                 SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
                     analytics?.logCommunication(
                         protocol = SPOS_PROTOCOL,
-                        message = "RESPONSE: RESULT CANCELED\n${intent.extras?.toRawData()}"
+                        message = AnalyticsMessageFactory.createResultCanceled(intent.extras)
                     )
                 }
             } else {

@@ -15,7 +15,6 @@ import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
-import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
@@ -59,7 +58,7 @@ class PaymentRefundContract(
                 SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
                     analytics?.logCommunication(
                         protocol = SPOS_PROTOCOL,
-                        message = "RESPONSE: RESULT OK\n${intent?.extras?.toRawData()}"
+                        message = AnalyticsMessageFactory.createResultOk(intent?.extras)
                     )
                 }
             }
@@ -68,7 +67,7 @@ class PaymentRefundContract(
                 SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
                     analytics?.logCommunication(
                         protocol = SPOS_PROTOCOL,
-                        message = "RESPONSE: RESULT CANCELED\n${intent.extras?.toRawData()}"
+                        message = AnalyticsMessageFactory.createResultCanceled(intent.extras)
                     )
                 }
             } else {

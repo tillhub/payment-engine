@@ -30,12 +30,12 @@ class TerminalDisconnectContract(
             if (resultCode == Activity.RESULT_OK) {
                 analytics?.logCommunication(
                     protocol = SPOS_PROTOCOL,
-                    message = "RESPONSE: RESULT OK"
+                    message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
                 )
             } else {
                 analytics?.logCommunication(
                     protocol = SPOS_PROTOCOL,
-                    message = "RESPONSE: RESULT CANCELED"
+                    message = AnalyticsMessageFactory.RESPONSE_RESULT_CANCELED
                 )
             }
         }

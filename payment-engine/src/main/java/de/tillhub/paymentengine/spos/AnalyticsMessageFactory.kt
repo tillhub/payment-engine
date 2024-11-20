@@ -1,9 +1,11 @@
 package de.tillhub.paymentengine.spos
 
+import android.os.Bundle
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 
 internal object AnalyticsMessageFactory {
     fun createPaymentOperation(input: PaymentRequest) = "Operation: CARD_PAYMENT(" +
@@ -26,4 +28,12 @@ internal object AnalyticsMessageFactory {
     fun createConnectOperation(input: Terminal) = "Operation: TERMINAL_CONNECT\n$input"
 
     fun createDisconnectOperation(input: Terminal) = "Operation: TERMINAL_DISCONNECT\n$input"
+
+    fun createResultOk(extras: Bundle?) = "$RESPONSE_RESULT_OK\n${extras?.toRawData()}"
+
+    fun createResultCanceled(extras: Bundle?) = "$RESPONSE_RESULT_CANCELED\n${extras?.toRawData()}"
+
+    const val RESPONSE_RESULT_OK = "RESPONSE: RESULT OK"
+
+    const val RESPONSE_RESULT_CANCELED = "RESPONSE: RESULT CANCELED"
 }

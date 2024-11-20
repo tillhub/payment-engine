@@ -11,7 +11,6 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
-import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 
 class TerminalConnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
@@ -31,12 +30,12 @@ class TerminalConnectContract(
             if (resultCode == Activity.RESULT_OK) {
                 analytics?.logCommunication(
                     protocol = SPOS_PROTOCOL,
-                    message = "RESPONSE: RESULT OK"
+                    message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
                 )
             } else {
                 analytics?.logCommunication(
                     protocol = SPOS_PROTOCOL,
-                    message = "RESPONSE: RESULT CANCELED\n${intent?.extras?.toRawData()}"
+                    message = AnalyticsMessageFactory.createResultCanceled(intent?.extras)
                 )
             }
         }
