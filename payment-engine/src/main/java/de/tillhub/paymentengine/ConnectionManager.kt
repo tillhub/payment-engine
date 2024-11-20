@@ -25,18 +25,16 @@ interface ConnectionManager : CardManager {
 internal class ConnectionManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
-    resultCaller: ActivityResultCaller
-) : CardManagerImpl(configs, terminalState), ConnectionManager {
-
+    resultCaller: ActivityResultCaller,
     private val connectContract: ActivityResultLauncher<Terminal> =
         resultCaller.registerForActivityResult(TerminalConnectContract()) { result ->
             terminalState.tryEmit(result)
-        }
-
+        },
     private val disconnectContract: ActivityResultLauncher<Terminal> =
         resultCaller.registerForActivityResult(TerminalDisconnectContract()) { result ->
             terminalState.tryEmit(result)
         }
+) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
     override fun startSPOSConnect() {
         val configName = configs.values.firstOrNull()?.name.orEmpty()
