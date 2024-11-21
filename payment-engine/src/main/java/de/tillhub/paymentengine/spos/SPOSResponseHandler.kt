@@ -15,7 +15,7 @@ import java.time.Instant
 internal object SPOSResponseHandler {
     fun handleTerminalConnectResponse(
         resultCode: Int,
-        intent: Intent?
+        intent: Intent?,
     ): TerminalOperationStatus = if (resultCode == Activity.RESULT_OK) {
         TerminalOperationStatus.Success.SPOS(
             date = Instant.now(),
@@ -37,7 +37,9 @@ internal object SPOSResponseHandler {
         } ?: TerminalOperationStatus.Canceled
     }
 
-    fun handleTerminalDisconnectResponse(resultCode: Int): TerminalOperationStatus =
+    fun handleTerminalDisconnectResponse(
+        resultCode: Int,
+    ): TerminalOperationStatus =
         if (resultCode == Activity.RESULT_OK) {
             TerminalOperationStatus.Success.SPOS(
                 date = Instant.now(),
@@ -56,12 +58,8 @@ internal object SPOSResponseHandler {
         converter: StringToReceiptDtoConverter = StringToReceiptDtoConverter()
     ): TerminalOperationStatus = if (resultCode == Activity.RESULT_OK) {
         intent?.extras?.let { extras ->
-            val merchantReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_MERCHANT)?.let {
-                converter.convert(it).toReceiptString()
-            }.orEmpty()
-            val customerReceipt = extras.getString(SPOSKey.ResultExtra.RECEIPT_CUSTOMER)?.let {
-                converter.convert(it).toReceiptString()
-            }.orEmpty()
+            val merchantReceipt = extras.getReceipt(SPOSKey.ResultExtra.RECEIPT_MERCHANT, converter)
+            val customerReceipt = extras.getReceipt(SPOSKey.ResultExtra.RECEIPT_CUSTOMER, converter)
             val resultState = SPOSResultState.find(
                 type = extras.getString(SPOSKey.ResultExtra.RESULT_STATE).orEmpty()
             )
@@ -110,7 +108,7 @@ internal object SPOSResponseHandler {
         } ?: TerminalOperationStatus.Canceled
     }
 
-    private fun Bundle.toRawData(): String {
+    internal fun Bundle.toRawData(): String {
         val builder = StringBuilder()
         builder.appendLine("Extras {")
 
@@ -130,4 +128,9 @@ internal object SPOSResponseHandler {
             cardPan = getString(SPOSKey.ResultExtra.CARD_PAN).orEmpty(),
             paymentProvider = getString(SPOSKey.ResultExtra.MERCHANT).orEmpty(), // TODO check if it is ok
         )
+
+    private fun Bundle.getReceipt(key: String, converter: StringToReceiptDtoConverter): String =
+        getString(key)?.let {
+            converter.convert(it).toReceiptString()
+        }.orEmpty()
 }

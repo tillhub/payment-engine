@@ -56,12 +56,6 @@ internal class CardPaymentActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
-        analytics?.logOperation(
-            "Operation: CARD_PAYMENT(" +
-                "amount: $amount, " +
-                "currency: $currency)" +
-                "\n$config"
-        )
         doPayment(Payment(amount, currency.value))
     }
 

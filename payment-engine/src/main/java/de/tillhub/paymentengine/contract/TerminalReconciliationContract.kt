@@ -5,16 +5,21 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
+import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
-class TerminalReconciliationContract : ActivityResultContract<Terminal, TerminalOperationStatus>() {
+class TerminalReconciliationContract(
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
+) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
     override fun createIntent(context: Context, input: Terminal): Intent {
         return when (input) {
             is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
@@ -26,6 +31,8 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
             }
 
             is Terminal.SPOS -> SPOSIntentFactory.createReconciliationIntent()
+        }.also {
+            analytics?.logOperation(AnalyticsMessageFactory.createReconciliationOperation(input))
         }
     }
 
@@ -40,14 +47,28 @@ class TerminalReconciliationContract : ActivityResultContract<Terminal, Terminal
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+                    )
+                }
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = AnalyticsMessageFactory.createResultCanceled(intent.extras)
+                    )
+                }
             } else {
                 TerminalOperationStatus.Canceled
             }
         }
+    }
+
+    companion object {
+        private const val SPOS_PROTOCOL = "SPOS"
     }
 }

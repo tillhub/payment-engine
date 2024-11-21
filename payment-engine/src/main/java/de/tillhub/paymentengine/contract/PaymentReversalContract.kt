@@ -5,11 +5,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
+import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
 import de.tillhub.paymentengine.spos.data.SPOSKey
@@ -17,7 +20,9 @@ import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
 
-class PaymentReversalContract : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
+class PaymentReversalContract(
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
+) : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: ReversalRequest): Intent {
         return when (input.config) {
@@ -32,6 +37,8 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
             }
 
             is Terminal.SPOS -> SPOSIntentFactory.createPaymentReversalIntent(input)
+        }.also {
+            analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
         }
     }
 
@@ -46,15 +53,29 @@ class PaymentReversalContract : ActivityResultContract<ReversalRequest, Terminal
                     )
                 } ?: TerminalOperationStatus.Canceled
             } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+                    )
+                }
             }
         } else {
             if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent)
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = AnalyticsMessageFactory.createResultCanceled(intent.extras)
+                    )
+                }
             } else {
                 TerminalOperationStatus.Canceled
             }
         }
+    }
+
+    companion object {
+        private const val SPOS_PROTOCOL = "SPOS"
     }
 }
 

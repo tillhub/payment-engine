@@ -47,6 +47,9 @@ class SPOSResponseHandlerTest : DescribeSpec({
             every {
                 intent.extras?.getString(SPOSKey.ResultExtra.ERROR)
             } returns "CARD_PAYMENT_NOT_ONBOARDED"
+            every {
+                intent.extras?.keySet()
+            } returns setOf(SPOSKey.ResultExtra.ERROR)
 
             val result = SPOSResponseHandler.handleTerminalConnectResponse(
                 Activity.RESULT_CANCELED,
@@ -120,6 +123,12 @@ class SPOSResponseHandlerTest : DescribeSpec({
             }
 
             it("no extras") {
+                every {
+                    intent.extras?.keySet()
+                } returns setOf()
+
+                every { intent.extras?.getString(any()) } returns null
+
                 val result = SPOSResponseHandler.handleTransactionResponse(
                     Activity.RESULT_OK,
                     intent

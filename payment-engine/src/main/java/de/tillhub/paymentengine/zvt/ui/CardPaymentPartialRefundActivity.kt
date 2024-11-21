@@ -66,13 +66,6 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
-        analytics?.logOperation(
-            "Operation: PARTIAL_REFUND(" +
-                "amount: $amount, " +
-                "currency: $currency)" +
-                "\n$config"
-        )
-
         doPartialRefund(
             amount = amount,
             currency = currency
