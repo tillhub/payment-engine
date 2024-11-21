@@ -55,8 +55,6 @@ class ReversalManagerTest : FunSpec({
             receiptNo = receiptNo
         )
 
-        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
-
         verify {
             reversalContract.launch(
                 ReversalRequest(
@@ -69,6 +67,8 @@ class ReversalManagerTest : FunSpec({
                 )
             )
         }
+
+        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
     }
 
     test("startReversalTransaction with configName should launch reversal contract") {
@@ -89,8 +89,6 @@ class ReversalManagerTest : FunSpec({
             receiptNo = receiptNo
         )
 
-        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
-
         verify {
             reversalContract.launch(
                 ReversalRequest(
@@ -103,6 +101,8 @@ class ReversalManagerTest : FunSpec({
                 )
             )
         }
+
+        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
     }
 
     test("startReversalTransaction custom Terminal should launch reversal contract") {
@@ -121,8 +121,6 @@ class ReversalManagerTest : FunSpec({
             receiptNo = receiptNo
         )
 
-        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
-
         verify {
             reversalContract.launch(
                 ReversalRequest(
@@ -135,5 +133,7 @@ class ReversalManagerTest : FunSpec({
                 )
             )
         }
+
+        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
     }
 })

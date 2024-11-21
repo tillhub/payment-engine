@@ -8,6 +8,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -52,10 +53,12 @@ class ConnectionManagerTest : FunSpec({
     test("startSPOSConnect by default terminal ") {
         target.startSPOSConnect()
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
+        verify(ordering = Ordering.ORDERED) {
+            terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+            connectContract.launch(Terminal.ZVT())
+        }
 
-        verify { terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting) }
-        verify { connectContract.launch(Terminal.ZVT()) }
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
     }
 
     test("startSPOSConnect by config name") {
@@ -63,29 +66,34 @@ class ConnectionManagerTest : FunSpec({
         configs["opi"] = terminal
         target.startSPOSConnect("opi")
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
+        verify(ordering = Ordering.ORDERED) {
+            terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+            connectContract.launch(terminal)
+        }
 
-        verify { terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting) }
-        verify { connectContract.launch(terminal) }
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
     }
 
     test("startSPOSConnect by terminal") {
         val terminal = Terminal.SPOS()
         target.startSPOSConnect(terminal)
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
+        verify(ordering = Ordering.ORDERED) {
+            terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+            connectContract.launch(terminal)
+        }
 
-        verify { terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting) }
-        verify { connectContract.launch(terminal) }
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
     }
 
     test("startSPOSDisconnect by default terminal ") {
         target.startSPOSDisconnect()
 
+        verify(ordering = Ordering.ORDERED) {
+            terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+            disconnectContract.launch(Terminal.ZVT())
+        }
         terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
-
-        verify { terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting) }
-        verify { disconnectContract.launch(Terminal.ZVT()) }
     }
 
     test("startSPOSDisconnect by config name") {
@@ -93,19 +101,23 @@ class ConnectionManagerTest : FunSpec({
         configs["opi"] = terminal
         target.startSPOSDisconnect("opi")
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
+        verify(ordering = Ordering.ORDERED) {
+            terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+            disconnectContract.launch(terminal)
+        }
 
-        verify { terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting) }
-        verify { disconnectContract.launch(terminal) }
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
     }
 
     test("startSPOSDisconnect by terminal") {
         val terminal = Terminal.SPOS()
         target.startSPOSDisconnect(terminal)
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
+        verify(ordering = Ordering.ORDERED) {
+            terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+            disconnectContract.launch(terminal)
+        }
 
-        verify { terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting) }
-        verify { disconnectContract.launch(terminal) }
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
     }
 })

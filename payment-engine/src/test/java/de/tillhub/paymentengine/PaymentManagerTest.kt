@@ -53,8 +53,6 @@ class PaymentManagerTest : FunSpec({
 
         target.startPaymentTransaction(transactionId, amount, tip, currency)
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
-
         verify {
             paymentResultContract.launch(
                 match {
@@ -66,6 +64,8 @@ class PaymentManagerTest : FunSpec({
                 }
             )
         }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
     }
 
     test("startPaymentTransaction with configName should launch payment result contract") {
@@ -78,8 +78,6 @@ class PaymentManagerTest : FunSpec({
 
         target.startPaymentTransaction(transactionId, amount, tip, currency, "opi")
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
-
         verify {
             paymentResultContract.launch(
                 match {
@@ -91,6 +89,8 @@ class PaymentManagerTest : FunSpec({
                 }
             )
         }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
     }
 
     test("startPaymentTransaction with Terminal should launch payment result contract") {
@@ -102,8 +102,6 @@ class PaymentManagerTest : FunSpec({
 
         target.startPaymentTransaction(transactionId, amount, tip, currency, terminal)
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
-
         verify {
             paymentResultContract.launch(
                 match {
@@ -115,5 +113,7 @@ class PaymentManagerTest : FunSpec({
                 }
             )
         }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
     }
 })

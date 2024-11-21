@@ -52,8 +52,6 @@ class RefundManagerTest : FunSpec({
             currency = currency
         )
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
-
         verify {
             refundContract.launch(
                 RefundRequest(
@@ -64,6 +62,8 @@ class RefundManagerTest : FunSpec({
                 )
             )
         }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
     }
 
     test("startRefundTransaction with configName should launch refund contract") {
@@ -80,8 +80,6 @@ class RefundManagerTest : FunSpec({
             configName = "opi"
         )
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
-
         verify {
             refundContract.launch(
                 RefundRequest(
@@ -92,6 +90,8 @@ class RefundManagerTest : FunSpec({
                 )
             )
         }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
     }
 
     test("startRefundTransaction with custom Terminal should launch refund contract") {
@@ -107,8 +107,6 @@ class RefundManagerTest : FunSpec({
             config = customTerminal
         )
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
-
         verify {
             refundContract.launch(
                 RefundRequest(
@@ -119,5 +117,7 @@ class RefundManagerTest : FunSpec({
                 )
             )
         }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
     }
 })

@@ -40,9 +40,9 @@ class ReconciliationManagerTest : FunSpec({
     test("startReconciliation should use default config when no configName provided") {
         target.startReconciliation()
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
-
         verify { reconciliationContract.launch(Terminal.ZVT()) }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
     }
 
     test("startReconciliation with configName should and launch reconciliation contract") {
@@ -51,9 +51,9 @@ class ReconciliationManagerTest : FunSpec({
 
         target.startReconciliation(configName = "opi")
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
-
         verify { reconciliationContract.launch(terminal) }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
     }
 
     test("startReconciliation with custom Terminal should and launch reconciliation contract") {
@@ -61,8 +61,8 @@ class ReconciliationManagerTest : FunSpec({
 
         target.startReconciliation(customTerminal)
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
-
         verify { reconciliationContract.launch(customTerminal) }
+
+        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
     }
 })
