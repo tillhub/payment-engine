@@ -12,7 +12,7 @@ internal abstract class CardManagerImpl(
     )
 ) : CardManager {
 
-    protected val defaultConfig: Terminal by lazy {
+    internal val defaultConfig: Terminal by lazy {
         Terminal.ZVT()
     }
 

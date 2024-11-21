@@ -44,14 +44,13 @@ interface ReversalManager : CardManager {
 
 internal class ReversalManagerImpl(
     configs: MutableMap<String, Terminal>,
-    transactionState: MutableStateFlow<TerminalOperationStatus>,
-    resultCaller: ActivityResultCaller
-) : CardManagerImpl(configs, transactionState), ReversalManager {
-
+    terminalState: MutableStateFlow<TerminalOperationStatus>,
+    resultCaller: ActivityResultCaller,
     private val reversalContract: ActivityResultLauncher<ReversalRequest> =
         resultCaller.registerForActivityResult(PaymentReversalContract()) { result ->
             terminalState.tryEmit(result)
         }
+) : CardManagerImpl(configs, terminalState), ReversalManager {
 
     override fun startReversalTransaction(
         transactionId: String,
@@ -66,8 +65,8 @@ internal class ReversalManagerImpl(
             amount = amount,
             tip = tip,
             currency = currency,
-            configName = receiptNo,
-            receiptNo = configName
+            configName = configName,
+            receiptNo = receiptNo
         )
     }
 
@@ -86,7 +85,7 @@ internal class ReversalManagerImpl(
             tip = tip,
             currency = currency,
             config = terminalConfig,
-            receiptNo = configName
+            receiptNo = receiptNo
         )
     }
 

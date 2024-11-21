@@ -20,13 +20,12 @@ interface ReconciliationManager : CardManager {
 internal class ReconciliationManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
-    resultCaller: ActivityResultCaller
-) : CardManagerImpl(configs, terminalState), ReconciliationManager {
-
+    resultCaller: ActivityResultCaller,
     private val reconciliationContract: ActivityResultLauncher<Terminal> =
         resultCaller.registerForActivityResult(TerminalReconciliationContract()) { result ->
             terminalState.tryEmit(result)
         }
+) : CardManagerImpl(configs, terminalState), ReconciliationManager {
 
     override fun startReconciliation() {
         val configName = configs.values.firstOrNull()?.name.orEmpty()

@@ -21,6 +21,7 @@ interface PaymentManager : CardManager {
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency
     )
+
     fun startPaymentTransaction(
         transactionId: String,
         amount: BigDecimal,
@@ -28,6 +29,7 @@ interface PaymentManager : CardManager {
         currency: ISOAlphaCurrency,
         configName: String
     )
+
     fun startPaymentTransaction(
         transactionId: String,
         amount: BigDecimal,
@@ -40,13 +42,12 @@ interface PaymentManager : CardManager {
 internal class PaymentManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
-    resultCaller: ActivityResultCaller
-) : CardManagerImpl(configs, terminalState), PaymentManager {
-
+    resultCaller: ActivityResultCaller,
     private val paymentResultContract: ActivityResultLauncher<PaymentRequest> =
         resultCaller.registerForActivityResult(PaymentResultContract()) { result ->
             terminalState.tryEmit(result)
         }
+) : CardManagerImpl(configs, terminalState), PaymentManager {
 
     override fun startPaymentTransaction(
         transactionId: String,
