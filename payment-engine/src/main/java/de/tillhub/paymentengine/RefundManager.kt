@@ -15,9 +15,25 @@ import java.math.BigDecimal
  * it sets up the manager so the data from the transaction is collected correctly.
  */
 interface RefundManager : CardManager {
-    fun startRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency)
-    fun startRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, configName: String)
-    fun startRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, config: Terminal)
+    fun startRefundTransaction(
+        transactionId: String,
+        amount: BigDecimal,
+        currency: ISOAlphaCurrency
+    )
+
+    fun startRefundTransaction(
+        transactionId: String,
+        amount: BigDecimal,
+        currency: ISOAlphaCurrency,
+        configName: String
+    )
+
+    fun startRefundTransaction(
+        transactionId: String,
+        amount: BigDecimal,
+        currency: ISOAlphaCurrency,
+        config: Terminal
+    )
 }
 
 internal class RefundManagerImpl(
@@ -31,28 +47,39 @@ internal class RefundManagerImpl(
             terminalState.tryEmit(result)
         }
 
-    override fun startRefundTransaction(amount: BigDecimal, currency: ISOAlphaCurrency) {
+    override fun startRefundTransaction(
+        transactionId: String,
+        amount: BigDecimal,
+        currency: ISOAlphaCurrency
+    ) {
         val configName = configs.values.firstOrNull()?.name.orEmpty()
-        startRefundTransaction(amount, currency, configName)
+        startRefundTransaction(transactionId, amount, currency, configName)
     }
 
     override fun startRefundTransaction(
+        transactionId: String,
         amount: BigDecimal,
         currency: ISOAlphaCurrency,
         configName: String
     ) {
         val terminalConfig = configs.getOrDefault(configName, defaultConfig)
-        startRefundTransaction(amount, currency, terminalConfig)
+        startRefundTransaction(transactionId, amount, currency, terminalConfig)
     }
 
     override fun startRefundTransaction(
+        transactionId: String,
         amount: BigDecimal,
         currency: ISOAlphaCurrency,
         config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Refund(amount, currency))
         refundContract.launch(
-            RefundRequest(config, amount, currency)
+            RefundRequest(
+                config = config,
+                transactionId = transactionId,
+                amount = amount,
+                currency = currency
+            )
         )
     }
 }

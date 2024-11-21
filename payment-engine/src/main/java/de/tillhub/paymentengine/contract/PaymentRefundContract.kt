@@ -5,16 +5,24 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.PaymentEngine
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
+import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
+import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 import java.util.Objects
 
-class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOperationStatus>() {
+class PaymentRefundContract(
+    private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
+) : ActivityResultContract<RefundRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: RefundRequest): Intent {
         return when (input.config) {
@@ -29,22 +37,59 @@ class PaymentRefundContract : ActivityResultContract<RefundRequest, TerminalOper
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
+
+            is Terminal.SPOS -> SPOSIntentFactory.createPaymentRefundIntent(input)
+        }.also {
+            analytics?.logOperation(AnalyticsMessageFactory.createRefundOperation(input))
         }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return intent.takeIf { resultCode == Activity.RESULT_OK }?.extras?.let {
-            BundleCompat.getParcelable(
-                it,
-                ExtraKeys.EXTRAS_RESULT,
-                TerminalOperationStatus::class.java
-            )
-        } ?: TerminalOperationStatus.Canceled
+        return if (resultCode == Activity.RESULT_OK) {
+            if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
+                intent.extras?.let {
+                    BundleCompat.getParcelable(
+                        it,
+                        ExtraKeys.EXTRAS_RESULT,
+                        TerminalOperationStatus::class.java
+                    )
+                } ?: TerminalOperationStatus.Canceled
+            } else {
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+                    )
+                }
+            }
+        } else {
+            if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
+                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
+                    analytics?.logCommunication(
+                        protocol = SPOS_PROTOCOL,
+                        message = AnalyticsMessageFactory.createResultCanceled(intent.extras)
+                    )
+                }
+            } else {
+                TerminalOperationStatus.Canceled
+            }
+        }
+    }
+
+    companion object {
+        private const val SPOS_PROTOCOL = "SPOS"
     }
 }
 
+/***
+ * @param config - terminal config used for this request
+ * @param transactionId - id of the transaction that will be created by the request (S-POS only)
+ * @param amount - amount being refunded in this transaction
+ * @param currency - currency the transaction will be made in
+ */
 class RefundRequest(
     val config: Terminal,
+    val transactionId: String,
     val amount: BigDecimal,
     val currency: ISOAlphaCurrency
 ) {

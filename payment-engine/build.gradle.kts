@@ -84,6 +84,7 @@ dependencies {
 
     // Unit tests
     testImplementation(libs.bundles.testing)
+    testImplementation(libs.bundles.robolectric)
 }
 
 afterEvaluate {
@@ -92,7 +93,7 @@ afterEvaluate {
             create<MavenPublication>("payment-engine") {
                 groupId = "de.tillhub.paymentengine"
                 artifactId = "payment-engine"
-                version = "2.2.0"
+                version = "3.0.0"
 
                 from(components.getByName("release"))
             }

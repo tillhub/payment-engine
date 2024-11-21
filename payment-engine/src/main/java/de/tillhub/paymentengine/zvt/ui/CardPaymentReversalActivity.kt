@@ -51,11 +51,6 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
 
     override fun startOperation() {
         viewModel.parseTransactionNumber(receiptNo).onSuccess {
-            analytics?.logOperation(
-                "Operation: CARD_PAYMENT_REVERSAL(" +
-                    "receiptNo: $receiptNo)" +
-                    "\n$config"
-            )
             doCancellation(it)
         }
     }

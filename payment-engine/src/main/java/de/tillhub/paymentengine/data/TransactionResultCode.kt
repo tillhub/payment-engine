@@ -34,6 +34,7 @@ sealed class TransactionResultCode : Parcelable {
 
     class Unknown(
         val resultCode: Int,
+        val resultCodeString: String? = null,
         @StringRes
         override val errorMessage: Int,
         @StringRes
@@ -60,8 +61,8 @@ sealed class TransactionResultCode : Parcelable {
 }
 
 @SuppressWarnings("MagicNumber")
-internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode>) {
-    data object OpiResultCodes : ResultCodeSets(
+internal sealed class ResultCodeSets<T>(val mapping: Map<T, TransactionResultCode>) {
+    data object OpiResultCodes : ResultCodeSets<Int>(
         mapOf(
             Pair(0, TransactionResultCode.Known(R.string.opi_error_code_00)),
             Pair(1, TransactionResultCode.Known(R.string.opi_error_code_01)),
@@ -232,7 +233,7 @@ internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode
         )
     )
 
-    data object ZvtResultCodes : ResultCodeSets(
+    data object ZvtResultCodes : ResultCodeSets<Int>(
         mapOf(
             Pair(
                 0,
@@ -454,7 +455,7 @@ internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode
         )
     )
 
-    data object LavegoResultCodes : ResultCodeSets(
+    data object LavegoResultCodes : ResultCodeSets<Int>(
         mapOf(
             Pair(2, TransactionResultCode.Known(R.string.lavego_result_code_2_call_merchant)),
             Pair(
@@ -561,6 +562,99 @@ internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode
         )
     )
 
+    data object SPOSResultCodes : ResultCodeSets<String>(
+        mapOf(
+            Pair(
+                "S_SWITCH_NOT_CONNECTED",
+                TransactionResultCode.Known(R.string.spos_error_terminal_not_connected)
+            ),
+            Pair(
+                "CARD_PAYMENT_NOT_ONBOARDED",
+                TransactionResultCode.Known(R.string.spos_error_terminal_not_onboarded)
+            ),
+            Pair(
+                "Failure",
+                TransactionResultCode.Known(R.string.spos_error_failure)
+            ),
+            Pair(
+                "Aborted",
+                TransactionResultCode.Known(R.string.spos_error_aborted)
+            ),
+            Pair(
+                "Busy",
+                TransactionResultCode.Known(R.string.spos_error_busy)
+            ),
+            Pair(
+                "CommunicationError",
+                TransactionResultCode.Known(R.string.spos_error_communication_error)
+            ),
+            Pair(
+                "DeviceConfigurationFailure",
+                TransactionResultCode.Known(R.string.spos_error_configuration_failure)
+            ),
+            Pair(
+                "DeviceUnavailable",
+                TransactionResultCode.Known(R.string.spos_error_device_unavailable)
+            ),
+            Pair(
+                "FormatError",
+                TransactionResultCode.Known(R.string.spos_error_format_error)
+            ),
+            Pair(
+                "MissingMandatoryData",
+                TransactionResultCode.Known(R.string.spos_error_missing_mandatory_data)
+            ),
+            Pair(
+                "NoActivePayment",
+                TransactionResultCode.Known(R.string.spos_error_no_active_payment)
+            ),
+            Pair(
+                "ParsingError",
+                TransactionResultCode.Known(R.string.spos_error_parsing_error)
+            ),
+            Pair(
+                "PartialFailure",
+                TransactionResultCode.Known(R.string.spos_error_partial_failure)
+            ),
+            Pair(
+                "PaymentOnGoing",
+                TransactionResultCode.Known(R.string.spos_error_payment_ongoing)
+            ),
+            Pair(
+                "PcCommunicationFailed",
+                TransactionResultCode.Known(R.string.spos_error_pc_communication_failed)
+            ),
+            Pair(
+                "DeviceConfigurationFailed",
+                TransactionResultCode.Known(R.string.spos_error_configuration_failure)
+            ),
+            Pair(
+                "PrintLastTicket",
+                TransactionResultCode.Known(R.string.spos_error_print_last_ticket)
+            ),
+            Pair(
+                "TimedOut",
+                TransactionResultCode.Known(R.string.spos_error_timed_out)
+            ),
+            Pair(
+                "ReceiptCallFailed",
+                TransactionResultCode.Known(R.string.spos_error_receipt_call_failed)
+            ),
+            Pair(
+                "TerminalAlreadyActivated",
+                TransactionResultCode.Known(R.string.spos_error_terminal_already_activated)
+            ),
+            Pair(
+                "ValidationError",
+                TransactionResultCode.Known(R.string.spos_error_validation_error)
+            ),
+            Pair(
+                "Unknown",
+                TransactionResultCode.Known(R.string.spos_error_unknown)
+            )
+        )
+    )
+
     companion object {
         private const val UNKNOWN_RESULT_CODE = -1
 
@@ -582,6 +676,17 @@ internal sealed class ResultCodeSets(val mapping: Map<Int, TransactionResultCode
                 resultCode,
                 TransactionResultCode.Unknown(
                     resultCode = resultCode ?: UNKNOWN_RESULT_CODE,
+                    errorMessage = R.string.zvt_error_code_unknown
+                )
+            )
+        }
+
+        fun getSPOSCode(resultCode: String?): TransactionResultCode {
+            return SPOSResultCodes.mapping.getOrDefault(
+                resultCode,
+                TransactionResultCode.Unknown(
+                    resultCode = UNKNOWN_RESULT_CODE,
+                    resultCodeString = resultCode,
                     errorMessage = R.string.zvt_error_code_unknown
                 )
             )

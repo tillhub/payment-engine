@@ -20,6 +20,10 @@ simpleXml = "2.7.1"
 junit = "4.13.2"
 mockk = "1.13.8"
 kotest = "5.8.0"
+robolectric = "4.14"
+androidxCoreTest = "1.6.1"
+kotestRobolectric = "0.4.0"
+kotestExtensionsAndroid = "0.1.1"
 
 lifecycle = "2.7.0"
 activity-compose = "1.8.2"
@@ -78,6 +82,10 @@ kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core-jvm", 
 kotest-property = { group = "io.kotest", name = "kotest-property-jvm", version.ref = "kotest" }
 kotest-api = { group = "io.kotest", name = "kotest-framework-api", version.ref = "kotest" }
 lifecycle-runtime-testing = { group = "androidx.lifecycle", name = "lifecycle-runtime-testing", version.ref = "lifecycle" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+kotest-robolectric = { group = "io.kotest.extensions", name = "kotest-extensions-robolectric", version.ref = "kotestRobolectric" }
+kotest-extensions-android = { group = "br.com.colman", name = "kotest-extensions-android", version.ref = "kotestExtensionsAndroid" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidxCoreTest" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -114,6 +122,12 @@ testing = [
     "kotest.assertions",
     "kotest.property",
     "kotest-api",
-    "lifecycle-runtime-testing"
+    "lifecycle-runtime-testing",
+]
+robolectric = [
+    "robolectric",
+    "kotest-robolectric",
+    "androidx-test-core",
+    "kotest-extensions-android"
 ]
 

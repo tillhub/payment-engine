@@ -294,7 +294,6 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
-                analytics.logOperation("Operation: CARD_PAYMENT(amount: 6.0, currency: ISOAlphaCurrency(value=EUR))\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -475,7 +474,6 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
-                analytics.logOperation("Operation: CARD_PAYMENT_REVERSAL(stan: 223)\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -628,7 +626,6 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
-                analytics.logOperation("Operation: PARTIAL_REFUND(amount: 6.0, currency: ISOAlphaCurrency(value=EUR))\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
@@ -786,7 +783,6 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
             target.operationState.value shouldBe OPIOperationStatus.Pending.Operation(NOW)
 
             verify(Ordering.ORDERED) {
-                analytics.logOperation("Operation: RECONCILIATION\n$TERMINAL_STRING")
                 converterFactory.newStringToDtoConverter(DeviceRequest::class.java)
                 converterFactory.newDtoToStringConverter<DeviceResponse>()
                 opiChannel1.setOnError(any())
