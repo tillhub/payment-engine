@@ -81,6 +81,12 @@ class PaymentRefundContract(
     }
 }
 
+/***
+ * @param config - terminal config used for this request
+ * @param transactionId - id of the transaction that will be created by the request (S-POS only)
+ * @param amount - amount being refunded in this transaction
+ * @param currency - currency the transaction will be made in
+ */
 class RefundRequest(
     val config: Terminal,
     val transactionId: String,

@@ -79,6 +79,14 @@ class PaymentReversalContract(
     }
 }
 
+/***
+ * @param config - terminal config used for this request
+ * @param transactionId - id of the transaction that will be created by the request (S-POS only)
+ * @param amount - amount of the original transaction being cancelled
+ * @param tip - tip of the original transaction being cancelled, by default it will be set to 0.00
+ * @param currency - currency the transaction will be made in
+ * @param receiptNo - the receipt number of the original transaction being cancelled
+ */
 class ReversalRequest(
     val config: Terminal,
     val transactionId: String,

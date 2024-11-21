@@ -79,6 +79,13 @@ class PaymentResultContract(
     }
 }
 
+/***
+ * @param config - terminal config used for this request
+ * @param transactionId - id of the transaction that will be created by the request (S-POS only)
+ * @param amount - amount being charged in the created transaction
+ * @param tip - tip being charged in the created transaction, by default it will be set to 0.00
+ * @param currency - currency the transaction will be made in
+ */
 class PaymentRequest(
     val config: Terminal,
     val transactionId: String,
