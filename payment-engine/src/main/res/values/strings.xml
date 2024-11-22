@@ -343,4 +343,5 @@
     <string name="spos_error_terminal_already_activated">Terminal already activated</string>
     <string name="spos_error_validation_error">Validation error</string>
     <string name="spos_error_unknown">Unknown terminal error</string>
+    <string name="spos_error_app_not_found">Terminal application not found on device</string>
 </resources>

@@ -1,12 +1,15 @@
 package de.tillhub.paymentengine
 
+import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.time.Instant
 
 /**
  * This is called to start of S-POS terminal connect and disconnect,
@@ -48,7 +51,20 @@ internal class ConnectionManagerImpl(
 
     override fun startSPOSConnect(config: Terminal) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
-        connectContract.launch(config)
+        try {
+            connectContract.launch(config)
+        } catch (_: ActivityNotFoundException) {
+            terminalState.tryEmit(
+                TerminalOperationStatus.Error.SPOS(
+                    date = Instant.now(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                )
+            )
+        }
     }
 
     override fun startSPOSDisconnect() {
@@ -63,6 +79,19 @@ internal class ConnectionManagerImpl(
 
     override fun startSPOSDisconnect(config: Terminal) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
-        disconnectContract.launch(config)
+        try {
+            disconnectContract.launch(config)
+        } catch (_: ActivityNotFoundException) {
+            terminalState.tryEmit(
+                TerminalOperationStatus.Error.SPOS(
+                    date = Instant.now(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                )
+            )
+        }
     }
 }

@@ -1,13 +1,16 @@
 package de.tillhub.paymentengine
 
+import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.mockk
@@ -119,5 +122,39 @@ class ConnectionManagerTest : FunSpec({
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
+    }
+
+    test("contract failing to launch disconnect request due to no activity") {
+        every { disconnectContract.launch(any()) } answers {
+            throw ActivityNotFoundException()
+        }
+
+        val terminal = Terminal.SPOS()
+        target.startSPOSDisconnect(terminal)
+
+        verify(ordering = Ordering.ORDERED) {
+            disconnectContract.launch(terminal)
+        }
+
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+    }
+
+    test("contract failing to launch connect request due to no activity") {
+        every { connectContract.launch(any()) } answers {
+            throw ActivityNotFoundException()
+        }
+
+        val terminal = Terminal.SPOS()
+        target.startSPOSConnect(terminal)
+
+        verify(ordering = Ordering.ORDERED) {
+            connectContract.launch(terminal)
+        }
+
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

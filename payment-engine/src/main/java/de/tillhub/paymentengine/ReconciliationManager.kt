@@ -1,11 +1,14 @@
 package de.tillhub.paymentengine
 
+import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalReconciliationContract
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.time.Instant
 
 /**
  * This is called to start of a terminal reconciliation,
@@ -39,6 +42,19 @@ internal class ReconciliationManagerImpl(
 
     override fun startReconciliation(config: Terminal) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Reconciliation)
-        reconciliationContract.launch(config)
+        try {
+            reconciliationContract.launch(config)
+        } catch (_: ActivityNotFoundException) {
+            terminalState.tryEmit(
+                TerminalOperationStatus.Error.SPOS(
+                    date = Instant.now(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                )
+            )
+        }
     }
 }

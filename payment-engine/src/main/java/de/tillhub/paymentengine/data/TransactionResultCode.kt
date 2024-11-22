@@ -657,6 +657,7 @@ internal sealed class ResultCodeSets<T>(val mapping: Map<T, TransactionResultCod
 
     companion object {
         private const val UNKNOWN_RESULT_CODE = -1
+        val APP_NOT_FOUND_ERROR = TransactionResultCode.Known(R.string.spos_error_app_not_found)
 
         fun getZVTCode(resultCode: Int?): TransactionResultCode {
             return LavegoResultCodes.mapping.getOrDefault(
