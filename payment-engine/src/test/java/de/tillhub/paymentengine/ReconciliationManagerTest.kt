@@ -1,13 +1,19 @@
 package de.tillhub.paymentengine
 
+import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalReconciliationContract
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ReconciliationManagerTest : FunSpec({
@@ -64,5 +70,21 @@ class ReconciliationManagerTest : FunSpec({
         verify { reconciliationContract.launch(customTerminal) }
 
         terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
+    }
+
+    test("contract failing to launch request due to no activity") {
+        every { reconciliationContract.launch(any()) } answers {
+            throw ActivityNotFoundException()
+        }
+
+        val customTerminal = Terminal.SPOS()
+
+        target.startReconciliation(customTerminal)
+
+        verify { reconciliationContract.launch(customTerminal) }
+
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

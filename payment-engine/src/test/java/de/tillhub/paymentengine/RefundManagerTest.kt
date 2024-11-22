@@ -1,15 +1,21 @@
 package de.tillhub.paymentengine
 
+import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.PaymentRefundContract
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
 
@@ -119,5 +125,38 @@ class RefundManagerTest : FunSpec({
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
+    }
+
+    test("contract failing to launch request due to no activity") {
+        every { refundContract.launch(any()) } answers {
+            throw ActivityNotFoundException()
+        }
+
+        val customTerminal = Terminal.SPOS()
+        val transactionId = "12345"
+        val amount = BigDecimal(100)
+        val currency = ISOAlphaCurrency("EUR")
+
+        target.startRefundTransaction(
+            transactionId = transactionId,
+            amount = amount,
+            currency = currency,
+            config = customTerminal
+        )
+
+        verify {
+            refundContract.launch(
+                RefundRequest(
+                    config = customTerminal,
+                    transactionId = transactionId,
+                    amount = amount,
+                    currency = currency
+                )
+            )
+        }
+
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })
