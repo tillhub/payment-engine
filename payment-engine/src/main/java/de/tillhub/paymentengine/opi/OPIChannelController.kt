@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 internal interface OPIChannelController {
 
@@ -221,7 +222,7 @@ internal class OPIChannelControllerImpl(
                     workstationId = terminal.saleConfig.saleId,
                     posData = PosData(terminalConfig.timeNow().toISOString()),
                     totalAmount = TotalAmount(
-                        value = amount.setScale(2),
+                        value = amount.setScale(2, RoundingMode.HALF_EVEN),
                         currency = currency.value
                     )
                 )
@@ -308,7 +309,7 @@ internal class OPIChannelControllerImpl(
                     workstationId = terminal.saleConfig.saleId,
                     posData = PosData(terminalConfig.timeNow().toISOString()),
                     totalAmount = TotalAmount(
-                        value = amount.setScale(2),
+                        value = amount.setScale(2, RoundingMode.HALF_EVEN),
                         currency = currency.value
                     )
                 )
