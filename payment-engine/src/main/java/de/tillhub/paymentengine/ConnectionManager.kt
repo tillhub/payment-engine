@@ -40,7 +40,7 @@ internal class ConnectionManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
     override fun startSPOSConnect() {
-        val configName = configs.values.firstOrNull()?.name.orEmpty()
+        val configName = configs.values.firstOrNull()?.id.orEmpty()
         startSPOSConnect(configName)
     }
 
@@ -68,7 +68,7 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startSPOSDisconnect() {
-        val configName = configs.values.firstOrNull()?.name.orEmpty()
+        val configName = configs.values.firstOrNull()?.id.orEmpty()
         startSPOSDisconnect(configName)
     }
 

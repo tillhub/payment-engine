@@ -6,12 +6,12 @@ import java.util.Objects
 
 @Parcelize
 sealed class Terminal : Parcelable {
-    abstract val name: String
+    abstract val id: String
 
     abstract val saleConfig: CardSaleConfig
 
     class ZVT(
-        override val name: String = DEFAULT_NAME,
+        override val id: String = DEFAULT_ZVT_ID,
         override val saleConfig: CardSaleConfig = CardSaleConfig(),
         val ipAddress: String = DEFAULT_IP_ADDRESS,
         val port: Int = DEFAULT_PORT,
@@ -19,7 +19,7 @@ sealed class Terminal : Parcelable {
         val isoCurrencyNumber: String = DEFAULT_CURRENCY_CODE,
     ) : Terminal() {
         override fun toString() = "Terminal.ZVT(" +
-                "name=$name, " +
+                "id=$id, " +
                 "ipAddress=$ipAddress, " +
                 "port=$port, " +
                 "saleConfig=$saleConfig, " +
@@ -28,7 +28,7 @@ sealed class Terminal : Parcelable {
                 ")"
 
         override fun equals(other: Any?) = other is ZVT &&
-                name == other.name &&
+                id == other.id &&
                 ipAddress == other.ipAddress &&
                 port == other.port &&
                 saleConfig == other.saleConfig &&
@@ -36,7 +36,7 @@ sealed class Terminal : Parcelable {
                 isoCurrencyNumber == other.isoCurrencyNumber
 
         override fun hashCode() = Objects.hash(
-            name,
+            id,
             ipAddress,
             port,
             saleConfig,
@@ -45,7 +45,7 @@ sealed class Terminal : Parcelable {
         )
 
         companion object {
-            private const val DEFAULT_NAME = "Default:ZVT"
+            private const val DEFAULT_ZVT_ID = "Default:ZVT"
             const val DEFAULT_IP_ADDRESS = "127.0.0.1"
             const val DEFAULT_PORT = 40007
             const val DEFAULT_CURRENCY_CODE = "0978"
@@ -54,7 +54,7 @@ sealed class Terminal : Parcelable {
     }
 
     class OPI(
-        override val name: String = DEFAULT_NAME,
+        override val id: String = DEFAULT_OPI_ID,
         override val saleConfig: CardSaleConfig = CardSaleConfig(),
         val ipAddress: String = DEFAULT_IP_ADDRESS,
         val port: Int = DEFAULT_PORT_1,
@@ -62,7 +62,7 @@ sealed class Terminal : Parcelable {
         val currencyCode: String = DEFAULT_CURRENCY_CODE,
     ) : Terminal() {
         override fun toString() = "Terminal.OPI(" +
-                "name=$name, " +
+                "id=$id, " +
                 "ipAddress=$ipAddress, " +
                 "port=$port, " +
                 "saleConfig=$saleConfig, " +
@@ -71,7 +71,7 @@ sealed class Terminal : Parcelable {
                 ")"
 
         override fun equals(other: Any?) = other is OPI &&
-                name == other.name &&
+                id == other.id &&
                 ipAddress == other.ipAddress &&
                 port == other.port &&
                 saleConfig == other.saleConfig &&
@@ -79,7 +79,7 @@ sealed class Terminal : Parcelable {
                 currencyCode == other.currencyCode
 
         override fun hashCode() = Objects.hash(
-            name,
+            id,
             ipAddress,
             port,
             saleConfig,
@@ -88,7 +88,7 @@ sealed class Terminal : Parcelable {
         )
 
         companion object {
-            private const val DEFAULT_NAME = "Default:OPI"
+            private const val DEFAULT_OPI_ID = "Default:OPI"
             const val DEFAULT_IP_ADDRESS = "127.0.0.1"
             const val DEFAULT_PORT_1 = 20002
             const val DEFAULT_PORT_2 = 20007
@@ -97,34 +97,34 @@ sealed class Terminal : Parcelable {
     }
 
     class SPOS(
-        override val name: String = DEFAULT_NAME,
+        override val id: String = DEFAULT_SPOS_ID,
         override val saleConfig: CardSaleConfig = CardSaleConfig(),
         val appId: String = DEFAULT_APP_ID,
         val connected: Boolean = DEFAULT_CONNECTION,
         val currencyCode: String = DEFAULT_CURRENCY_CODE,
     ) : Terminal() {
         override fun toString() = "Terminal.SPOS(" +
-                "name=$name, " +
+                "id=$id, " +
                 "appId=$appId, " +
                 "saleConfig=$saleConfig, " +
                 "currencyCode=$currencyCode" +
                 ")"
 
         override fun equals(other: Any?) = other is SPOS &&
-                name == other.name &&
+                id == other.id &&
                 appId == other.appId &&
                 saleConfig == other.saleConfig &&
                 currencyCode == other.currencyCode
 
         override fun hashCode() = Objects.hash(
-            name,
+            id,
             appId,
             saleConfig,
             currencyCode
         )
 
         companion object {
-            private const val DEFAULT_NAME = "Default:SPOS"
+            private const val DEFAULT_SPOS_ID = "Default:SPOS"
             private const val DEFAULT_APP_ID = "TESTCLIENT"
             private const val DEFAULT_CONNECTION = false
             const val DEFAULT_CURRENCY_CODE = "EUR"

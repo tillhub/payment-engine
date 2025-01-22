@@ -31,7 +31,7 @@ internal class ReconciliationManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ReconciliationManager {
 
     override fun startReconciliation() {
-        val configName = configs.values.firstOrNull()?.name.orEmpty()
+        val configName = configs.values.firstOrNull()?.id.orEmpty()
         startReconciliation(configName)
     }
 

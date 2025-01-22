@@ -23,7 +23,7 @@ class PaymentEngine private constructor() {
     fun observeTerminalState(): StateFlow<TerminalOperationStatus> = terminalState
 
     fun putTerminalConfig(config: Terminal) {
-        configs[config.name] = config
+        configs[config.id] = config
     }
 
     fun newPaymentManager(registry: ActivityResultCaller): PaymentManager {

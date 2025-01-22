@@ -56,7 +56,7 @@ class TerminalReconciliationContractTest : FunSpec({
             analytics.logOperation(
                 "Operation: RECONCILIATION" +
                         "\nTerminal.SPOS(" +
-                        "name=s-pos, " +
+                        "id=s-pos, " +
                         "appId=TESTCLIENT, " +
                         "saleConfig=CardSaleConfig(" +
                         "applicationName=Tillhub GO, " +
@@ -90,7 +90,7 @@ class TerminalReconciliationContractTest : FunSpec({
             analytics.logOperation(
                 "Operation: RECONCILIATION" +
                         "\nTerminal.OPI(" +
-                        "name=opi, " +
+                        "id=opi, " +
                         "ipAddress=127.0.0.1, " +
                         "port=20002, " +
                         "saleConfig=CardSaleConfig(" +
@@ -126,7 +126,7 @@ class TerminalReconciliationContractTest : FunSpec({
             analytics.logOperation(
                 "Operation: RECONCILIATION" +
                         "\nTerminal.ZVT(" +
-                        "name=zvt, " +
+                        "id=zvt, " +
                         "ipAddress=127.0.0.1, " +
                         "port=40007, " +
                         "saleConfig=CardSaleConfig(" +
@@ -198,18 +198,18 @@ class TerminalReconciliationContractTest : FunSpec({
 }) {
     companion object {
         val ZVT = Terminal.ZVT(
-            name = "zvt",
+            id = "zvt",
             ipAddress = "127.0.0.1",
             port = 40007,
         )
         val OPI = Terminal.OPI(
-            name = "opi",
+            id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
         )
         val SPOS = Terminal.SPOS(
-            name = "s-pos",
+            id = "s-pos",
         )
     }
 }

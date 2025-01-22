@@ -55,7 +55,7 @@ internal class RefundManagerImpl(
         amount: BigDecimal,
         currency: ISOAlphaCurrency
     ) {
-        val configName = configs.values.firstOrNull()?.name.orEmpty()
+        val configName = configs.values.firstOrNull()?.id.orEmpty()
         startRefundTransaction(transactionId, amount, currency, configName)
     }
 

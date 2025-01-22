@@ -58,7 +58,7 @@ internal class PaymentManagerImpl(
         tip: BigDecimal,
         currency: ISOAlphaCurrency
     ) {
-        val configName = configs.values.firstOrNull()?.name.orEmpty()
+        val configName = configs.values.firstOrNull()?.id.orEmpty()
         startPaymentTransaction(transactionId, amount, tip, currency, configName)
     }
 

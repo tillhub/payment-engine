@@ -27,7 +27,7 @@ class CardManagerTest : FunSpec({
     test("putTerminalConfig should add terminal to the configs map") {
         val terminal = Terminal.OPI()
         target.putTerminalConfig(terminal)
-        verify { configs[terminal.name] = terminal }
+        verify { configs[terminal.id] = terminal }
     }
 
     test("observePaymentState should return the terminal state flow") {

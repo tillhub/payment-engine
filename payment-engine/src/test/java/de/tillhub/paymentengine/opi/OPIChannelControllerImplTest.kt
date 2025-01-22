@@ -1081,7 +1081,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
         val NOW = "2024-02-09T09:36:36Z".toInstant()
 
         val TERMINAL = Terminal.OPI(
-            name = "opi",
+            id = "opi",
             ipAddress = "192.168.1.22",
             port = 20002,
             port2 = 20007

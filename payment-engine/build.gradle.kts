@@ -93,7 +93,7 @@ afterEvaluate {
             create<MavenPublication>("payment-engine") {
                 groupId = "de.tillhub.paymentengine"
                 artifactId = "payment-engine"
-                version = "3.0.2"
+                version = "3.0.3"
 
                 from(components.getByName("release"))
             }

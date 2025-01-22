@@ -54,7 +54,7 @@ class TerminalDisconnectContractTest : FunSpec({
             analytics.logOperation(
                 "Operation: TERMINAL_DISCONNECT" +
                         "\nTerminal.SPOS(" +
-                        "name=s-pos, " +
+                        "id=s-pos, " +
                         "appId=TESTCLIENT, " +
                         "saleConfig=CardSaleConfig(" +
                         "applicationName=Tillhub GO, " +
@@ -115,13 +115,13 @@ class TerminalDisconnectContractTest : FunSpec({
 }) {
     companion object {
         val OPI = Terminal.OPI(
-            name = "opi",
+            id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
         )
         val SPOS = Terminal.SPOS(
-            name = "s-pos",
+            id = "s-pos",
         )
     }
 }

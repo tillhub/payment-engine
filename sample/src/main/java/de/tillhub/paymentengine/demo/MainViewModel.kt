@@ -72,21 +72,21 @@ class MainViewModel : ViewModel() {
     private fun setupTerminalConfigs(cardManager: CardManager) {
         cardManager.putTerminalConfig(
             Terminal.ZVT(
-                name = "zvt-remote",
+                id = "zvt-remote",
                 ipAddress = REMOTE_IP,
                 port = 20007
             )
         )
         cardManager.putTerminalConfig(
             Terminal.ZVT(
-                name = "zvt-local",
+                id = "zvt-local",
                 ipAddress = "127.0.0.1",
                 port = 40007
             )
         )
         cardManager.putTerminalConfig(
             Terminal.OPI(
-                name = "opi",
+                id = "opi",
                 ipAddress = REMOTE_IP,
                 port = 20002,
                 port2 = 20007
@@ -94,7 +94,7 @@ class MainViewModel : ViewModel() {
         )
         cardManager.putTerminalConfig(
             Terminal.SPOS(
-                name = "s-pos",
+                id = "s-pos",
             )
         )
     }

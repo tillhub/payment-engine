@@ -68,7 +68,7 @@ class PaymentRefundContractTest : FunSpec({
                         "amount: 500, " +
                         "currency: ISOAlphaCurrency(value=EUR))" +
                         "\nTerminal.SPOS(" +
-                        "name=s-pos, " +
+                        "id=s-pos, " +
                         "appId=TESTCLIENT, " +
                         "saleConfig=CardSaleConfig(" +
                         "applicationName=Tillhub GO, " +
@@ -119,7 +119,7 @@ class PaymentRefundContractTest : FunSpec({
                         "amount: 500, " +
                         "currency: ISOAlphaCurrency(value=EUR))" +
                         "\nTerminal.OPI(" +
-                        "name=opi, " +
+                        "id=opi, " +
                         "ipAddress=127.0.0.1, " +
                         "port=20002, " +
                         "saleConfig=CardSaleConfig(" +
@@ -172,7 +172,7 @@ class PaymentRefundContractTest : FunSpec({
                         "amount: 500, " +
                         "currency: ISOAlphaCurrency(value=EUR))" +
                         "\nTerminal.ZVT(" +
-                        "name=zvt, " +
+                        "id=zvt, " +
                         "ipAddress=127.0.0.1, " +
                         "port=40007, " +
                         "saleConfig=CardSaleConfig(" +
@@ -266,18 +266,18 @@ class PaymentRefundContractTest : FunSpec({
 }) {
     companion object {
         val ZVT = Terminal.ZVT(
-            name = "zvt",
+            id = "zvt",
             ipAddress = "127.0.0.1",
             port = 40007,
         )
         val OPI = Terminal.OPI(
-            name = "opi",
+            id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
         )
         val SPOS = Terminal.SPOS(
-            name = "s-pos",
+            id = "s-pos",
         )
     }
 }

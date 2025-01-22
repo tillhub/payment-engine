@@ -64,7 +64,7 @@ internal class ReversalManagerImpl(
         currency: ISOAlphaCurrency,
         receiptNo: String
     ) {
-        val configName = configs.values.firstOrNull()?.name.orEmpty()
+        val configName = configs.values.firstOrNull()?.id.orEmpty()
         startReversalTransaction(
             transactionId = transactionId,
             amount = amount,

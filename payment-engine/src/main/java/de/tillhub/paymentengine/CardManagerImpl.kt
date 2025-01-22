@@ -17,7 +17,7 @@ internal abstract class CardManagerImpl(
     }
 
     override fun putTerminalConfig(config: Terminal) {
-        configs[config.name] = config
+        configs[config.id] = config
     }
 
     override fun observePaymentState(): StateFlow<TerminalOperationStatus> = terminalState
