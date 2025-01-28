@@ -49,6 +49,12 @@
             android:exported="false"/>
 
         <activity
+            android:name=".zvt.ui.TerminalLoginActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false"/>
+
+        <activity
             android:name=".opi.ui.OPIPaymentActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
@@ -68,6 +74,12 @@
 
         <activity
             android:name=".opi.ui.OPIReconciliationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".opi.ui.OPILoginActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
             android:exported="false" />

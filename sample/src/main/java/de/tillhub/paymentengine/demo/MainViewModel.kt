@@ -133,8 +133,8 @@ class MainViewModel : ViewModel() {
         reconciliationManager.startReconciliation(CONFIG_IN_USE)
     }
 
-    fun startSPOSConnect() {
-        connectionManager.startSPOSConnect(CONFIG_IN_USE)
+    fun startConnect() {
+        connectionManager.startConnect(CONFIG_IN_USE)
     }
 
     fun startSPOSDisconnect() {
@@ -142,7 +142,7 @@ class MainViewModel : ViewModel() {
     }
 
     companion object {
-        private const val CONFIG_IN_USE = "s-pos"
-        private const val REMOTE_IP = "192.168.1.121"
+        private const val CONFIG_IN_USE = "opi"
+        private const val REMOTE_IP = "192.168.100.39"
     }
 }

@@ -38,7 +38,7 @@ internal sealed class OPIOperationStatus {
         abstract val merchantReceipt: String
         abstract val rawData: String
         abstract val data: CardServiceResponse?
-        abstract val reconciliationData: ServiceResponse?
+        abstract val serviceData: ServiceResponse?
 
         abstract fun toTerminalOperation(): TerminalOperationStatus
 
@@ -48,7 +48,7 @@ internal sealed class OPIOperationStatus {
             override val merchantReceipt: String,
             override val rawData: String,
             override val data: CardServiceResponse? = null,
-            override val reconciliationData: ServiceResponse? = null
+            override val serviceData: ServiceResponse? = null
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Error.OPI(
@@ -64,7 +64,7 @@ internal sealed class OPIOperationStatus {
                             cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
                             paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
                         )
-                    } ?: reconciliationData?.let {
+                    } ?: serviceData?.let {
                         TransactionData(
                             terminalId = it.terminal?.terminalId.orEmpty(),
                             transactionId = "",
@@ -75,7 +75,7 @@ internal sealed class OPIOperationStatus {
                     },
                     resultCode = ResultCodeSets.getOPICode(
                         resultCode = data?.tender?.authorisation?.actionCode?.toIntOrNull()
-                            ?: reconciliationData?.privateData?.errorCode?.value?.toIntOrNull()
+                            ?: serviceData?.privateData?.errorCode?.value?.toIntOrNull()
                     )
                 )
         }
@@ -86,7 +86,7 @@ internal sealed class OPIOperationStatus {
             override val merchantReceipt: String,
             override val rawData: String,
             override val data: CardServiceResponse? = null,
-            override val reconciliationData: ServiceResponse? = null
+            override val serviceData: ServiceResponse? = null
         ) : Result() {
             override fun toTerminalOperation() =
                 TerminalOperationStatus.Success.OPI(
@@ -102,7 +102,7 @@ internal sealed class OPIOperationStatus {
                             cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
                             paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
                         )
-                    } ?: reconciliationData?.let {
+                    } ?: serviceData?.let {
                         TransactionData(
                             terminalId = it.terminal?.terminalId.orEmpty(),
                             transactionId = "",

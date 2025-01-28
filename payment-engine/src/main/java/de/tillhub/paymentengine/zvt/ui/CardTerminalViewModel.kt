@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.lavego.zvt.api.Apdu
+import de.lavego.zvt.cmds.CompletionForRegister
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
@@ -17,6 +19,8 @@ import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.math.BigInteger
 import java.time.Instant
 
 internal class CardTerminalViewModel(
@@ -100,7 +104,7 @@ internal class CardTerminalViewModel(
                         )
                     }
 
-                    else -> throw IllegalStateException("Illegal state: ${terminalOperationState.value}")
+                    else -> error("Illegal state: ${terminalOperationState.value}")
                 }
             }
         }
@@ -131,6 +135,52 @@ internal class CardTerminalViewModel(
             viewModelScope.launch {
                 delay(TIMEOUT_DELAY)
                 _terminalOperationState.value = State.OperationAborted
+            }
+        }
+    }
+
+    fun setupFinished(completion: String, moveToFront: () -> Unit) {
+        viewModelScope.launch {
+            val json = JSONObject(completion)
+            val apdu = Apdu(json.getString("response_apdu"))
+            val status = CompletionForRegister(apdu)
+
+            _terminalOperationState.value = if (abortOperationTriggered) {
+                moveToFront()
+                State.OperationAborted
+            } else {
+                moveToFront()
+                State.Success(
+                    date = terminalConfig.timeNow(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = completion,
+                    data = LavegoTransactionData(
+                        additionalText = "",
+                        aid = "",
+                        amount = BigInteger.ZERO,
+                        cardName = "",
+                        cardSeqNumber = 0,
+                        cardType = 0,
+                        chipData = "",
+                        data = "",
+                        date = "",
+                        expiry = "",
+                        receiptNo = 0,
+                        resultCode = 0,
+                        resultText = "",
+                        singleAmounts = "",
+                        tags = emptyMap(),
+                        tid = status.tid(),
+                        time = "",
+                        trace = "",
+                        traceOrig = "",
+                        track1 = "",
+                        track2 = "",
+                        track3 = "",
+                        vu = ""
+                    )
+                )
             }
         }
     }

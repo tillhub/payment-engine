@@ -16,9 +16,9 @@ import java.time.Instant
  * it sets up the manager so the connection to the terminal is viable.
  */
 interface ConnectionManager : CardManager {
-    fun startSPOSConnect()
-    fun startSPOSConnect(configName: String)
-    fun startSPOSConnect(config: Terminal)
+    fun startConnect()
+    fun startConnect(configName: String)
+    fun startConnect(config: Terminal)
 
     fun startSPOSDisconnect()
     fun startSPOSDisconnect(configName: String)
@@ -39,17 +39,17 @@ internal class ConnectionManagerImpl(
         }
 ) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
-    override fun startSPOSConnect() {
+    override fun startConnect() {
         val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startSPOSConnect(configName)
+        startConnect(configName)
     }
 
-    override fun startSPOSConnect(configName: String) {
+    override fun startConnect(configName: String) {
         val terminalConfig = configs.getOrDefault(configName, defaultConfig)
-        startSPOSConnect(terminalConfig)
+        startConnect(terminalConfig)
     }
 
-    override fun startSPOSConnect(config: Terminal) {
+    override fun startConnect(config: Terminal) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
         try {
             connectContract.launch(config)

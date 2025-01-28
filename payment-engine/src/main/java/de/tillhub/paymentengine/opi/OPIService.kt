@@ -117,6 +117,12 @@ internal class OPIService(
         }
     }
 
+    fun startLogin() {
+        lifecycleScope.launch {
+            opiController.initiateLogin()
+        }
+    }
+
     fun abortRequest() {
         lifecycleScope.launch {
             opiController.abortRequest()

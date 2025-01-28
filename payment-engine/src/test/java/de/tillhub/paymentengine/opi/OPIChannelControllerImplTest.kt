@@ -382,7 +382,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
 
             verify {
@@ -445,7 +445,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ERROR_CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
@@ -544,7 +544,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
 
@@ -597,7 +597,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ERROR_CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
@@ -699,7 +699,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
 
@@ -755,7 +755,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ERROR_CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
@@ -849,7 +849,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.SERVICE_RESPONSE_XML,
                 data = null,
-                reconciliationData = ConvertersTest.SERVICE_RESPONSE
+                serviceData = ConvertersTest.SERVICE_RESPONSE
             )
         }
 
@@ -899,7 +899,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.SERVICE_RESPONSE_XML,
                 data = null,
-                reconciliationData = ERROR_SERVICE_RESPONSE.copy(
+                serviceData = ERROR_SERVICE_RESPONSE.copy(
                     requestType = "ReconciliationWithClosure"
                 )
             )
@@ -1023,7 +1023,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = null,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
