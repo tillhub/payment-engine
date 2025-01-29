@@ -267,6 +267,23 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                     opiChannel1.close()
                 }
             }
+
+            it("initiateLogin") {
+                target.login()
+
+                c0OnMessage?.invoke(ConvertersTest.SERVICE_RESPONSE_XML)
+
+                target.initiateLogin()
+
+                target.operationState.value shouldBe OPIOperationStatus.Result.Success(
+                    date = NOW,
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    serviceData = ConvertersTest.SERVICE_RESPONSE
+                )
+            }
         }
     }
 

@@ -7,9 +7,6 @@ import androidx.lifecycle.viewModelScope
 import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.cmds.CompletionForRegister
 import de.tillhub.paymentengine.R
-import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
-import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
-import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionData
@@ -17,9 +14,11 @@ import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.data.getOrNull
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
+import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
+import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.math.BigInteger
 import java.time.Instant
 
@@ -99,7 +98,7 @@ internal class CardTerminalViewModel(
                             merchantReceipt = lastReceipt?.merchantReceipt.orEmpty(),
                             rawData = lastData.orEmpty(),
                             data = lastData?.let {
-                                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+                                lavegoTransactionDataConverter.convertFromTxJson(it).getOrNull()
                             }
                         )
                     }
@@ -114,7 +113,7 @@ internal class CardTerminalViewModel(
         moveToFront()
         viewModelScope.launch {
             val data = lastData?.let {
-                lavegoTransactionDataConverter.convertFromJson(it).getOrNull()
+                lavegoTransactionDataConverter.convertFromTxJson(it).getOrNull()
             }
             _terminalOperationState.value = State.Error(
                 date = terminalConfig.timeNow(),
@@ -141,8 +140,8 @@ internal class CardTerminalViewModel(
 
     fun setupFinished(completion: String, moveToFront: () -> Unit) {
         viewModelScope.launch {
-            val json = JSONObject(completion)
-            val apdu = Apdu(json.getString("response_apdu"))
+            val apduString = lavegoTransactionDataConverter.convertFromLoginJson(completion)
+            val apdu = Apdu(apduString.getOrNull()?.responseApdu)
             val status = CompletionForRegister(apdu)
 
             _terminalOperationState.value = if (abortOperationTriggered) {
