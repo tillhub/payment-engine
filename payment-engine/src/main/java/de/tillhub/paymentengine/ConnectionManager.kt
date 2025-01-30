@@ -16,12 +16,12 @@ import java.time.Instant
  * it sets up the manager so the connection to the terminal is viable.
  */
 interface ConnectionManager : CardManager {
-    fun startSPOSConnect()
-    fun startSPOSConnect(configName: String)
-    fun startSPOSConnect(config: Terminal)
+    fun startConnect()
+    fun startConnect(configId: String)
+    fun startConnect(config: Terminal)
 
     fun startSPOSDisconnect()
-    fun startSPOSDisconnect(configName: String)
+    fun startSPOSDisconnect(configId: String)
     fun startSPOSDisconnect(config: Terminal)
 }
 
@@ -39,17 +39,17 @@ internal class ConnectionManagerImpl(
         }
 ) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
-    override fun startSPOSConnect() {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startSPOSConnect(configName)
+    override fun startConnect() {
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startConnect(configId)
     }
 
-    override fun startSPOSConnect(configName: String) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
-        startSPOSConnect(terminalConfig)
+    override fun startConnect(configId: String) {
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
+        startConnect(terminalConfig)
     }
 
-    override fun startSPOSConnect(config: Terminal) {
+    override fun startConnect(config: Terminal) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
         try {
             connectContract.launch(config)
@@ -68,12 +68,12 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startSPOSDisconnect() {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startSPOSDisconnect(configName)
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startSPOSDisconnect(configId)
     }
 
-    override fun startSPOSDisconnect(configName: String) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+    override fun startSPOSDisconnect(configId: String) {
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startSPOSDisconnect(terminalConfig)
     }
 

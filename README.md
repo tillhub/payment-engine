@@ -103,7 +103,7 @@ interface PaymentManager {
     fun putTerminalConfig(config: Terminal)
     fun observePaymentState(): SharedFlow<TerminalOperationStatus>
     fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency)
-    fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, configName: String)
+    fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, configId: String)
     fun startPaymentTransaction(amount: BigDecimal, currency: ISOAlphaCurrency, config: Terminal)
 }
 ```

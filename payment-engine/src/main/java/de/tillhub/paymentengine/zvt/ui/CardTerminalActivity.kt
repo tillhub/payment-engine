@@ -181,6 +181,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
     override fun onCompletion(completion: String) {
         super.onCompletion(completion)
+
         viewModel.onCompletion(::moveAppToFront)
     }
 
@@ -205,7 +206,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
         finish()
     }
 
-    private fun moveAppToFront() {
+    protected fun moveAppToFront() {
         activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
     }
 
@@ -233,6 +234,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
         const val PASSWORD_BYTE_COUNT: Int = 3
         const val CC_BYTE_COUNT: Int = 2
 
+        // TLV is static, it represents config so the receipt is coded into the correct character set
         private const val REGISTER_TLV_CONTAINER_STRING = "06 0C 12 01 30 27 03 14 01 FE 40 02 B0 B0"
         private const val TERMINAL_CONFIG_BYTE: Byte = 0b11000110.toByte()
     }

@@ -267,6 +267,23 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                     opiChannel1.close()
                 }
             }
+
+            it("initiateLogin") {
+                target.login()
+
+                c0OnMessage?.invoke(ConvertersTest.SERVICE_RESPONSE_XML)
+
+                target.initiateLogin()
+
+                target.operationState.value shouldBe OPIOperationStatus.Result.Success(
+                    date = NOW,
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    serviceData = ConvertersTest.SERVICE_RESPONSE
+                )
+            }
         }
     }
 
@@ -382,7 +399,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
 
             verify {
@@ -445,7 +462,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ERROR_CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
@@ -544,7 +561,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
 
@@ -597,7 +614,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ERROR_CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
@@ -699,7 +716,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ConvertersTest.CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
 
@@ -755,7 +772,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = ERROR_CARD_SERVICE_RESPONSE,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }
@@ -849,7 +866,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "Merchant receipt\nline 1\nline 2\n",
                 rawData = ConvertersTest.SERVICE_RESPONSE_XML,
                 data = null,
-                reconciliationData = ConvertersTest.SERVICE_RESPONSE
+                serviceData = ConvertersTest.SERVICE_RESPONSE
             )
         }
 
@@ -899,7 +916,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.SERVICE_RESPONSE_XML,
                 data = null,
-                reconciliationData = ERROR_SERVICE_RESPONSE.copy(
+                serviceData = ERROR_SERVICE_RESPONSE.copy(
                     requestType = "ReconciliationWithClosure"
                 )
             )
@@ -1023,7 +1040,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
                 merchantReceipt = "",
                 rawData = ConvertersTest.CARD_SERVICE_RESPONSE_XML,
                 data = null,
-                reconciliationData = null
+                serviceData = null
             )
         }
     }

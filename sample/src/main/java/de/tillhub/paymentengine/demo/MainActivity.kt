@@ -79,8 +79,8 @@ class MainActivity : ComponentActivity() {
                             viewModel.startReconciliation()
                         }
 
-                        ActionButton("S-POS connect") {
-                            viewModel.startSPOSConnect()
+                        ActionButton("Connect/Login") {
+                            viewModel.startConnect()
                         }
                         ActionButton("S-POS disconnect") {
                             viewModel.startSPOSDisconnect()

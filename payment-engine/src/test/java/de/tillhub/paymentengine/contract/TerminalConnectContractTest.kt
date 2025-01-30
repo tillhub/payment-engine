@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.core.os.BundleCompat
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.data.SPOSKey
@@ -70,20 +72,34 @@ class TerminalConnectContractTest : FunSpec({
         }
     }
 
-    test("createIntent OPI + ZVT") {
-        try {
-            target.createIntent(
-                context,
-                OPI
-            )
-        } catch (e: Exception) {
-            e.shouldBeInstanceOf<UnsupportedOperationException>()
-            e.message shouldBe "Connect only supported for S-POS terminals"
-        }
+    test("createIntent OPI") {
+        val result = target.createIntent(
+            context,
+            OPI
+        )
 
-        verify(inverse = true) {
-            analytics.logOperation(any())
-        }
+        result.shouldBeInstanceOf<Intent>()
+        result.component?.className shouldBe "de.tillhub.paymentengine.opi.ui.OPILoginActivity"
+        BundleCompat.getParcelable(
+            result.extras!!,
+            ExtraKeys.EXTRA_CONFIG,
+            Terminal.OPI::class.java
+        ) shouldBe PaymentResultContractTest.OPI
+    }
+
+    test("createIntent ZVT") {
+        val result = target.createIntent(
+            context,
+            ZVT
+        )
+
+        result.shouldBeInstanceOf<Intent>()
+        result.component?.className shouldBe "de.tillhub.paymentengine.zvt.ui.TerminalLoginActivity"
+        BundleCompat.getParcelable(
+            result.extras!!,
+            ExtraKeys.EXTRA_CONFIG,
+            Terminal.ZVT::class.java
+        ) shouldBe ZVT
     }
 
     test("parseResult SPOS: result OK") {
@@ -118,6 +134,33 @@ class TerminalConnectContractTest : FunSpec({
             )
         }
     }
+
+    test("parseResult OPI + ZVT: result OK") {
+        val intent = Intent().apply {
+            putExtra(
+                ExtraKeys.EXTRAS_RESULT,
+                TerminalOperationStatus.Success.OPI(
+                    date = mockk(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "rawData",
+                    data = null
+                )
+            )
+        }
+
+        val result = target.parseResult(Activity.RESULT_OK, intent)
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Success.OPI>()
+    }
+
+    test("parseResult OPI + ZVT: result CANCELED") {
+        val intent = Intent()
+
+        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+    }
 }) {
     companion object {
         val OPI = Terminal.OPI(
@@ -125,6 +168,11 @@ class TerminalConnectContractTest : FunSpec({
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
+        )
+        val ZVT = Terminal.ZVT(
+            id = "zvt",
+            ipAddress = "127.0.0.1",
+            port = 20007,
         )
         val SPOS = Terminal.SPOS(
             id = "s-pos",

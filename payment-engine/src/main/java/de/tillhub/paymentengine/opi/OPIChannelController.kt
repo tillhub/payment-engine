@@ -57,6 +57,7 @@ internal interface OPIChannelController {
         currency: ISOAlphaCurrency
     )
     suspend fun initiateReconciliation()
+    suspend fun initiateLogin()
     suspend fun abortRequest()
 }
 
@@ -81,6 +82,8 @@ internal class OPIChannelControllerImpl(
     private val _operationState = MutableStateFlow<OPIOperationStatus>(OPIOperationStatus.Idle)
     override val operationState: StateFlow<OPIOperationStatus>
         get() = _operationState
+
+    private lateinit var loginResponse: ServiceResponse
 
     override fun init(terminal: Terminal.OPI) {
         this.terminal = terminal
@@ -174,6 +177,8 @@ internal class OPIChannelControllerImpl(
                     )
                     return@sendMessage
                 }
+
+                loginResponse = response
 
                 _operationState.value = when (OverallResult.find(response.overallResult)) {
                     OverallResult.SUCCESS -> OPIOperationStatus.LoggedIn
@@ -337,6 +342,39 @@ internal class OPIChannelControllerImpl(
 
             // setup C0 communication
             handleC0Communication(payload, requestConverter, responseConverter)
+        } else {
+            // in case the controller is not initialized set the state to `Error.NotInitialised`
+            _operationState.value = OPIOperationStatus.Error.NotInitialised
+        }
+    }
+
+    override suspend fun initiateLogin() = withOPIContext {
+        // If the state is not LoggedIn, then we should drop the new request
+        if (_operationState.value !is OPIOperationStatus.LoggedIn) return@withOPIContext
+
+        _operationState.value = OPIOperationStatus.Pending.Operation(terminalConfig.timeNow())
+
+        // checks if the controller is initialized
+        if (initialized) {
+            _operationState.value = when (OverallResult.find(loginResponse.overallResult)) {
+                OverallResult.SUCCESS -> OPIOperationStatus.Result.Success(
+                    date = terminalConfig.timeNow(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    serviceData = loginResponse
+                )
+
+                else -> OPIOperationStatus.Result.Error(
+                    date = terminalConfig.timeNow(),
+                    customerReceipt = "",
+                    merchantReceipt = "",
+                    rawData = "",
+                    data = null,
+                    serviceData = loginResponse
+                )
+            }
         } else {
             // in case the controller is not initialized set the state to `Error.NotInitialised`
             _operationState.value = OPIOperationStatus.Error.NotInitialised
@@ -610,7 +648,7 @@ internal class OPIChannelControllerImpl(
                     merchantReceipt = merchantReceipt,
                     rawData = responseXml,
                     data = response as? CardServiceResponse,
-                    reconciliationData = response as? ServiceResponse
+                    serviceData = response as? ServiceResponse
                 )
 
                 else -> OPIOperationStatus.Result.Error(
@@ -619,7 +657,7 @@ internal class OPIChannelControllerImpl(
                     merchantReceipt = merchantReceipt,
                     rawData = responseXml,
                     data = response as? CardServiceResponse,
-                    reconciliationData = response as? ServiceResponse
+                    serviceData = response as? ServiceResponse
                 )
             }
 

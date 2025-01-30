@@ -54,7 +54,7 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startSPOSConnect by default terminal ") {
-        target.startSPOSConnect()
+        target.startConnect()
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
@@ -67,7 +67,7 @@ class ConnectionManagerTest : FunSpec({
     test("startSPOSConnect by config name") {
         val terminal = Terminal.OPI()
         configs["opi"] = terminal
-        target.startSPOSConnect("opi")
+        target.startConnect("opi")
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
@@ -79,7 +79,7 @@ class ConnectionManagerTest : FunSpec({
 
     test("startSPOSConnect by terminal") {
         val terminal = Terminal.SPOS()
-        target.startSPOSConnect(terminal)
+        target.startConnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
@@ -147,7 +147,7 @@ class ConnectionManagerTest : FunSpec({
         }
 
         val terminal = Terminal.SPOS()
-        target.startSPOSConnect(terminal)
+        target.startConnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
             connectContract.launch(terminal)

@@ -30,7 +30,7 @@ interface PaymentManager : CardManager {
         amount: BigDecimal,
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency,
-        configName: String
+        configId: String
     )
 
     fun startPaymentTransaction(
@@ -58,8 +58,8 @@ internal class PaymentManagerImpl(
         tip: BigDecimal,
         currency: ISOAlphaCurrency
     ) {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startPaymentTransaction(transactionId, amount, tip, currency, configName)
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startPaymentTransaction(transactionId, amount, tip, currency, configId)
     }
 
     override fun startPaymentTransaction(
@@ -67,9 +67,9 @@ internal class PaymentManagerImpl(
         amount: BigDecimal,
         tip: BigDecimal,
         currency: ISOAlphaCurrency,
-        configName: String
+        configId: String
     ) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startPaymentTransaction(transactionId, amount, tip, currency, terminalConfig)
     }
 

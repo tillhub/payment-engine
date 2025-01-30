@@ -16,18 +16,32 @@ import java.math.BigInteger
 internal class LavegoTransactionDataConverter(
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 ) {
-    private fun createJsonAdapter(): JsonAdapter<TransactionDataDto> =
+    private fun createTxJsonAdapter(): JsonAdapter<TransactionDataDto> =
         moshi.adapter(TransactionDataDto::class.java)
 
-    suspend fun convertFromJson(json: String): Payment<LavegoTransactionData> =
+    suspend fun convertFromTxJson(json: String): Payment<LavegoTransactionData> =
         try {
             withContext(Dispatchers.IO) {
                 @Suppress("BlockingMethodInNonBlockingContext")
-                createJsonAdapter().fromJson(json)?.toDomain()
+                createTxJsonAdapter().fromJson(json)?.toDomain()
             }.errorIfNull("data could not be converted to transaction data: $json")
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Timber.v(e, "data could not be converted to transaction data: %s", json)
             Payment.Error("data could not be converted to transaction data: $json")
+        }
+
+    private fun createLoginJsonAdapter(): JsonAdapter<LoginDataDto> =
+        moshi.adapter(LoginDataDto::class.java)
+
+    suspend fun convertFromLoginJson(json: String): Payment<LavegoLoginData> =
+        try {
+            withContext(Dispatchers.IO) {
+                @Suppress("BlockingMethodInNonBlockingContext")
+                createLoginJsonAdapter().fromJson(json)?.toDomain()
+            }.errorIfNull("data could not be converted to login data: $json")
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            Timber.v(e, "data could not be converted to login data: %s", json)
+            Payment.Error("data could not be converted to login data: $json")
         }
 
     private fun TransactionDataDto.toDomain(): LavegoTransactionData =
@@ -56,6 +70,8 @@ internal class LavegoTransactionDataConverter(
             track3 = track3,
             vu = vu,
         )
+
+    private fun LoginDataDto.toDomain(): LavegoLoginData = LavegoLoginData(responseApdu)
 }
 
 @Keep
@@ -84,4 +100,10 @@ internal data class TransactionDataDto(
     @Json(name = "track2") val track2: String,
     @Json(name = "track3") val track3: String,
     @Json(name = "vu") val vu: String,
+)
+
+@Keep
+@JsonClass(generateAdapter = true)
+internal data class LoginDataDto(
+    @Json(name = "response_apdu") val responseApdu: String,
 )
