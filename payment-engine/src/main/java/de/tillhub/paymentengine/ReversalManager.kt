@@ -32,8 +32,8 @@ interface ReversalManager : CardManager {
         amount: BigDecimal,
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency,
-        configName: String,
         receiptNo: String,
+        configId: String,
     )
 
     @Suppress("LongParameterList")
@@ -42,8 +42,8 @@ interface ReversalManager : CardManager {
         amount: BigDecimal,
         tip: BigDecimal = BigDecimal.ZERO,
         currency: ISOAlphaCurrency,
+        receiptNo: String,
         config: Terminal,
-        receiptNo: String
     )
 }
 
@@ -64,13 +64,13 @@ internal class ReversalManagerImpl(
         currency: ISOAlphaCurrency,
         receiptNo: String
     ) {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
         startReversalTransaction(
             transactionId = transactionId,
             amount = amount,
             tip = tip,
             currency = currency,
-            configName = configName,
+            configId = configId,
             receiptNo = receiptNo
         )
     }
@@ -80,17 +80,17 @@ internal class ReversalManagerImpl(
         amount: BigDecimal,
         tip: BigDecimal,
         currency: ISOAlphaCurrency,
-        configName: String,
-        receiptNo: String
+        receiptNo: String,
+        configId: String
     ) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startReversalTransaction(
             transactionId = transactionId,
             amount = amount,
             tip = tip,
             currency = currency,
-            config = terminalConfig,
-            receiptNo = receiptNo
+            receiptNo = receiptNo,
+            config = terminalConfig
         )
     }
 
@@ -99,8 +99,8 @@ internal class ReversalManagerImpl(
         amount: BigDecimal,
         tip: BigDecimal,
         currency: ISOAlphaCurrency,
-        config: Terminal,
-        receiptNo: String
+        receiptNo: String,
+        config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Pending.Reversal(receiptNo))
         try {

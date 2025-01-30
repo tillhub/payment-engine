@@ -43,7 +43,7 @@ class ReconciliationManagerTest : FunSpec({
         )
     }
 
-    test("startReconciliation should use default config when no configName provided") {
+    test("startReconciliation should use default config when no configId provided") {
         target.startReconciliation()
 
         verify { reconciliationContract.launch(Terminal.ZVT()) }
@@ -51,11 +51,11 @@ class ReconciliationManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
     }
 
-    test("startReconciliation with configName should and launch reconciliation contract") {
+    test("startReconciliation with configId should and launch reconciliation contract") {
         val terminal = Terminal.OPI()
         configs["opi"] = terminal
 
-        target.startReconciliation(configName = "opi")
+        target.startReconciliation(configId = "opi")
 
         verify { reconciliationContract.launch(terminal) }
 

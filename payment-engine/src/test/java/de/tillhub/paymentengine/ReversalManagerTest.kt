@@ -43,7 +43,7 @@ class ReversalManagerTest : FunSpec({
         )
     }
 
-    test("startReversalTransaction should use default config when no configName provided") {
+    test("startReversalTransaction should use default config when no configId provided") {
         val transactionId = "12345"
         val amount = BigDecimal(100)
         val currency = ISOAlphaCurrency("EUR")
@@ -74,7 +74,7 @@ class ReversalManagerTest : FunSpec({
         transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
     }
 
-    test("startReversalTransaction with configName should launch reversal contract") {
+    test("startReversalTransaction with configId should launch reversal contract") {
         val terminal = Terminal.OPI()
         configs["opi"] = terminal
         val transactionId = "12345"
@@ -88,7 +88,7 @@ class ReversalManagerTest : FunSpec({
             amount = amount,
             tip = tip,
             currency = currency,
-            configName = "opi",
+            configId = "opi",
             receiptNo = receiptNo
         )
 

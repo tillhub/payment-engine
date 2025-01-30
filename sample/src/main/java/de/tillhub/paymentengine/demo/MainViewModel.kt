@@ -114,7 +114,7 @@ class MainViewModel : ViewModel() {
             transactionId = UUID.randomUUID().toString(),
             amount = 600.toBigDecimal(),
             currency = ISOAlphaCurrency("EUR"),
-            configName = CONFIG_IN_USE
+            configId = CONFIG_IN_USE
         )
     }
 
@@ -125,7 +125,7 @@ class MainViewModel : ViewModel() {
             tip = 100.toBigDecimal(),
             currency = ISOAlphaCurrency("EUR"),
             receiptNo = "374",
-            configName = CONFIG_IN_USE
+            configId = CONFIG_IN_USE
         )
     }
 
@@ -142,7 +142,7 @@ class MainViewModel : ViewModel() {
     }
 
     companion object {
-        private const val CONFIG_IN_USE = "opi"
+        private const val CONFIG_IN_USE = "zvt-remote"
         private const val REMOTE_IP = "192.168.100.39"
     }
 }

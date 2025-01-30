@@ -28,7 +28,7 @@ interface RefundManager : CardManager {
         transactionId: String,
         amount: BigDecimal,
         currency: ISOAlphaCurrency,
-        configName: String
+        configId: String
     )
 
     fun startRefundTransaction(
@@ -55,17 +55,17 @@ internal class RefundManagerImpl(
         amount: BigDecimal,
         currency: ISOAlphaCurrency
     ) {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startRefundTransaction(transactionId, amount, currency, configName)
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startRefundTransaction(transactionId, amount, currency, configId)
     }
 
     override fun startRefundTransaction(
         transactionId: String,
         amount: BigDecimal,
         currency: ISOAlphaCurrency,
-        configName: String
+        configId: String
     ) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startRefundTransaction(transactionId, amount, currency, terminalConfig)
     }
 

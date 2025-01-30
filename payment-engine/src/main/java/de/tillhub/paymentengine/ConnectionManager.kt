@@ -17,11 +17,11 @@ import java.time.Instant
  */
 interface ConnectionManager : CardManager {
     fun startConnect()
-    fun startConnect(configName: String)
+    fun startConnect(configId: String)
     fun startConnect(config: Terminal)
 
     fun startSPOSDisconnect()
-    fun startSPOSDisconnect(configName: String)
+    fun startSPOSDisconnect(configId: String)
     fun startSPOSDisconnect(config: Terminal)
 }
 
@@ -40,12 +40,12 @@ internal class ConnectionManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
     override fun startConnect() {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startConnect(configName)
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startConnect(configId)
     }
 
-    override fun startConnect(configName: String) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+    override fun startConnect(configId: String) {
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startConnect(terminalConfig)
     }
 
@@ -68,12 +68,12 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startSPOSDisconnect() {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startSPOSDisconnect(configName)
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startSPOSDisconnect(configId)
     }
 
-    override fun startSPOSDisconnect(configName: String) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+    override fun startSPOSDisconnect(configId: String) {
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startSPOSDisconnect(terminalConfig)
     }
 

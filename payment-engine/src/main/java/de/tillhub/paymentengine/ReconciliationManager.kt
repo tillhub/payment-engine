@@ -16,7 +16,7 @@ import java.time.Instant
  */
 interface ReconciliationManager : CardManager {
     fun startReconciliation()
-    fun startReconciliation(configName: String)
+    fun startReconciliation(configId: String)
     fun startReconciliation(config: Terminal)
 }
 
@@ -31,12 +31,12 @@ internal class ReconciliationManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ReconciliationManager {
 
     override fun startReconciliation() {
-        val configName = configs.values.firstOrNull()?.id.orEmpty()
-        startReconciliation(configName)
+        val configId = configs.values.firstOrNull()?.id.orEmpty()
+        startReconciliation(configId)
     }
 
-    override fun startReconciliation(configName: String) {
-        val terminalConfig = configs.getOrDefault(configName, defaultConfig)
+    override fun startReconciliation(configId: String) {
+        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
         startReconciliation(terminalConfig)
     }
 

@@ -45,7 +45,7 @@ class RefundManagerTest : FunSpec({
         )
     }
 
-    test("startRefundTransaction should use default config when no configName provided") {
+    test("startRefundTransaction should use default config when no configId provided") {
         val defaultTerminal = Terminal.ZVT()
         configs.clear()
         val transactionId = "12345"
@@ -72,7 +72,7 @@ class RefundManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
     }
 
-    test("startRefundTransaction with configName should launch refund contract") {
+    test("startRefundTransaction with configId should launch refund contract") {
         val terminal = Terminal.OPI()
         configs["opi"] = terminal
         val transactionId = "12345"
@@ -83,7 +83,7 @@ class RefundManagerTest : FunSpec({
             transactionId = transactionId,
             amount = amount,
             currency = currency,
-            configName = "opi"
+            configId = "opi"
         )
 
         verify {

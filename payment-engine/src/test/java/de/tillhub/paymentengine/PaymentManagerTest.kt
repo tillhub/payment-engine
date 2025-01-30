@@ -48,7 +48,7 @@ class PaymentManagerTest : FunSpec({
         )
     }
 
-    test("startPaymentTransaction should use default config when no configName provided") {
+    test("startPaymentTransaction should use default config when no configId provided") {
         val transactionId = "tx789"
         val amount = BigDecimal(300)
         val tip = BigDecimal(30)
@@ -71,7 +71,7 @@ class PaymentManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
     }
 
-    test("startPaymentTransaction with configName should launch payment result contract") {
+    test("startPaymentTransaction with configId should launch payment result contract") {
         val transactionId = "tx456"
         val amount = BigDecimal(200)
         val tip = BigDecimal(20)
