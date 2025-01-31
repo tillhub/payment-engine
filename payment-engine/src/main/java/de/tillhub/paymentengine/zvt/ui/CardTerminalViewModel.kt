@@ -5,8 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.lavego.zvt.api.Apdu
-import de.lavego.zvt.api.Bmp
-import de.lavego.zvt.api.Commons
+import de.lavego.zvt.cmds.CompletionForRegister
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationStatus
@@ -31,7 +30,6 @@ internal class CardTerminalViewModel(
     companion object {
         private const val SERVICE_START_DELAY: Long = 500
         private const val TIMEOUT_DELAY: Long = 30_000
-        private const val BMP29_PAYLOAD_LENGTH: Int = 4
     }
 
     private var lastReceipt: LavegoReceiptBuilder? = null
@@ -143,7 +141,8 @@ internal class CardTerminalViewModel(
     fun setupFinished(completion: String, moveToFront: () -> Unit) {
         viewModelScope.launch {
             val apduString = lavegoTransactionDataConverter.convertFromLoginJson(completion)
-            val tid = Apdu(apduString.getOrNull()?.responseApdu).findTid()
+            val apdu = Apdu(apduString.getOrNull()?.responseApdu)
+            val status = CompletionForRegister(apdu)
 
             _terminalOperationState.value = if (abortOperationTriggered) {
                 moveToFront()
@@ -171,7 +170,7 @@ internal class CardTerminalViewModel(
                         resultText = "",
                         singleAmounts = "",
                         tags = emptyMap(),
-                        tid = tid,
+                        tid = status.tid(),
                         time = "",
                         trace = "",
                         traceOrig = "",
@@ -182,19 +181,6 @@ internal class CardTerminalViewModel(
                     )
                 )
             }
-        }
-    }
-
-    private fun Apdu.findTid(): String {
-        val apdu = apdu()
-        val tidLocation = apdu.indexOfFirst { it == Bmp.BMP29 }
-        val start = tidLocation + 1
-        val end = tidLocation + BMP29_PAYLOAD_LENGTH
-
-        return try {
-            Commons.BCDToString(apdu.sliceArray(start..end))
-        } catch (_: Exception) {
-            ""
         }
     }
 
