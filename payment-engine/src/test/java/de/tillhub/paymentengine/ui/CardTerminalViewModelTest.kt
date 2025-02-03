@@ -164,7 +164,7 @@ class CardTerminalViewModelTest : FunSpec({
                     resultText = "",
                     singleAmounts = "",
                     tags = emptyMap(),
-                    tid = "526017",
+                    tid = "52601735",
                     time = "",
                     trace = "",
                     traceOrig = "",

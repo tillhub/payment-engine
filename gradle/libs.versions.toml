@@ -12,8 +12,8 @@ timber = "5.0.1"
 androidDesugarJdkLibs = "2.0.4"
 detekt = "1.23.6"
 
-lavegoSdk = "1.0.0"
-lavegoUtils = "1.0.0"
+lavegoSdk = "1.0.1"
+lavegoUtils = "1.0.1"
 commonsCodec = "1.15"
 simpleXml = "2.7.1"
 
