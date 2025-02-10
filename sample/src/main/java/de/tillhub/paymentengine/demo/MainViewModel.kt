@@ -24,6 +24,8 @@ class MainViewModel : ViewModel() {
     private lateinit var reversalManager: ReversalManager
     private lateinit var reconciliationManager: ReconciliationManager
     private lateinit var connectionManager: ConnectionManager
+    var terminalID: String = "s-pos"
+    var remoteIP: String = ""
 
     val cardManagerState: StateFlow<TerminalOperationStatus> by lazy {
         merge(
@@ -73,7 +75,7 @@ class MainViewModel : ViewModel() {
         cardManager.putTerminalConfig(
             Terminal.ZVT(
                 id = "zvt-remote",
-                ipAddress = REMOTE_IP,
+                ipAddress = remoteIP,
                 port = 20007
             )
         )
@@ -87,7 +89,7 @@ class MainViewModel : ViewModel() {
         cardManager.putTerminalConfig(
             Terminal.OPI(
                 id = "opi",
-                ipAddress = REMOTE_IP,
+                ipAddress = remoteIP,
                 port = 20002,
                 port2 = 20007
             )
@@ -100,49 +102,50 @@ class MainViewModel : ViewModel() {
     }
 
     fun startPayment() {
+        initPaymentManager(this.paymentManager)
         paymentManager.startPaymentTransaction(
             UUID.randomUUID().toString(),
             500.toBigDecimal(),
             100.toBigDecimal(),
             ISOAlphaCurrency("EUR"),
-            CONFIG_IN_USE
+            terminalID
         )
     }
 
     fun startRefund() {
+        initRefundManager(this.refundManager)
         refundManager.startRefundTransaction(
             transactionId = UUID.randomUUID().toString(),
             amount = 600.toBigDecimal(),
             currency = ISOAlphaCurrency("EUR"),
-            configId = CONFIG_IN_USE
+            configId = terminalID
         )
     }
 
     fun startReversal() {
+        initReversalManager(this.reversalManager)
         reversalManager.startReversalTransaction(
             transactionId = UUID.randomUUID().toString(),
             amount = 500.toBigDecimal(),
             tip = 100.toBigDecimal(),
             currency = ISOAlphaCurrency("EUR"),
             receiptNo = "374",
-            configId = CONFIG_IN_USE
+            configId = terminalID
         )
     }
 
     fun startReconciliation() {
-        reconciliationManager.startReconciliation(CONFIG_IN_USE)
+        initReconciliationManager(this.reconciliationManager)
+        reconciliationManager.startReconciliation(terminalID)
     }
 
-    fun startConnect() {
-        connectionManager.startConnect(CONFIG_IN_USE)
+    fun startSPOSConnect() {
+        initConnectionManager(this.connectionManager)
+        connectionManager.startConnect(terminalID)
     }
 
     fun startSPOSDisconnect() {
-        connectionManager.startSPOSDisconnect(CONFIG_IN_USE)
+        connectionManager.startSPOSDisconnect(terminalID)
     }
 
-    companion object {
-        private const val CONFIG_IN_USE = "zvt-remote"
-        private const val REMOTE_IP = "192.168.100.39"
-    }
 }
