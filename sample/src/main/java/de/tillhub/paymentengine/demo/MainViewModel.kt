@@ -11,6 +11,7 @@ import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
@@ -24,8 +25,10 @@ class MainViewModel : ViewModel() {
     private lateinit var reversalManager: ReversalManager
     private lateinit var reconciliationManager: ReconciliationManager
     private lateinit var connectionManager: ConnectionManager
-    var terminalID: String = "s-pos"
-    var remoteIP: String = ""
+    var terminalID: MutableStateFlow<String> = MutableStateFlow("s-pos")
+    var remoteIP: MutableStateFlow<String> = MutableStateFlow("")
+    var port1: MutableStateFlow<String> = MutableStateFlow("20002")
+    var port2: MutableStateFlow<String> = MutableStateFlow("20007")
 
     val cardManagerState: StateFlow<TerminalOperationStatus> by lazy {
         merge(
@@ -75,23 +78,23 @@ class MainViewModel : ViewModel() {
         cardManager.putTerminalConfig(
             Terminal.ZVT(
                 id = "zvt-remote",
-                ipAddress = remoteIP,
-                port = 20007
+                ipAddress = remoteIP.value,
+                port = if (port1.value.toIntOrNull() != null) port1.value.toInt() else 20007
             )
         )
         cardManager.putTerminalConfig(
             Terminal.ZVT(
                 id = "zvt-local",
                 ipAddress = "127.0.0.1",
-                port = 40007
+                port = if (port1.value.toIntOrNull() != null) port1.value.toInt() else 40007
             )
         )
         cardManager.putTerminalConfig(
             Terminal.OPI(
                 id = "opi",
-                ipAddress = remoteIP,
-                port = 20002,
-                port2 = 20007
+                ipAddress = remoteIP.value,
+                port =  if (port1.value.toIntOrNull() != null) port1.value.toInt() else 20002,
+                port2 = if (port2.value.toIntOrNull() != null) port2.value.toInt() else 20007
             )
         )
         cardManager.putTerminalConfig(
@@ -108,7 +111,7 @@ class MainViewModel : ViewModel() {
             500.toBigDecimal(),
             100.toBigDecimal(),
             ISOAlphaCurrency("EUR"),
-            terminalID
+            terminalID.value
         )
     }
 
@@ -118,7 +121,7 @@ class MainViewModel : ViewModel() {
             transactionId = UUID.randomUUID().toString(),
             amount = 600.toBigDecimal(),
             currency = ISOAlphaCurrency("EUR"),
-            configId = terminalID
+            configId = terminalID.value
         )
     }
 
@@ -130,22 +133,22 @@ class MainViewModel : ViewModel() {
             tip = 100.toBigDecimal(),
             currency = ISOAlphaCurrency("EUR"),
             receiptNo = "374",
-            configId = terminalID
+            configId = terminalID.value
         )
     }
 
     fun startReconciliation() {
         initReconciliationManager(this.reconciliationManager)
-        reconciliationManager.startReconciliation(terminalID)
+        reconciliationManager.startReconciliation(terminalID.value)
     }
 
     fun startSPOSConnect() {
         initConnectionManager(this.connectionManager)
-        connectionManager.startConnect(terminalID)
+        connectionManager.startConnect(terminalID.value)
     }
 
     fun startSPOSDisconnect() {
-        connectionManager.startSPOSDisconnect(terminalID)
+        connectionManager.startSPOSDisconnect(terminalID.value)
     }
 
 }

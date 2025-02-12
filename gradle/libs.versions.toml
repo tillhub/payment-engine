@@ -1,5 +1,6 @@
 [versions]
 agp = "8.2.2"
+datastoreCore = "1.1.2"
 kotlin = "1.9.0"
 core-ktx = "1.12.0"
 appcompat = "1.7.0"
@@ -30,10 +31,14 @@ activity-compose = "1.8.2"
 compose-bom = "2024.02.02"
 
 retrofit-simplexml = "2.10.0"
+datastoreCoreAndroid = "1.1.2"
+datastorePreferencesCoreJvm = "1.1.2"
 
 [libraries]
 # Define the libraries
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastoreCore" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 ui = { group = "androidx.compose.ui", name = "ui" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -86,6 +91,8 @@ robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "
 kotest-robolectric = { group = "io.kotest.extensions", name = "kotest-extensions-robolectric", version.ref = "kotestRobolectric" }
 kotest-extensions-android = { group = "br.com.colman", name = "kotest-extensions-android", version.ref = "kotestExtensionsAndroid" }
 androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidxCoreTest" }
+androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+androidx-datastore-preferences-core-jvm = { group = "androidx.datastore", name = "datastore-preferences-core-jvm", version.ref = "datastorePreferencesCoreJvm" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
