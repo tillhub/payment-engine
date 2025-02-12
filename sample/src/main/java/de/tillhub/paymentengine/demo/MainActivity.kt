@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
         when(terminalID.collectAsState().value) {
             "s-pos" ->
                 SPOSConfig(
-                    connectAction = { viewModel.startSPOSConnect() },
+                    connectAction = { viewModel.startConnect() },
                     disconnectAction = { viewModel.startSPOSDisconnect() }
                 )
 
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                     refundAction = { viewModel.startRefund() },
                     reversalAction = { viewModel.startReversal() },
                     reconciliationAction = { viewModel.startReconciliation() },
-                    connectAction = { viewModel.startSPOSConnect() },
+                    connectAction = { viewModel.startConnect() },
                     viewModel.remoteIP,
                     viewModel.port1
                 )
@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
                     refundAction = { viewModel.startRefund() },
                     reversalAction = { viewModel.startReversal() },
                     reconciliationAction = { viewModel.startReconciliation() },
-                    connectAction = { viewModel.startSPOSConnect() },
+                    connectAction = { viewModel.startConnect() },
                     viewModel.port1,
                 )
 
@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
                     refundAction = { viewModel.startRefund() },
                     reversalAction = { viewModel.startReversal() },
                     reconciliationAction = { viewModel.startReconciliation() },
-                    connectAction = { viewModel.startSPOSConnect() },
+                    connectAction = { viewModel.startConnect() },
                     viewModel.remoteIP,
                     viewModel.port1,
                     viewModel.port2

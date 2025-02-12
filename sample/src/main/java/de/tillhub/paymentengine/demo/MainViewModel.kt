@@ -142,7 +142,7 @@ class MainViewModel : ViewModel() {
         reconciliationManager.startReconciliation(terminalID.value)
     }
 
-    fun startSPOSConnect() {
+    fun startConnect() {
         initConnectionManager(this.connectionManager)
         connectionManager.startConnect(terminalID.value)
     }
