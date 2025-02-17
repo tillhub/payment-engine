@@ -15,6 +15,7 @@ import de.tillhub.paymentengine.spos.SPOSResponseHandler
 class TerminalDisconnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
+
     override fun createIntent(context: Context, input: Terminal): Intent {
         return if (input is Terminal.SPOS) {
             SPOSIntentFactory.createDisconnectIntent(input)

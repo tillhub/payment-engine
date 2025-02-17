@@ -59,6 +59,9 @@ internal object SPOSIntentFactory {
             putExtra(SPOSKey.Extra.TAX_AMOUNT, "000")
         }
 
+    fun createRecoveryIntent() =
+        Intent(SPOSKey.Action.RECOVERY_ACTION)
+
     fun createReconciliationIntent() =
         Intent(SPOSKey.Action.RECONCILIATION_ACTION)
 }

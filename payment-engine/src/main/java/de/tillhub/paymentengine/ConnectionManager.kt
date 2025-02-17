@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.Instant
 
 /**
- * This is called to start of S-POS terminal connect and disconnect,
+ * This is called to as initial process to connect to terminal and fetch it's data,
  * it sets up the manager so the connection to the terminal is viable.
  */
 interface ConnectionManager : CardManager {
@@ -61,7 +61,8 @@ internal class ConnectionManagerImpl(
                     merchantReceipt = "",
                     rawData = "",
                     data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
+                    isRecoverable = false
                 )
             )
         }
@@ -89,7 +90,8 @@ internal class ConnectionManagerImpl(
                     merchantReceipt = "",
                     rawData = "",
                     data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
+                    isRecoverable = false
                 )
             )
         }

@@ -1,21 +1,18 @@
 package de.tillhub.paymentengine.contract
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
-import de.tillhub.paymentengine.spos.SPOSResponseHandler
-import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -44,41 +41,8 @@ class PaymentRefundContract(
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return if (resultCode == Activity.RESULT_OK) {
-            if (intent?.extras?.containsKey(ExtraKeys.EXTRAS_RESULT) == true) {
-                intent.extras?.let {
-                    BundleCompat.getParcelable(
-                        it,
-                        ExtraKeys.EXTRAS_RESULT,
-                        TerminalOperationStatus::class.java
-                    )
-                } ?: TerminalOperationStatus.Canceled
-            } else {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
-                    analytics?.logCommunication(
-                        protocol = SPOS_PROTOCOL,
-                        message = AnalyticsMessageFactory.createResultOk(intent?.extras)
-                    )
-                }
-            }
-        } else {
-            if (intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true) {
-                SPOSResponseHandler.handleTransactionResponse(resultCode, intent).also {
-                    analytics?.logCommunication(
-                        protocol = SPOS_PROTOCOL,
-                        message = AnalyticsMessageFactory.createResultCanceled(intent.extras)
-                    )
-                }
-            } else {
-                TerminalOperationStatus.Canceled
-            }
-        }
-    }
-
-    companion object {
-        private const val SPOS_PROTOCOL = "SPOS"
-    }
+    override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus =
+        ResponseHandler.parseResult(resultCode, intent, analytics)
 }
 
 /***
