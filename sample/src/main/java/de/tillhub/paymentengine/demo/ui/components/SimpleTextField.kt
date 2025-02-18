@@ -12,17 +12,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
-fun SimpleTextField(label: String, mutableStateFlow: MutableStateFlow<String>) {
-    var text by remember { mutableStateOf(TextFieldValue(mutableStateFlow.value)) }
+fun SimpleTextField(label: String, init: String?, onChange: (newText:String) -> Unit) {
+    var text by remember { mutableStateOf(TextFieldValue(init.orEmpty())) }
 
     TextField(
         value = text,
         onValueChange = { newText: TextFieldValue ->
             text = newText
-            mutableStateFlow.value = newText.text
+            onChange(newText.text)
         },
         label = { Text(label) },
         modifier = Modifier.padding(vertical = 3.dp).fillMaxWidth()

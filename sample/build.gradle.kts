@@ -2,6 +2,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -47,6 +49,13 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "kotlin/reflect/reflect.kotlin_builtins"
+            excludes += "kotlin/coroutines/coroutines.kotlin_builtins"
+            excludes += "kotlin/collections/collections.kotlin_builtins"
+            excludes += "kotlin/internal/internal.kotlin_builtins"
+            excludes += "kotlin/kotlin.kotlin_builtins"
+            excludes += "kotlin/ranges/ranges.kotlin_builtins"
+            excludes += "kotlin/annotation/annotation.kotlin_builtins"
         }
     }
 }
@@ -57,6 +66,9 @@ dependencies {
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.datastore.preferences.core.jvm)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.lifecycle.viewmodel.compose.android)
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     implementation(libs.core.ktx)

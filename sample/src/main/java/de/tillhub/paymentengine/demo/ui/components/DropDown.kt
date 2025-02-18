@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.demo.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,10 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import de.tillhub.paymentengine.demo.MainViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,9 +27,10 @@ fun DropDown(listOfItems: List<String>, label: String, onValueChange: (newValue:
         expanded = isExpanded,
         onExpandedChange = { isExpanded = !isExpanded },
         Modifier.padding(vertical = 3.dp)
+            .fillMaxWidth()
     ) {
         TextField(
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
             value = selectedItem,
             onValueChange = {},
             readOnly = true,

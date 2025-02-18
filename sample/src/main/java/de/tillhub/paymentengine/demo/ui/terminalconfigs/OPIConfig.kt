@@ -1,9 +1,9 @@
 package de.tillhub.paymentengine.demo.ui.terminalconfigs
 
 import androidx.compose.runtime.Composable
+import de.tillhub.paymentengine.demo.storage.TerminalData
 import de.tillhub.paymentengine.demo.ui.components.ActionButton
 import de.tillhub.paymentengine.demo.ui.components.SimpleTextField
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun OPIConfig(
@@ -12,13 +12,20 @@ fun OPIConfig(
     reversalAction: () -> Unit,
     reconciliationAction: () -> Unit,
     connectAction: () -> Unit,
-    ipAddress: MutableStateFlow<String>,
-    port1: MutableStateFlow<String>,
-    port2: MutableStateFlow<String>
+    terminalData: TerminalData,
+    ipChange: (String) -> Unit,
+    port1Change: (String) -> Unit,
+    port2Change: (String) -> Unit,
 ) {
-    SimpleTextField("IP Address", ipAddress)
-    SimpleTextField("Network Port", port1)
-    SimpleTextField("Network Port 2", port2)
+    SimpleTextField("IP Address", terminalData.ipAddress) {
+        ipChange(it)
+    }
+    SimpleTextField("Network Port", terminalData.port1) {
+        port1Change(it)
+    }
+    SimpleTextField("Network Port 2", terminalData.port2) {
+        port2Change(it)
+    }
     ActionButton("Payment") {
         paymentAction()
     }

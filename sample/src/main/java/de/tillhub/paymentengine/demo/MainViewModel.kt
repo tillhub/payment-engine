@@ -1,7 +1,11 @@
 package de.tillhub.paymentengine.demo
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import de.tillhub.paymentengine.CardManager
 import de.tillhub.paymentengine.ConnectionManager
 import de.tillhub.paymentengine.PaymentManager
@@ -11,14 +15,20 @@ import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.demo.di.SampleAppApplication
+import de.tillhub.paymentengine.demo.storage.DeviceRepository
+import de.tillhub.paymentengine.demo.storage.TerminalData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val deviceRepository: DeviceRepository
+) : ViewModel() {
 
     private lateinit var paymentManager: PaymentManager
     private lateinit var refundManager: RefundManager
@@ -26,9 +36,12 @@ class MainViewModel : ViewModel() {
     private lateinit var reconciliationManager: ReconciliationManager
     private lateinit var connectionManager: ConnectionManager
     var terminalID: MutableStateFlow<String> = MutableStateFlow("s-pos")
-    var remoteIP: MutableStateFlow<String> = MutableStateFlow("")
-    var port1: MutableStateFlow<String> = MutableStateFlow("20002")
-    var port2: MutableStateFlow<String> = MutableStateFlow("20007")
+
+    val terminalData: StateFlow<TerminalData> = deviceRepository.terminal.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(),
+        initialValue = TerminalData()
+    )
 
     val cardManagerState: StateFlow<TerminalOperationStatus> by lazy {
         merge(
@@ -78,23 +91,23 @@ class MainViewModel : ViewModel() {
         cardManager.putTerminalConfig(
             Terminal.ZVT(
                 id = "zvt-remote",
-                ipAddress = remoteIP.value,
-                port = if (port1.value.toIntOrNull() != null) port1.value.toInt() else 20007
+                ipAddress = terminalData.value.ipAddress!!,
+                port = if (terminalData.value.port1?.toIntOrNull() != null) terminalData.value.port1!!.toInt() else 20007
             )
         )
         cardManager.putTerminalConfig(
             Terminal.ZVT(
                 id = "zvt-local",
                 ipAddress = "127.0.0.1",
-                port = if (port1.value.toIntOrNull() != null) port1.value.toInt() else 40007
+                port = if (terminalData.value.port1?.toIntOrNull() != null) terminalData.value.port1!!.toInt() else 40007
             )
         )
         cardManager.putTerminalConfig(
             Terminal.OPI(
                 id = "opi",
-                ipAddress = remoteIP.value,
-                port =  if (port1.value.toIntOrNull() != null) port1.value.toInt() else 20002,
-                port2 = if (port2.value.toIntOrNull() != null) port2.value.toInt() else 20007
+                ipAddress = terminalData.value.ipAddress!!,
+                port = if (terminalData.value.port1?.toIntOrNull() != null) terminalData.value.port1!!.toInt() else 20002,
+                port2 = if (terminalData.value.port2?.toIntOrNull() != null) terminalData.value.port2!!.toInt() else 20007
             )
         )
         cardManager.putTerminalConfig(
@@ -151,4 +164,25 @@ class MainViewModel : ViewModel() {
         connectionManager.startSPOSDisconnect(terminalID.value)
     }
 
+    fun updateIpAddress(newValue: String) {
+        deviceRepository.updateTerminal(newValue, terminalData.value.port1.orEmpty(), terminalData.value.port2.orEmpty())
+    }
+    fun updatePort1(newValue: String) {
+        deviceRepository.updateTerminal(terminalData.value.ipAddress.orEmpty(), newValue, terminalData.value.port2.orEmpty())
+    }
+    fun updatePort2(newValue: String) {
+        deviceRepository.updateTerminal(terminalData.value.ipAddress.orEmpty(), terminalData.value.port1.orEmpty(), newValue)
+    }
+
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as SampleAppApplication)
+                MainViewModel(
+                    application.deviceRepository
+                )
+            }
+        }
+    }
 }

@@ -1,22 +1,27 @@
 package de.tillhub.paymentengine.demo.ui.terminalconfigs
 
 import androidx.compose.runtime.Composable
+import de.tillhub.paymentengine.demo.storage.TerminalData
 import de.tillhub.paymentengine.demo.ui.components.ActionButton
 import de.tillhub.paymentengine.demo.ui.components.SimpleTextField
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
-fun ZVTRemoteConfig(
+fun ZVTConfig(
     paymentAction: () -> Unit,
     refundAction: () -> Unit,
     reversalAction: () -> Unit,
     reconciliationAction: () -> Unit,
     connectAction: () -> Unit,
-    ipAddress: MutableStateFlow<String>,
-    port1: MutableStateFlow<String>
-) {
-    SimpleTextField("IP Address", ipAddress)
-    SimpleTextField("Network Port", port1)
+    terminalData: TerminalData,
+    ipChange: (String) -> Unit,
+    port1Change: (String) -> Unit,
+    ) {
+    SimpleTextField("IP Address", terminalData.ipAddress) {
+        ipChange(it)
+    }
+    SimpleTextField("Network Port", terminalData.port1) {
+        port1Change(it)
+    }
     ActionButton("Payment") {
         paymentAction()
     }
