@@ -93,7 +93,8 @@ internal class PaymentManagerImpl(
                     merchantReceipt = "",
                     rawData = "",
                     data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
+                    isRecoverable = false
                 )
             )
         }

@@ -3,6 +3,7 @@ package de.tillhub.paymentengine.spos
 import android.app.Activity
 import android.content.Intent
 import de.tillhub.paymentengine.R
+import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.spos.data.ReceiptDto
@@ -11,12 +12,16 @@ import de.tillhub.paymentengine.spos.data.StringToReceiptDtoConverter
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 
 class SPOSResponseHandlerTest : DescribeSpec({
+
     lateinit var intent: Intent
     lateinit var receiptDto: ReceiptDto
+    lateinit var analytics: PaymentAnalytics
     lateinit var receiptConverter: StringToReceiptDtoConverter
 
     beforeTest {
@@ -26,6 +31,11 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
         intent = mockk {
             every { extras } returns null
+        }
+
+        analytics = mockk {
+            every { logOperation(any()) } just Runs
+            every { logCommunication(any(), any()) } just Runs
         }
 
         receiptConverter = mockk {
@@ -91,9 +101,10 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
     describe("handleTransactionResponse") {
         it("canceled") {
-            val result = SPOSResponseHandler.handleTransactionResponse(
+            val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_CANCELED,
-                intent
+                intent,
+                analytics
             )
 
             result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
@@ -112,9 +123,10 @@ class SPOSResponseHandlerTest : DescribeSpec({
                     intent.extras?.keySet()
                 } returns setOf(SPOSKey.ResultExtra.ERROR)
 
-                val result = SPOSResponseHandler.handleTransactionResponse(
+                val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_CANCELED,
-                    intent
+                    intent,
+                    analytics
                 )
 
                 result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
@@ -129,9 +141,10 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
                 every { intent.extras?.getString(any()) } returns null
 
-                val result = SPOSResponseHandler.handleTransactionResponse(
+                val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
-                    intent
+                    intent,
+                    analytics
                 )
 
                 result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
@@ -181,15 +194,23 @@ class SPOSResponseHandlerTest : DescribeSpec({
                     intent.extras?.getString(SPOSKey.ResultExtra.MERCHANT)
                 } returns "merchant"
 
-                val result = SPOSResponseHandler.handleTransactionResponse(
+                every {
+                    intent.extras?.getString(SPOSKey.ResultExtra.ERROR)
+                } returns null
+                every {
+                    intent.extras?.getString(SPOSKey.ResultExtra.ERROR_MESSAGE)
+                } returns "CARD_DETECTION_FAILED"
+
+                val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
                     intent,
+                    analytics,
                     receiptConverter
                 )
 
                 result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
                 result.resultCode.shouldBeInstanceOf<TransactionResultCode.Known>()
-                result.resultCode.errorMessage shouldBe R.string.spos_error_failure
+                result.resultCode.errorMessage shouldBe R.string.spos_error_card_detection_failed
                 result.customerReceipt shouldBe "RECEIPT"
                 result.merchantReceipt shouldBe "RECEIPT"
                 result.rawData shouldBe "Extras {\n" +
@@ -253,9 +274,17 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 intent.extras?.getString(SPOSKey.ResultExtra.MERCHANT)
             } returns "merchant"
 
-            val result = SPOSResponseHandler.handleTransactionResponse(
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.ERROR)
+            } returns null
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.ERROR_MESSAGE)
+            } returns null
+
+            val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_OK,
                 intent,
+                analytics,
                 receiptConverter
             )
 

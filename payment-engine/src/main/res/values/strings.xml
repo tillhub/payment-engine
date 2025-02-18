@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="operation_not_supported_error">Operation not supported</string>
     <string name="checkout_card_payment_follow_instructions">Follow instructions on the terminal</string>
     <string name="transaction_cancel_card_reversal_follow_instructions">Follow instructions on the terminal</string>
     <string name="transaction_cancel">Cancel</string>
@@ -323,25 +324,39 @@
 
     <!-- S-POS Errors -->
     <string name="spos_error_terminal_not_connected">POS is not connected to terminal</string>
+    <string name="spos_error_terminal_not_connected_action">Connect S-POS terminal from the settings of the app</string>
     <string name="spos_error_terminal_not_onboarded">Terminal has not been onboarded</string>
-    <string name="spos_error_failure">Transaction failure</string>
-    <string name="spos_error_aborted">Transaction aborted</string>
-    <string name="spos_error_busy">Terminal is busy</string>
-    <string name="spos_error_communication_error">Terminal communication error</string>
-    <string name="spos_error_configuration_failure">Terminal configuration failure</string>
-    <string name="spos_error_device_unavailable">Terminal unavailable</string>
-    <string name="spos_error_format_error">Format error</string>
-    <string name="spos_error_missing_mandatory_data">Missing mandatory data</string>
-    <string name="spos_error_no_active_payment">No active payment</string>
-    <string name="spos_error_parsing_error">Parsing error</string>
-    <string name="spos_error_partial_failure">Partial failure</string>
-    <string name="spos_error_payment_ongoing">Payment ongoing</string>
-    <string name="spos_error_pc_communication_failed">PC communication failed</string>
-    <string name="spos_error_print_last_ticket">Print last ticket</string>
-    <string name="spos_error_timed_out">Transaction timed out</string>
-    <string name="spos_error_receipt_call_failed">Receipt call failed</string>
-    <string name="spos_error_terminal_already_activated">Terminal already activated</string>
-    <string name="spos_error_validation_error">Validation error</string>
-    <string name="spos_error_unknown">Unknown terminal error</string>
+    <string name="spos_error_terminal_not_onboarded_action">Finish initialisation of Sparkasse POS app</string>
+    <string name="spos_error_amount_required">Amount is missing</string>
+    <string name="spos_error_amount_required_action">Add amount</string>
+    <string name="spos_error_card_detection_failed">Detection of card failed</string>
+    <string name="spos_error_card_read_failed">Reading of card failed</string>
+    <string name="spos_error_card_reader_status_failed">Retrieving status of card reader failed</string>
+    <string name="spos_error_flow_already_happening">Another payment is currently active</string>
+    <string name="spos_error_flow_already_happening_action">Wait for the other transaction to complete</string>
+    <string name="spos_error_invalid_request_type">The sent Request Type is not supported</string>
+    <string name="spos_error_response_timeout">A terminal read timeout</string>
+    <string name="spos_error_response_timeout_action">Retry the payment recovery</string>
+    <string name="spos_error_email_verification_timeout_server">Email verification timeout server</string>
+    <string name="spos_error_email_verification_timeout_server_action">Contact support and request a new terminal password</string>
+    <string name="spos_error_not_installed">S-POS Plugin is not installed on the device</string>
+    <string name="spos_error_not_installed_action">Install the S-Pos Plug-In</string>
+    <string name="spos_error_personalization_not_done">S-POS Plugin needs to be personalized before payments can be made.</string>
+    <string name="spos_error_personalization_not_done_action">Initialize the Plug-in</string>
+    <string name="spos_error_terminal_not_operational">Terminal is not ready to operate yet</string>
+    <string name="spos_error_terminal_not_operational_action">Try again later or reset the terminal.</string>
+    <string name="spos_error_wbc_keys_expired">WBC keys expired</string>
+    <string name="spos_error_wbc_keys_expired_action">Try to update to the latest S-POS Plugin version</string>
+    <string name="spos_error_terminal_connection_lost">A send/read error or a send timeout during the transaction</string>
+    <string name="spos_error_terminal_connection_lost_action">Retry with the payment recovery</string>
+    <string name="spos_error_personalization_failed">Plugin is not personalized</string>
+    <string name="spos_error_personalization_failed_action">Try to personalize the plugin or contact support</string>
+    <string name="spos_error_threat_detection_triggered">Personalization data has been deleted due to threat detection</string>
+    <string name="spos_error_threat_detection_triggered_action">Try to personalize the plugin or contact support</string>
+    <string name="spos_error_general_error">Unexpected error</string>
+    <string name="spos_error_payment_error">Payment not successful</string>
+    <string name="spos_error_repeat_last_message_error">Repeat-last-message not successful</string>
+    <string name="spos_error_app_not_in_foreground">S-POS app is not in foreground to start payment</string>
+    <string name="spos_error_app_not_in_foreground_action">Try again</string>
     <string name="spos_error_app_not_found">Terminal application not found on device</string>
 </resources>
