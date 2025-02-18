@@ -20,6 +20,7 @@ import de.tillhub.paymentengine.zvt.ui.TerminalLoginActivity
 class TerminalConnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
+
     override fun createIntent(context: Context, input: Terminal): Intent {
         return when (input) {
             is Terminal.SPOS -> SPOSIntentFactory.createConnectIntent(input)

@@ -43,6 +43,7 @@ sealed class TerminalOperationStatus : Parcelable {
 
         data object Connecting : Pending()
         data object Disconnecting : Pending()
+        data object Recovery : Pending()
     }
 
     @Parcelize
@@ -115,32 +116,36 @@ sealed class TerminalOperationStatus : Parcelable {
         abstract val rawData: String
         abstract val data: TransactionData?
         abstract val resultCode: TransactionResultCode
+        abstract val isRecoverable: Boolean
 
         class ZVT(
             override val date: Instant,
-            override val customerReceipt: String,
-            override val merchantReceipt: String,
-            override val rawData: String,
-            override val data: TransactionData?,
-            override val resultCode: TransactionResultCode
+            override val customerReceipt: String = "",
+            override val merchantReceipt: String = "",
+            override val rawData: String = "",
+            override val data: TransactionData? = null,
+            override val resultCode: TransactionResultCode,
+            override val isRecoverable: Boolean = false
         ) : Error()
 
         class OPI(
             override val date: Instant,
-            override val customerReceipt: String,
-            override val merchantReceipt: String,
-            override val rawData: String,
-            override val data: TransactionData?,
-            override val resultCode: TransactionResultCode
+            override val customerReceipt: String = "",
+            override val merchantReceipt: String = "",
+            override val rawData: String = "",
+            override val data: TransactionData? = null,
+            override val resultCode: TransactionResultCode,
+            override val isRecoverable: Boolean = false
         ) : Error()
 
         class SPOS(
             override val date: Instant,
-            override val customerReceipt: String,
-            override val merchantReceipt: String,
-            override val rawData: String,
-            override val data: TransactionData?,
-            override val resultCode: TransactionResultCode
+            override val customerReceipt: String = "",
+            override val merchantReceipt: String = "",
+            override val rawData: String = "",
+            override val data: TransactionData? = null,
+            override val resultCode: TransactionResultCode,
+            override val isRecoverable: Boolean
         ) : Error()
 
         override fun equals(other: Any?) = other is Error &&
@@ -149,7 +154,8 @@ sealed class TerminalOperationStatus : Parcelable {
                 merchantReceipt == other.merchantReceipt &&
                 rawData == other.rawData &&
                 data == other.data &&
-                resultCode == other.resultCode
+                resultCode == other.resultCode &&
+                isRecoverable == other.isRecoverable
 
         override fun hashCode() = Objects.hash(
             date,
@@ -157,7 +163,8 @@ sealed class TerminalOperationStatus : Parcelable {
             merchantReceipt,
             rawData,
             data,
-            resultCode
+            resultCode,
+            isRecoverable
         )
 
         override fun toString() = "Error(" +
@@ -167,6 +174,7 @@ sealed class TerminalOperationStatus : Parcelable {
                 "rawData=$rawData, " +
                 "data=$data, " +
                 "resultCode=$resultCode" +
+                "isRecoverable=$isRecoverable" +
                 ")"
     }
 }

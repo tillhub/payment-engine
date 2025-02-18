@@ -56,5 +56,11 @@ class PaymentEngine private constructor() {
         }
     }
 
+    fun newRecoveryManager(registry: ActivityResultCaller): RecoveryManager {
+        return RecoveryManagerImpl(configs, terminalState, registry).also {
+            terminalState.tryEmit(TerminalOperationStatus.Waiting)
+        }
+    }
+
     companion object : SingletonHolder<PaymentEngine>(::PaymentEngine)
 }

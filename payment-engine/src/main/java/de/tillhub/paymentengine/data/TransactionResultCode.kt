@@ -566,105 +566,144 @@ internal sealed class ResultCodeSets<T>(val mapping: Map<T, TransactionResultCod
         mapOf(
             Pair(
                 "S_SWITCH_NOT_CONNECTED",
-                TransactionResultCode.Known(R.string.spos_error_terminal_not_connected)
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_terminal_not_connected,
+                    recoveryMessages = listOf(R.string.spos_error_terminal_not_connected_action)
+                )
             ),
             Pair(
                 "CARD_PAYMENT_NOT_ONBOARDED",
-                TransactionResultCode.Known(R.string.spos_error_terminal_not_onboarded)
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_terminal_not_onboarded,
+                    recoveryMessages = listOf(R.string.spos_error_terminal_not_onboarded_action)
+                )
             ),
             Pair(
-                "Failure",
-                TransactionResultCode.Known(R.string.spos_error_failure)
+                "AMOUNT_REQUIRED",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_amount_required,
+                    recoveryMessages = listOf(R.string.spos_error_amount_required_action)
+                )
             ),
             Pair(
-                "Aborted",
-                TransactionResultCode.Known(R.string.spos_error_aborted)
+                "CARD_DETECTION_FAILED",
+                TransactionResultCode.Known(R.string.spos_error_card_detection_failed)
             ),
             Pair(
-                "Busy",
-                TransactionResultCode.Known(R.string.spos_error_busy)
+                "CARD_READ_FAILED",
+                TransactionResultCode.Known(R.string.spos_error_card_read_failed)
             ),
             Pair(
-                "CommunicationError",
-                TransactionResultCode.Known(R.string.spos_error_communication_error)
+                "CARD_READER_STATUS_FAILED",
+                TransactionResultCode.Known(R.string.spos_error_card_reader_status_failed)
             ),
             Pair(
-                "DeviceConfigurationFailure",
-                TransactionResultCode.Known(R.string.spos_error_configuration_failure)
+                "FLOW_ALREADY_HAPPENING",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_flow_already_happening,
+                    recoveryMessages = listOf(R.string.spos_error_flow_already_happening_action)
+                )
             ),
             Pair(
-                "DeviceUnavailable",
-                TransactionResultCode.Known(R.string.spos_error_device_unavailable)
+                "INVALID_REQUEST_TYPE",
+                TransactionResultCode.Known(R.string.spos_error_invalid_request_type)
             ),
             Pair(
-                "FormatError",
-                TransactionResultCode.Known(R.string.spos_error_format_error)
+                "RESPONSE_TIMEOUT",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_response_timeout,
+                    recoveryMessages = listOf(R.string.spos_error_response_timeout_action)
+                )
             ),
             Pair(
-                "MissingMandatoryData",
-                TransactionResultCode.Known(R.string.spos_error_missing_mandatory_data)
+                "STATUS_EMAIL_VERIFICATION_TIMEOUT_SERVER",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_email_verification_timeout_server,
+                    recoveryMessages = listOf(R.string.spos_error_email_verification_timeout_server_action)
+                )
             ),
             Pair(
-                "NoActivePayment",
-                TransactionResultCode.Known(R.string.spos_error_no_active_payment)
+                "STATUS_NOT_INSTALLED",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_not_installed,
+                    recoveryMessages = listOf(R.string.spos_error_not_installed_action)
+                )
             ),
             Pair(
-                "ParsingError",
-                TransactionResultCode.Known(R.string.spos_error_parsing_error)
+                "STATUS_PERSONALIZATION_NOT_DONE_YET",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_personalization_not_done,
+                    recoveryMessages = listOf(R.string.spos_error_personalization_not_done_action)
+                )
             ),
             Pair(
-                "PartialFailure",
-                TransactionResultCode.Known(R.string.spos_error_partial_failure)
+                "STATUS_TERMINAL_NOT_OPERATIONAL",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_terminal_not_operational,
+                    recoveryMessages = listOf(R.string.spos_error_terminal_not_operational_action)
+                )
             ),
             Pair(
-                "PaymentOnGoing",
-                TransactionResultCode.Known(R.string.spos_error_payment_ongoing)
+                "STATUS_WBC_KEYS_EXPIRED",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_wbc_keys_expired,
+                    recoveryMessages = listOf(R.string.spos_error_wbc_keys_expired_action)
+                )
             ),
             Pair(
-                "PcCommunicationFailed",
-                TransactionResultCode.Known(R.string.spos_error_pc_communication_failed)
+                "TERMINAL_CONNECTION_LOST",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_terminal_connection_lost,
+                    recoveryMessages = listOf(R.string.spos_error_terminal_connection_lost_action)
+                )
             ),
             Pair(
-                "DeviceConfigurationFailed",
-                TransactionResultCode.Known(R.string.spos_error_configuration_failure)
+                "STATUS_PERSONALIZATION_FAILED",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_personalization_failed,
+                    recoveryMessages = listOf(R.string.spos_error_personalization_failed_action)
+                )
             ),
             Pair(
-                "PrintLastTicket",
-                TransactionResultCode.Known(R.string.spos_error_print_last_ticket)
+                "STATUS_THREAT_DETECTION_TRIGGERED",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_threat_detection_triggered,
+                    recoveryMessages = listOf(R.string.spos_error_threat_detection_triggered_action)
+                )
             ),
             Pair(
-                "TimedOut",
-                TransactionResultCode.Known(R.string.spos_error_timed_out)
+                "STATUS_GENERAL_ERROR",
+                TransactionResultCode.Known(R.string.spos_error_general_error)
             ),
             Pair(
-                "ReceiptCallFailed",
-                TransactionResultCode.Known(R.string.spos_error_receipt_call_failed)
+                "PAYMENT_ERROR",
+                TransactionResultCode.Known(R.string.spos_error_payment_error)
             ),
             Pair(
-                "TerminalAlreadyActivated",
-                TransactionResultCode.Known(R.string.spos_error_terminal_already_activated)
+                "REPEAT_LAST_MESSAGE_ERROR",
+                TransactionResultCode.Known(R.string.spos_error_repeat_last_message_error)
             ),
             Pair(
-                "ValidationError",
-                TransactionResultCode.Known(R.string.spos_error_validation_error)
+                "APP_NOT_IN_FOREGROUND",
+                TransactionResultCode.Known(
+                    errorMessage = R.string.spos_error_app_not_in_foreground,
+                    recoveryMessages = listOf(R.string.spos_error_app_not_in_foreground_action)
+                )
             ),
-            Pair(
-                "Unknown",
-                TransactionResultCode.Known(R.string.spos_error_unknown)
-            )
         )
     )
 
     companion object {
         private const val UNKNOWN_RESULT_CODE = -1
         val APP_NOT_FOUND_ERROR = TransactionResultCode.Known(R.string.spos_error_app_not_found)
+        val ACTION_NOT_SUPPORTED = TransactionResultCode.Known(R.string.operation_not_supported_error)
 
         fun getZVTCode(resultCode: Int?): TransactionResultCode {
             return LavegoResultCodes.mapping.getOrDefault(
-                resultCode,
-                ZvtResultCodes.mapping.getOrDefault(
-                    resultCode,
-                    TransactionResultCode.Unknown(
+                key = resultCode,
+                defaultValue = ZvtResultCodes.mapping.getOrDefault(
+                    key = resultCode,
+                    defaultValue = TransactionResultCode.Unknown(
                         resultCode = resultCode ?: UNKNOWN_RESULT_CODE,
                         errorMessage = R.string.zvt_error_code_unknown
                     )
@@ -674,8 +713,8 @@ internal sealed class ResultCodeSets<T>(val mapping: Map<T, TransactionResultCod
 
         fun getOPICode(resultCode: Int?): TransactionResultCode {
             return OpiResultCodes.mapping.getOrDefault(
-                resultCode,
-                TransactionResultCode.Unknown(
+                key = resultCode,
+                defaultValue = TransactionResultCode.Unknown(
                     resultCode = resultCode ?: UNKNOWN_RESULT_CODE,
                     errorMessage = R.string.zvt_error_code_unknown
                 )
@@ -684,8 +723,8 @@ internal sealed class ResultCodeSets<T>(val mapping: Map<T, TransactionResultCod
 
         fun getSPOSCode(resultCode: String?): TransactionResultCode {
             return SPOSResultCodes.mapping.getOrDefault(
-                resultCode,
-                TransactionResultCode.Unknown(
+                key = resultCode,
+                defaultValue = TransactionResultCode.Unknown(
                     resultCode = UNKNOWN_RESULT_CODE,
                     resultCodeString = resultCode,
                     errorMessage = R.string.zvt_error_code_unknown
