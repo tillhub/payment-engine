@@ -136,6 +136,9 @@ internal class CardTerminalViewModel(
                 _terminalOperationState.value = State.OperationAborted
             }
         }
+        else if (terminalOperationState.value is State.Setup) {
+            _terminalOperationState.value = State.OperationAborted
+        }
     }
 
     fun setupFinished(completion: String, moveToFront: () -> Unit) {
