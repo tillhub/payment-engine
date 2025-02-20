@@ -227,6 +227,12 @@ class CardTerminalViewModelTest : FunSpec({
             )
         }
     }
+
+    test("onAbort during setup") {
+        viewModel.init()
+        viewModel.abortOperation {}
+        viewModel.terminalOperationState.value shouldBe CardTerminalViewModel.State.OperationAborted
+    }
 }) {
 
     interface Callback {

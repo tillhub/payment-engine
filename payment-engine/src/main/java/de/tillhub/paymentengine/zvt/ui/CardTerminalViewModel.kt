@@ -135,6 +135,8 @@ internal class CardTerminalViewModel(
                 delay(TIMEOUT_DELAY)
                 _terminalOperationState.value = State.OperationAborted
             }
+        } else if (terminalOperationState.value is State.Setup) {
+            _terminalOperationState.value = State.OperationAborted
         }
     }
 
