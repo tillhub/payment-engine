@@ -39,6 +39,7 @@
 -keep class de.tillhub.paymentengine.ReversalManager { *; }
 -keep class de.tillhub.paymentengine.ConnectionManager { *; }
 -keep class de.tillhub.paymentengine.RecoveryManager { *; }
+-keep class de.tillhub.paymentengine.TicketReprintManager { *; }
 -keep class de.tillhub.paymentengine.helper.SingletonHolder { *; }
 -keep class de.tillhub.paymentengine.analytics.PaymentAnalytics { *; }
 
