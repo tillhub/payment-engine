@@ -31,6 +31,8 @@ internal object AnalyticsMessageFactory {
 
     fun createRecoveryOperation(input: Terminal) = "Operation: TERMINAL_RECOVERY\n$input"
 
+    fun createTicketReprintOperation(input: Terminal) = "Operation: REPRINT_TICKET\n$input"
+
     fun createResultOk(extras: Bundle?) = "$RESPONSE_RESULT_OK\n${extras?.toRawData()}"
 
     fun createResultCanceled(extras: Bundle?) = "$RESPONSE_RESULT_CANCELED\n${extras?.toRawData()}"

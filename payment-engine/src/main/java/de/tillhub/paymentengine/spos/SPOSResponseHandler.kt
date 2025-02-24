@@ -83,7 +83,7 @@ internal object SPOSResponseHandler {
             ?: intent?.extras?.getString(SPOSKey.ResultExtra.ERROR_MESSAGE)
 
         val operationStatus = if (resultCode == Activity.RESULT_OK) {
-            if (transactionResult == SPOSTransactionResult.ACCEPTED && resultState == SPOSResultState.SUCCESS) {
+            if (transactionResult == SPOSTransactionResult.ACCEPTED && resultState.isSuccessful()) {
                 TerminalOperationStatus.Success.SPOS(
                     date = Instant.now(),
                     customerReceipt = customerReceipt.orEmpty(),
@@ -166,4 +166,7 @@ internal object SPOSResponseHandler {
         getString(key)?.let {
             converter.convert(it).toReceiptString()
         }.orEmpty()
+
+    private fun SPOSResultState.isSuccessful(): Boolean =
+        this == SPOSResultState.SUCCESS || this == SPOSResultState.PRINT_LAST_TICKET
 }
