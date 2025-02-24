@@ -19,7 +19,7 @@ class TicketReprintContract(
         return if (input is Terminal.SPOS) {
             SPOSIntentFactory.createTicketReprintIntent()
         } else {
-            throw UnsupportedOperationException("Recovery only supported for S-POS terminals")
+            throw UnsupportedOperationException("Ticket reprint only supported for S-POS terminals")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createTicketReprintOperation(input))
         }
