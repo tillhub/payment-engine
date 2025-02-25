@@ -44,6 +44,7 @@ sealed class TerminalOperationStatus : Parcelable {
         data object Connecting : Pending()
         data object Disconnecting : Pending()
         data object Recovery : Pending()
+        data object TicketReprint : Pending()
     }
 
     @Parcelize

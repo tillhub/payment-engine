@@ -62,6 +62,9 @@ internal object SPOSIntentFactory {
     fun createRecoveryIntent() =
         Intent(SPOSKey.Action.RECOVERY_ACTION)
 
+    fun createTicketReprintIntent() =
+        Intent(SPOSKey.Action.TICKET_REPRINT_ACTION)
+
     fun createReconciliationIntent() =
         Intent(SPOSKey.Action.RECONCILIATION_ACTION)
 }

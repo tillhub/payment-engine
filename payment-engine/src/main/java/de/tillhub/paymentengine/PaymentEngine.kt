@@ -62,5 +62,11 @@ class PaymentEngine private constructor() {
         }
     }
 
+    fun newTicketReprintManager(registry: ActivityResultCaller): TicketReprintManager {
+        return TicketReprintManagerImpl(configs, terminalState, registry).also {
+            terminalState.tryEmit(TerminalOperationStatus.Waiting)
+        }
+    }
+
     companion object : SingletonHolder<PaymentEngine>(::PaymentEngine)
 }

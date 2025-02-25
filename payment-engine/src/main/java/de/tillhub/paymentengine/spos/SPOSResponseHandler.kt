@@ -63,6 +63,39 @@ internal object SPOSResponseHandler {
             TerminalOperationStatus.Canceled
         }
 
+    fun handleTicketReprintResponse(
+        resultCode: Int,
+        intent: Intent?,
+        converter: StringToReceiptDtoConverter = StringToReceiptDtoConverter()
+    ): TerminalOperationStatus =
+        if (resultCode == Activity.RESULT_OK) {
+            val merchantReceipt =
+                intent?.extras?.getReceipt(SPOSKey.ResultExtra.RECEIPT_MERCHANT, converter)
+            val customerReceipt =
+                intent?.extras?.getReceipt(SPOSKey.ResultExtra.RECEIPT_CUSTOMER, converter)
+
+            val error = intent?.extras?.getString(SPOSKey.ResultExtra.ERROR_MESSAGE)
+
+            if (error == null) {
+                TerminalOperationStatus.Success.SPOS(
+                    date = Instant.now(),
+                    customerReceipt = customerReceipt.orEmpty(),
+                    merchantReceipt = merchantReceipt.orEmpty(),
+                    rawData = intent?.extras?.toRawData().orEmpty(),
+                    data = null
+                )
+            } else {
+                createError(
+                    intent = intent,
+                    customerReceipt = customerReceipt,
+                    merchantReceipt = merchantReceipt,
+                    error = error
+                )
+            }
+        } else {
+            TerminalOperationStatus.Canceled
+        }
+
     fun handleTransactionResult(
         resultCode: Int,
         intent: Intent?,
@@ -83,7 +116,7 @@ internal object SPOSResponseHandler {
             ?: intent?.extras?.getString(SPOSKey.ResultExtra.ERROR_MESSAGE)
 
         val operationStatus = if (resultCode == Activity.RESULT_OK) {
-            if (transactionResult == SPOSTransactionResult.ACCEPTED && resultState == SPOSResultState.SUCCESS) {
+            if (transactionResult == SPOSTransactionResult.ACCEPTED && resultState.isSuccessful()) {
                 TerminalOperationStatus.Success.SPOS(
                     date = Instant.now(),
                     customerReceipt = customerReceipt.orEmpty(),
@@ -166,4 +199,7 @@ internal object SPOSResponseHandler {
         getString(key)?.let {
             converter.convert(it).toReceiptString()
         }.orEmpty()
+
+    private fun SPOSResultState.isSuccessful(): Boolean =
+        this == SPOSResultState.SUCCESS || this == SPOSResultState.PRINT_LAST_TICKET
 }
