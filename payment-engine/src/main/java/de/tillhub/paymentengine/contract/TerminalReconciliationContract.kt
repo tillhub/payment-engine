@@ -35,5 +35,10 @@ class TerminalReconciliationContract(
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus =
-        ResponseHandler.parseResult(resultCode, intent, analytics)
+        ResponseHandler.parseResult(
+            resultCode,
+            intent,
+            analytics,
+            TerminalOperationStatus.Payment::class
+        )
 }

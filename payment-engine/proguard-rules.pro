@@ -47,7 +47,6 @@
 -keep class de.tillhub.paymentengine.data.CardSaleConfig { *; }
 -keep class de.tillhub.paymentengine.data.CardSaleConfig$* { *; }
 -keep class de.tillhub.paymentengine.data.ISOAlphaCurrency { *; }
--keep class de.tillhub.paymentengine.data.Payment { *; }
 -keep class de.tillhub.paymentengine.data.Terminal { *; }
 -keep class de.tillhub.paymentengine.data.Terminal$* { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus { *; }

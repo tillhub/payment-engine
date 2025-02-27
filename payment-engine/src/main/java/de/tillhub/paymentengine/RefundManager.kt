@@ -8,8 +8,11 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -18,6 +21,8 @@ import java.time.Instant
  * it sets up the manager so the data from the transaction is collected correctly.
  */
 interface RefundManager : CardManager {
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Refund>
+
     fun startRefundTransaction(
         transactionId: String,
         amount: BigDecimal,
@@ -42,13 +47,15 @@ interface RefundManager : CardManager {
 internal class RefundManagerImpl(
     configs: MutableMap<String, Terminal>,
     terminalState: MutableStateFlow<TerminalOperationStatus>,
-    resultCaller: ActivityResultCaller
-) : CardManagerImpl(configs, terminalState), RefundManager {
-
+    resultCaller: ActivityResultCaller,
     private val refundContract: ActivityResultLauncher<RefundRequest> =
         resultCaller.registerForActivityResult(PaymentRefundContract()) { result ->
             terminalState.tryEmit(result)
         }
+) : CardManagerImpl(configs, terminalState), RefundManager {
+
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Refund> =
+        terminalState.filterIsInstance(TerminalOperationStatus.Refund::class)
 
     override fun startRefundTransaction(
         transactionId: String,
@@ -75,7 +82,7 @@ internal class RefundManagerImpl(
         currency: ISOAlphaCurrency,
         config: Terminal
     ) {
-        terminalState.tryEmit(TerminalOperationStatus.Pending.Refund(amount, currency))
+        terminalState.tryEmit(TerminalOperationStatus.Refund.Pending(amount, currency))
         try {
             refundContract.launch(
                 RefundRequest(
@@ -87,14 +94,11 @@ internal class RefundManagerImpl(
             )
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Error.SPOS(
-                    date = Instant.now(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
-                    rawData = "",
-                    data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
-                    isRecoverable = false
+                TerminalOperationStatus.Payment.Error(
+                    TerminalOperationError(
+                        date = Instant.now(),
+                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    )
                 )
             )
         }

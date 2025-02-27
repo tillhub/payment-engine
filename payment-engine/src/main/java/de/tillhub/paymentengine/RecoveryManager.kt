@@ -6,14 +6,18 @@ import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.PaymentRecoveryContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import java.time.Instant
 
 /**
  * This is called to try to initiate recovery of last payment
  */
 interface RecoveryManager : CardManager {
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Recovery>
     fun startRecovery()
     fun startRecovery(configId: String)
     fun startRecovery(config: Terminal)
@@ -29,6 +33,9 @@ internal class RecoveryManagerImpl(
         }
 ) : CardManagerImpl(configs, terminalState), RecoveryManager {
 
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Recovery> =
+        terminalState.filterIsInstance(TerminalOperationStatus.Recovery::class)
+
     override fun startRecovery() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()
         startRecovery(configId)
@@ -40,33 +47,25 @@ internal class RecoveryManagerImpl(
     }
 
     override fun startRecovery(config: Terminal) {
-        terminalState.tryEmit(TerminalOperationStatus.Pending.Recovery)
+        terminalState.tryEmit(TerminalOperationStatus.Recovery.Pending)
         try {
             recoveryContract.launch(config)
         } catch (_: UnsupportedOperationException) {
             terminalState.tryEmit(
-                when (config) {
-                    is Terminal.OPI -> TerminalOperationStatus.Error.OPI(
+                TerminalOperationStatus.Payment.Error(
+                    TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
                     )
-                    is Terminal.SPOS -> TerminalOperationStatus.Error.SPOS(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED,
-                        isRecoverable = false
-                    )
-                    is Terminal.ZVT -> TerminalOperationStatus.Error.ZVT(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
-                    )
-                }
+                )
             )
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Error.SPOS(
-                    date = Instant.now(),
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
-                    isRecoverable = false
+                TerminalOperationStatus.Payment.Error(
+                    TerminalOperationError(
+                        date = Instant.now(),
+                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    )
                 )
             )
         }

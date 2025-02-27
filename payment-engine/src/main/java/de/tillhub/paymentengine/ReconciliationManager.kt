@@ -6,8 +6,11 @@ import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalReconciliationContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import java.time.Instant
 
 /**
@@ -15,6 +18,7 @@ import java.time.Instant
  * it sets up the manager so the data from the operation is collected correctly.
  */
 interface ReconciliationManager : CardManager {
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Reconciliation>
     fun startReconciliation()
     fun startReconciliation(configId: String)
     fun startReconciliation(config: Terminal)
@@ -30,6 +34,9 @@ internal class ReconciliationManagerImpl(
         }
 ) : CardManagerImpl(configs, terminalState), ReconciliationManager {
 
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Reconciliation> =
+        terminalState.filterIsInstance(TerminalOperationStatus.Reconciliation::class)
+
     override fun startReconciliation() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()
         startReconciliation(configId)
@@ -41,19 +48,16 @@ internal class ReconciliationManagerImpl(
     }
 
     override fun startReconciliation(config: Terminal) {
-        terminalState.tryEmit(TerminalOperationStatus.Pending.Reconciliation)
+        terminalState.tryEmit(TerminalOperationStatus.Reconciliation.Pending)
         try {
             reconciliationContract.launch(config)
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Error.SPOS(
-                    date = Instant.now(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
-                    rawData = "",
-                    data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
-                    isRecoverable = false
+                TerminalOperationStatus.Payment.Error(
+                    TerminalOperationError(
+                        date = Instant.now(),
+                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    )
                 )
             )
         }

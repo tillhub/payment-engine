@@ -7,8 +7,11 @@ import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import java.time.Instant
 
 /**
@@ -16,6 +19,7 @@ import java.time.Instant
  * it sets up the manager so the connection to the terminal is viable.
  */
 interface ConnectionManager : CardManager {
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Login>
     fun startConnect()
     fun startConnect(configId: String)
     fun startConnect(config: Terminal)
@@ -39,6 +43,9 @@ internal class ConnectionManagerImpl(
         }
 ) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Login> =
+        terminalState.filterIsInstance(TerminalOperationStatus.Login::class)
+
     override fun startConnect() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()
         startConnect(configId)
@@ -50,19 +57,16 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startConnect(config: Terminal) {
-        terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+        terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
         try {
             connectContract.launch(config)
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Error.SPOS(
-                    date = Instant.now(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
-                    rawData = "",
-                    data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
-                    isRecoverable = false
+                TerminalOperationStatus.Login.Error(
+                    TerminalOperationError(
+                        date = Instant.now(),
+                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    )
                 )
             )
         }
@@ -79,19 +83,16 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startSPOSDisconnect(config: Terminal) {
-        terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+        terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
         try {
             disconnectContract.launch(config)
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Error.SPOS(
-                    date = Instant.now(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
-                    rawData = "",
-                    data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
-                    isRecoverable = false
+                TerminalOperationStatus.Login.Error(
+                    TerminalOperationError(
+                        date = Instant.now(),
+                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    )
                 )
             )
         }

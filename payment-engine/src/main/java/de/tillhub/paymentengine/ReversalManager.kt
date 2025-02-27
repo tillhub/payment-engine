@@ -8,8 +8,11 @@ import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -18,6 +21,7 @@ import java.time.Instant
  * it sets up the manager so the data from the transaction is collected correctly.
  */
 interface ReversalManager : CardManager {
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Reversal>
     fun startReversalTransaction(
         transactionId: String,
         amount: BigDecimal,
@@ -56,6 +60,9 @@ internal class ReversalManagerImpl(
             terminalState.tryEmit(result)
         }
 ) : CardManagerImpl(configs, terminalState), ReversalManager {
+
+    override fun observePaymentState(): Flow<TerminalOperationStatus.Reversal> =
+        terminalState.filterIsInstance(TerminalOperationStatus.Reversal::class)
 
     override fun startReversalTransaction(
         transactionId: String,
@@ -102,7 +109,7 @@ internal class ReversalManagerImpl(
         receiptNo: String,
         config: Terminal
     ) {
-        terminalState.tryEmit(TerminalOperationStatus.Pending.Reversal(receiptNo))
+        terminalState.tryEmit(TerminalOperationStatus.Reversal.Pending(receiptNo))
         try {
             reversalContract.launch(
                 ReversalRequest(
@@ -116,14 +123,11 @@ internal class ReversalManagerImpl(
             )
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Error.SPOS(
-                    date = Instant.now(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
-                    rawData = "",
-                    data = null,
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR,
-                    isRecoverable = false
+                TerminalOperationStatus.Payment.Error(
+                    TerminalOperationError(
+                        date = Instant.now(),
+                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    )
                 )
             )
         }

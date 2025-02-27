@@ -1,9 +1,9 @@
 package de.tillhub.paymentengine.data
 
 object ExtraKeys {
-    const val EXTRA_CONFIG = "extra_config"
-    const val EXTRA_AMOUNT = "extra_amount"
-    const val EXTRA_CURRENCY = "extra_currency"
-    const val EXTRA_RECEIPT_NO = "extra_receipt_number"
-    const val EXTRAS_RESULT = "payment_result"
+    const val EXTRA_CONFIG = "de.tillhub.paymentengine.Config"
+    const val EXTRA_AMOUNT = "de.tillhub.paymentengine.Amount"
+    const val EXTRA_CURRENCY = "de.tillhub.paymentengine.Currency"
+    const val EXTRA_RECEIPT_NO = "de.tillhub.paymentengine.ReceiptNumber"
+    const val EXTRAS_RESULT = "de.tillhub.paymentengine.Result"
 }
