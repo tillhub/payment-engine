@@ -103,6 +103,7 @@ sealed class TerminalOperationStatus : Parcelable {
         class Error(
             val date: Instant,
             val rawData: String = "",
+            val resultCode: TransactionResultCode,
         ) : TicketReprint()
         data object Canceled : TicketReprint()
     }

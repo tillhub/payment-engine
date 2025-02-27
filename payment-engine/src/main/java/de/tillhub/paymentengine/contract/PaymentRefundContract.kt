@@ -46,7 +46,7 @@ class PaymentRefundContract(
             resultCode,
             intent,
             analytics,
-            TerminalOperationStatus.Payment::class
+            TerminalOperationStatus.Refund::class
         )
 }
 

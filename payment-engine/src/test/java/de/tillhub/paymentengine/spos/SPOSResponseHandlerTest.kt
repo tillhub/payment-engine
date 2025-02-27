@@ -50,7 +50,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 intent
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+            result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
         }
 
         it("error") {
@@ -66,7 +66,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 intent
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+            result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
             result.resultCode.shouldBeInstanceOf<TransactionResultCode.Known>()
             result.resultCode.errorMessage shouldBe R.string.spos_error_terminal_not_onboarded
         }
@@ -77,7 +77,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 intent
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+            result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
         }
     }
 
@@ -87,7 +87,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 Activity.RESULT_OK
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+            result.shouldBeInstanceOf<TerminalOperationStatus.Login.Disconnected>()
         }
 
         it("canceled") {
@@ -95,7 +95,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 Activity.RESULT_CANCELED
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+            result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
         }
     }
 
@@ -104,10 +104,11 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_CANCELED,
                 intent,
-                analytics
+                analytics,
+                TerminalOperationStatus.Payment::class
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+            result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Canceled>()
         }
 
         describe("error") {
@@ -126,12 +127,13 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_CANCELED,
                     intent,
-                    analytics
+                    analytics,
+                    TerminalOperationStatus.Payment::class
                 )
 
-                result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-                result.resultCode.shouldBeInstanceOf<TransactionResultCode.Known>()
-                result.resultCode.errorMessage shouldBe R.string.spos_error_terminal_not_onboarded
+                result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Error>()
+                result.response.resultCode.shouldBeInstanceOf<TransactionResultCode.Known>()
+                result.response.resultCode.errorMessage shouldBe R.string.spos_error_terminal_not_onboarded
             }
 
             it("no extras") {
@@ -144,12 +146,13 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
                     intent,
-                    analytics
+                    analytics,
+                    TerminalOperationStatus.Payment::class
                 )
 
-                result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-                result.resultCode.shouldBeInstanceOf<TransactionResultCode.Unknown>()
-                result.resultCode.errorMessage shouldBe R.string.zvt_error_code_unknown
+                result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Error>()
+                result.response.resultCode.shouldBeInstanceOf<TransactionResultCode.Unknown>()
+                result.response.resultCode.errorMessage shouldBe R.string.zvt_error_code_unknown
             }
 
             it("tx error") {
@@ -205,15 +208,16 @@ class SPOSResponseHandlerTest : DescribeSpec({
                     Activity.RESULT_OK,
                     intent,
                     analytics,
+                    TerminalOperationStatus.Payment::class,
                     receiptConverter
                 )
 
-                result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-                result.resultCode.shouldBeInstanceOf<TransactionResultCode.Known>()
-                result.resultCode.errorMessage shouldBe R.string.spos_error_card_detection_failed
-                result.customerReceipt shouldBe "RECEIPT"
-                result.merchantReceipt shouldBe "RECEIPT"
-                result.rawData shouldBe "Extras {\n" +
+                result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Error>()
+                result.response.resultCode.shouldBeInstanceOf<TransactionResultCode.Known>()
+                result.response.resultCode.errorMessage shouldBe R.string.spos_error_card_detection_failed
+                result.response.customerReceipt shouldBe "RECEIPT"
+                result.response.merchantReceipt shouldBe "RECEIPT"
+                result.response.rawData shouldBe "Extras {\n" +
                         "${SPOSKey.ResultExtra.RECEIPT_MERCHANT} = merchant_receipt\n" +
                         "${SPOSKey.ResultExtra.RECEIPT_CUSTOMER} = customer_receipt\n" +
                         "${SPOSKey.ResultExtra.RESULT_STATE} = Failure\n" +
@@ -224,11 +228,11 @@ class SPOSResponseHandlerTest : DescribeSpec({
                         "${SPOSKey.ResultExtra.CARD_PAN} = card_pan\n" +
                         "${SPOSKey.ResultExtra.MERCHANT} = merchant\n" +
                         "}"
-                result.data?.terminalId shouldBe "terminal_id"
-                result.data?.transactionId shouldBe "transaction_data"
-                result.data?.cardCircuit shouldBe "card_circuit"
-                result.data?.cardPan shouldBe "card_pan"
-                result.data?.paymentProvider shouldBe "merchant"
+                result.response.data?.terminalId shouldBe "terminal_id"
+                result.response.data?.transactionId shouldBe "transaction_data"
+                result.response.data?.cardCircuit shouldBe "card_circuit"
+                result.response.data?.cardPan shouldBe "card_pan"
+                result.response.data?.paymentProvider shouldBe "merchant"
             }
         }
 
@@ -285,13 +289,14 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 Activity.RESULT_OK,
                 intent,
                 analytics,
+                TerminalOperationStatus.Payment::class,
                 receiptConverter
             )
 
-            result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
-            result.customerReceipt shouldBe "RECEIPT"
-            result.merchantReceipt shouldBe "RECEIPT"
-            result.rawData shouldBe "Extras {\n" +
+            result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Success>()
+            result.response.customerReceipt shouldBe "RECEIPT"
+            result.response.merchantReceipt shouldBe "RECEIPT"
+            result.response.rawData shouldBe "Extras {\n" +
                     "${SPOSKey.ResultExtra.RECEIPT_MERCHANT} = merchant_receipt\n" +
                     "${SPOSKey.ResultExtra.RECEIPT_CUSTOMER} = customer_receipt\n" +
                     "${SPOSKey.ResultExtra.RESULT_STATE} = Success\n" +
@@ -302,11 +307,11 @@ class SPOSResponseHandlerTest : DescribeSpec({
                     "${SPOSKey.ResultExtra.CARD_PAN} = card_pan\n" +
                     "${SPOSKey.ResultExtra.MERCHANT} = merchant\n" +
                     "}"
-            result.data?.terminalId shouldBe "terminal_id"
-            result.data?.transactionId shouldBe "transaction_data"
-            result.data?.cardCircuit shouldBe "card_circuit"
-            result.data?.cardPan shouldBe "card_pan"
-            result.data?.paymentProvider shouldBe "merchant"
+            result.response.data?.terminalId shouldBe "terminal_id"
+            result.response.data?.transactionId shouldBe "transaction_data"
+            result.response.data?.cardCircuit shouldBe "card_circuit"
+            result.response.data?.cardPan shouldBe "card_pan"
+            result.response.data?.paymentProvider shouldBe "merchant"
         }
     }
 })

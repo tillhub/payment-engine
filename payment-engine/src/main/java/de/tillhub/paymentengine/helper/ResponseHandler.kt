@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 
 internal object ResponseHandler {
 
-    internal fun <T: TerminalOperationStatus>parseResult(
+    internal fun <T : TerminalOperationStatus>parseResult(
         resultCode: Int,
         intent: Intent?,
         analytics: PaymentAnalytics?,
@@ -32,7 +32,7 @@ internal object ResponseHandler {
         }
     }
 
-    internal fun <T: TerminalOperationStatus>getCanceledStatus(kClass: KClass<T>) = when (kClass) {
+    internal fun <T : TerminalOperationStatus>getCanceledStatus(kClass: KClass<T>) = when (kClass) {
         TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Canceled
         TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Canceled
         TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Canceled
@@ -43,7 +43,10 @@ internal object ResponseHandler {
         else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
     }
 
-    internal fun <T: TerminalOperationStatus>wrapSuccess(success: TerminalOperationSuccess, kClass: KClass<T>) = when (kClass) {
+    internal fun <T : TerminalOperationStatus>wrapSuccess(
+        success: TerminalOperationSuccess,
+        kClass: KClass<T>
+    ) = when (kClass) {
         TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Success(success)
         TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Success(success)
         TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Success(success)
@@ -52,7 +55,10 @@ internal object ResponseHandler {
         else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
     }
 
-    internal fun <T: TerminalOperationStatus>wrapError(error: TerminalOperationError, kClass: KClass<T>) = when (kClass) {
+    internal fun <T : TerminalOperationStatus>wrapError(
+        error: TerminalOperationError,
+        kClass: KClass<T>
+    ) = when (kClass) {
         TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Error(error)
         TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Error(error)
         TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Error(error)

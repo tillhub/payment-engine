@@ -39,6 +39,6 @@ class TerminalReconciliationContract(
             resultCode,
             intent,
             analytics,
-            TerminalOperationStatus.Payment::class
+            TerminalOperationStatus.Reconciliation::class
         )
 }

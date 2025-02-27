@@ -18,6 +18,7 @@ import de.tillhub.paymentengine.spos.data.StringToReceiptDtoConverter
 import java.time.Instant
 import kotlin.reflect.KClass
 
+@Suppress("TooManyFunctions")
 internal object SPOSResponseHandler {
 
     private const val SPOS_PROTOCOL = "SPOS"
@@ -80,14 +81,15 @@ internal object SPOSResponseHandler {
             } else {
                 TerminalOperationStatus.TicketReprint.Error(
                     date = Instant.now(),
-                    rawData = intent.extras?.toRawData().orEmpty()
+                    rawData = intent.extras?.toRawData().orEmpty(),
+                    resultCode = ResultCodeSets.getSPOSCode(error)
                 )
             }
         } else {
             TerminalOperationStatus.TicketReprint.Canceled
         }
 
-    fun <T: TerminalOperationStatus>handleTransactionResult(
+    fun <T : TerminalOperationStatus>handleTransactionResult(
         resultCode: Int,
         intent: Intent?,
         analytics: PaymentAnalytics?,

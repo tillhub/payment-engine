@@ -228,7 +228,7 @@ internal class CardTerminalViewModel(
                 TerminalOperationStatus.Reversal.Error(terminalOperation)
             }
             val connect: TerminalOperationStatus.Login.Error by lazy {
-                TerminalOperationStatus.Login.Error(terminalOperation)
+                TerminalOperationStatus.Login.Error(date, rawData, resultCode)
             }
             val reconciliation: TerminalOperationStatus.Reconciliation.Error by lazy {
                 TerminalOperationStatus.Reconciliation.Error(terminalOperation)

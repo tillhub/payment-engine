@@ -30,6 +30,6 @@ class PaymentRecoveryContract(
             resultCode,
             intent,
             analytics,
-            TerminalOperationStatus.Payment::class
+            TerminalOperationStatus.Recovery::class
         )
 }

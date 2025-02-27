@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.util.Objects
 
+@Suppress("LongParameterList")
 @Parcelize
 class TerminalOperationError(
     val date: Instant,

@@ -50,7 +50,7 @@ class TicketReprintManagerTest : FunSpec({
             ticketReprintContract.launch(Terminal.SPOS(id = "spos"))
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.TicketReprint
+        terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
     }
 
     test("startTicketReprint by config name") {
@@ -61,7 +61,7 @@ class TicketReprintManagerTest : FunSpec({
             ticketReprintContract.launch(Terminal.SPOS(id = "spos2"))
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.TicketReprint
+        terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
     }
 
     test("startTicketReprint by terminal") {
@@ -71,7 +71,7 @@ class TicketReprintManagerTest : FunSpec({
             ticketReprintContract.launch(Terminal.SPOS())
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.TicketReprint
+        terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
     }
 
     test("contract failing to launch recovery request due to no activity") {
@@ -83,7 +83,7 @@ class TicketReprintManagerTest : FunSpec({
 
         val result = terminalState.first()
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.TicketReprint.Error>()
         result.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

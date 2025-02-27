@@ -48,7 +48,7 @@ class ReconciliationManagerTest : FunSpec({
 
         verify { reconciliationContract.launch(Terminal.ZVT()) }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
+        terminalState.value shouldBe TerminalOperationStatus.Reconciliation.Pending
     }
 
     test("startReconciliation with configId should and launch reconciliation contract") {
@@ -59,7 +59,7 @@ class ReconciliationManagerTest : FunSpec({
 
         verify { reconciliationContract.launch(terminal) }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
+        terminalState.value shouldBe TerminalOperationStatus.Reconciliation.Pending
     }
 
     test("startReconciliation with custom Terminal should and launch reconciliation contract") {
@@ -69,7 +69,7 @@ class ReconciliationManagerTest : FunSpec({
 
         verify { reconciliationContract.launch(customTerminal) }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Reconciliation
+        terminalState.value shouldBe TerminalOperationStatus.Reconciliation.Pending
     }
 
     test("contract failing to launch request due to no activity") {
@@ -83,8 +83,8 @@ class ReconciliationManagerTest : FunSpec({
 
         verify { reconciliationContract.launch(customTerminal) }
 
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Error>()
+        (terminalState.value as TerminalOperationStatus.Reconciliation.Error).response
             .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

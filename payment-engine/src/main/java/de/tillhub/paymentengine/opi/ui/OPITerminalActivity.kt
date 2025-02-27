@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.opi.ui
 
-import android.app.Activity
 import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
@@ -126,22 +125,6 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         }
     }
 
-    private fun finishWithSuccess(state: OPIService.State.ResultSuccess) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
-        )
-        finish()
-    }
-
-    private fun finishWithError(state: OPIService.State.ResultError) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.data) }
-        )
-        finish()
-    }
-
     private fun handleErrorState(state: OPIService.State.OperationError) {
         showInstructions()
         showOperationErrorStatus(state.message)
@@ -157,4 +140,6 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     abstract fun showOperationErrorStatus(status: String)
     abstract fun startOperation()
     abstract fun showCancel()
+    abstract fun finishWithSuccess(state: OPIService.State.ResultSuccess)
+    abstract fun finishWithError(state: OPIService.State.ResultError)
 }

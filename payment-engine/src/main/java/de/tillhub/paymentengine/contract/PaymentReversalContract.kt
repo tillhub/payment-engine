@@ -44,7 +44,7 @@ class PaymentReversalContract(
             resultCode,
             intent,
             analytics,
-            TerminalOperationStatus.Payment::class
+            TerminalOperationStatus.Reversal::class
         )
 }
 

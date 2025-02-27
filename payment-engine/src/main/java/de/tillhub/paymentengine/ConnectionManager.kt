@@ -7,7 +7,6 @@ import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,10 +62,9 @@ internal class ConnectionManagerImpl(
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
                 TerminalOperationStatus.Login.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
+                    date = Instant.now(),
+                    rawData = "",
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
                 )
             )
         }
@@ -89,10 +87,9 @@ internal class ConnectionManagerImpl(
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
                 TerminalOperationStatus.Login.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
+                    date = Instant.now(),
+                    rawData = "",
+                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
                 )
             )
         }

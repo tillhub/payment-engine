@@ -50,7 +50,7 @@ class RecoveryManagerTest : FunSpec({
             recoveryContract.launch(Terminal.SPOS(id = "spos"))
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Recovery
+        terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
     test("startSPOSRecovery by config name") {
@@ -61,7 +61,7 @@ class RecoveryManagerTest : FunSpec({
             recoveryContract.launch(Terminal.SPOS(id = "spos2"))
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Recovery
+        terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
     test("startSPOSRecovery by terminal") {
@@ -71,7 +71,7 @@ class RecoveryManagerTest : FunSpec({
             recoveryContract.launch(Terminal.SPOS())
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Recovery
+        terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
     test("contract failing to launch recovery request due to no activity") {
@@ -83,7 +83,7 @@ class RecoveryManagerTest : FunSpec({
 
         val result = terminalState.first()
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        result.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+        result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Error>()
+        result.response.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

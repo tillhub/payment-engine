@@ -44,7 +44,7 @@ class TerminalConnectContract(
                         ExtraKeys.EXTRAS_RESULT,
                         TerminalOperationStatus::class.java
                     )
-                } ?: TerminalOperationStatus.Canceled
+                } ?: TerminalOperationStatus.Login.Canceled
             } else {
                 SPOSResponseHandler.handleTerminalConnectResponse(resultCode, intent).also {
                     analytics?.logCommunication(
@@ -62,7 +62,7 @@ class TerminalConnectContract(
                     )
                 }
             } else {
-                TerminalOperationStatus.Canceled
+                TerminalOperationStatus.Login.Canceled
             }
         }
     }

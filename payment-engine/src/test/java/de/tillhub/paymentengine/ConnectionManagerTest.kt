@@ -57,11 +57,11 @@ class ConnectionManagerTest : FunSpec({
         target.startConnect()
 
         verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
             connectContract.launch(Terminal.ZVT())
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
+        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startSPOSConnect by config name") {
@@ -70,11 +70,11 @@ class ConnectionManagerTest : FunSpec({
         target.startConnect("opi")
 
         verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
             connectContract.launch(terminal)
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
+        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startSPOSConnect by terminal") {
@@ -82,21 +82,21 @@ class ConnectionManagerTest : FunSpec({
         target.startConnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Pending.Connecting)
+            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
             connectContract.launch(terminal)
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Connecting
+        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startSPOSDisconnect by default terminal ") {
         target.startSPOSDisconnect()
 
         verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
             disconnectContract.launch(Terminal.ZVT())
         }
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
+        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startSPOSDisconnect by config name") {
@@ -105,11 +105,11 @@ class ConnectionManagerTest : FunSpec({
         target.startSPOSDisconnect("opi")
 
         verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
             disconnectContract.launch(terminal)
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
+        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startSPOSDisconnect by terminal") {
@@ -117,11 +117,11 @@ class ConnectionManagerTest : FunSpec({
         target.startSPOSDisconnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Pending.Disconnecting)
+            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
             disconnectContract.launch(terminal)
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Disconnecting
+        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("contract failing to launch disconnect request due to no activity") {
@@ -136,8 +136,8 @@ class ConnectionManagerTest : FunSpec({
             disconnectContract.launch(terminal)
         }
 
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
+        (terminalState.value as TerminalOperationStatus.Login.Error)
             .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 
@@ -153,8 +153,8 @@ class ConnectionManagerTest : FunSpec({
             connectContract.launch(terminal)
         }
 
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
+        (terminalState.value as TerminalOperationStatus.Login.Error)
             .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })
