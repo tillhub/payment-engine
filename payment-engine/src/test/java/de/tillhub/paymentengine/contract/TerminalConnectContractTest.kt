@@ -107,7 +107,7 @@ class TerminalConnectContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
 
         verify {
             analytics.logCommunication(
@@ -124,7 +124,7 @@ class TerminalConnectContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
 
         verify {
             analytics.logCommunication(
@@ -139,19 +139,18 @@ class TerminalConnectContractTest : FunSpec({
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
-                TerminalOperationStatus.Success.OPI(
+                TerminalOperationStatus.Login.Connected(
                     date = mockk(),
-                    customerReceipt = "",
-                    merchantReceipt = "",
                     rawData = "rawData",
-                    data = null
+                    terminalType = Terminal.OPI.TYPE,
+                    terminalId = "terminalId"
                 )
             )
         }
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Success.OPI>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
     }
 
     test("parseResult OPI + ZVT: result CANCELED") {
@@ -159,7 +158,7 @@ class TerminalConnectContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
     }
 }) {
     companion object {

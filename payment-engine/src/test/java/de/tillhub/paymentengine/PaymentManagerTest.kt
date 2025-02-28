@@ -68,7 +68,7 @@ class PaymentManagerTest : FunSpec({
             )
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
+        terminalState.value shouldBe TerminalOperationStatus.Payment.Pending(amount, currency)
     }
 
     test("startPaymentTransaction with configId should launch payment result contract") {
@@ -93,7 +93,7 @@ class PaymentManagerTest : FunSpec({
             )
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
+        terminalState.value shouldBe TerminalOperationStatus.Payment.Pending(amount, currency)
     }
 
     test("startPaymentTransaction with Terminal should launch payment result contract") {
@@ -117,7 +117,7 @@ class PaymentManagerTest : FunSpec({
             )
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Payment(amount, currency)
+        terminalState.value shouldBe TerminalOperationStatus.Payment.Pending(amount, currency)
     }
 
     test("contract failing to launch request due to no activity") {
@@ -145,8 +145,8 @@ class PaymentManagerTest : FunSpec({
             )
         }
 
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        (terminalState.value as TerminalOperationStatus.Error.SPOS)
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Payment.Error>()
+        (terminalState.value as TerminalOperationStatus.Payment.Error).response
             .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

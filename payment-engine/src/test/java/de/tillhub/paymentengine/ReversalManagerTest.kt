@@ -12,7 +12,10 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.math.BigDecimal
 
@@ -71,7 +74,7 @@ class ReversalManagerTest : FunSpec({
             )
         }
 
-        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
+        transactionState.value shouldBe TerminalOperationStatus.Reversal.Pending(receiptNo)
     }
 
     test("startReversalTransaction with configId should launch reversal contract") {
@@ -105,7 +108,7 @@ class ReversalManagerTest : FunSpec({
             )
         }
 
-        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
+        transactionState.value shouldBe TerminalOperationStatus.Reversal.Pending(receiptNo)
     }
 
     test("startReversalTransaction custom Terminal should launch reversal contract") {
@@ -137,7 +140,7 @@ class ReversalManagerTest : FunSpec({
             )
         }
 
-        transactionState.value shouldBe TerminalOperationStatus.Pending.Reversal(receiptNo)
+        transactionState.value shouldBe TerminalOperationStatus.Reversal.Pending(receiptNo)
     }
 
     test("contract failing to launch request due to no activity") {
@@ -173,8 +176,8 @@ class ReversalManagerTest : FunSpec({
             )
         }
 
-        transactionState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        (transactionState.value as TerminalOperationStatus.Error.SPOS)
-            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+        transactionState.value.shouldBeInstanceOf<TerminalOperationStatus.Reversal.Error>()
+        (transactionState.value as TerminalOperationStatus.Reversal.Error)
+            .response.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

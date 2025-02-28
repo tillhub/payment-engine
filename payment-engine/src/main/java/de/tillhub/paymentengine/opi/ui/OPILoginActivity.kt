@@ -1,10 +1,16 @@
 package de.tillhub.paymentengine.opi.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
+import de.tillhub.paymentengine.opi.OPIService
 
 internal class OPILoginActivity : OPITerminalActivity() {
 
@@ -40,6 +46,41 @@ internal class OPILoginActivity : OPITerminalActivity() {
 
     override fun showCancel() {
         binding.buttonCancel.isVisible = true
+    }
+
+    override fun finishWithSuccess(state: OPIService.State.ResultSuccess) {
+         setResult(
+            Activity.RESULT_OK,
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_RESULT,
+                    TerminalOperationStatus.Login.Connected(
+                        date = state.data.date,
+                        rawData = state.data.rawData,
+                        terminalType = Terminal.OPI.TYPE,
+                        terminalId = state.data.data?.terminalId.orEmpty()
+                    )
+                )
+            }
+        )
+        finish()
+    }
+
+    override fun finishWithError(state: OPIService.State.ResultError) {
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_RESULT,
+                    TerminalOperationStatus.Login.Error(
+                        date = state.data.date,
+                        rawData = state.data.rawData,
+                        resultCode = state.data.resultCode
+                    )
+                )
+            }
+        )
+        finish()
     }
 
     override fun startOperation() {

@@ -6,6 +6,7 @@ import java.util.Objects
 
 @Parcelize
 class TransactionData(
+    val terminalType: String,
     val terminalId: String,
     val transactionId: String,
     val cardCircuit: String,
@@ -14,6 +15,7 @@ class TransactionData(
 ) : Parcelable {
 
     override fun equals(other: Any?) = other is TransactionData &&
+            terminalType == other.terminalType &&
             terminalId == other.terminalId &&
             transactionId == other.transactionId &&
             cardCircuit == other.cardCircuit &&
@@ -21,6 +23,7 @@ class TransactionData(
             paymentProvider == other.paymentProvider
 
     override fun hashCode() = Objects.hash(
+        terminalType,
         terminalId,
         transactionId,
         cardCircuit,
@@ -28,6 +31,7 @@ class TransactionData(
         paymentProvider
     )
     override fun toString() = "TransactionData(" +
+            "terminalType=$terminalType, " +
             "terminalId=$terminalId, " +
             "transactionId=$transactionId, " +
             "cardCircuit=$cardCircuit, " +

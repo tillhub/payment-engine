@@ -8,10 +8,12 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.cmds.CompletionForRegister
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ResultCodeSets
+import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionData
 import de.tillhub.paymentengine.data.TransactionResultCode
-import de.tillhub.paymentengine.data.getOrNull
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
@@ -191,54 +193,90 @@ internal class CardTerminalViewModel(
         data object Setup : State()
         data object Operation : State()
         data class Error(
-            val date: Instant,
-            val customerReceipt: String,
-            val merchantReceipt: String,
-            val rawData: String,
-            val data: LavegoTransactionData?,
-            val resultCode: TransactionResultCode
+            private val date: Instant,
+            private val customerReceipt: String,
+            private val merchantReceipt: String,
+            private val rawData: String,
+            private val data: LavegoTransactionData?,
+            private val resultCode: TransactionResultCode
         ) : State() {
-            fun toTerminalOperation() =
-                TerminalOperationStatus.Error.ZVT(
-                    date = date,
-                    customerReceipt = customerReceipt,
-                    merchantReceipt = merchantReceipt,
-                    rawData = rawData,
-                    data = data?.let {
-                        TransactionData(
-                            terminalId = it.tid,
-                            transactionId = it.receiptNo.toString(),
-                            cardCircuit = it.cardName,
-                            cardPan = it.chipData,
-                            paymentProvider = it.additionalText
-                        )
-                    },
-                    resultCode = resultCode
-                )
+            private val terminalOperation = TerminalOperationError(
+                date = date,
+                customerReceipt = customerReceipt,
+                merchantReceipt = merchantReceipt,
+                rawData = rawData,
+                data = data?.let {
+                    TransactionData(
+                        terminalType = Terminal.ZVT.TYPE,
+                        terminalId = it.tid,
+                        transactionId = it.receiptNo.toString(),
+                        cardCircuit = it.cardName,
+                        cardPan = it.chipData,
+                        paymentProvider = it.additionalText
+                    )
+                },
+                resultCode = resultCode,
+                isRecoverable = false
+            )
+            val payment: TerminalOperationStatus.Payment.Error by lazy {
+                TerminalOperationStatus.Payment.Error(terminalOperation)
+            }
+            val refund: TerminalOperationStatus.Refund.Error by lazy {
+                TerminalOperationStatus.Refund.Error(terminalOperation)
+            }
+            val reversal: TerminalOperationStatus.Reversal.Error by lazy {
+                TerminalOperationStatus.Reversal.Error(terminalOperation)
+            }
+            val connect: TerminalOperationStatus.Login.Error by lazy {
+                TerminalOperationStatus.Login.Error(date, rawData, resultCode)
+            }
+            val reconciliation: TerminalOperationStatus.Reconciliation.Error by lazy {
+                TerminalOperationStatus.Reconciliation.Error(terminalOperation)
+            }
         }
         data class Success(
-            val date: Instant,
-            val customerReceipt: String,
-            val merchantReceipt: String,
-            val rawData: String,
-            val data: LavegoTransactionData?
+            private val date: Instant,
+            private val customerReceipt: String,
+            private val merchantReceipt: String,
+            private val rawData: String,
+            private val data: LavegoTransactionData?
         ) : State() {
-            fun toTerminalOperation() =
-                TerminalOperationStatus.Success.ZVT(
+            private val terminalOperation = TerminalOperationSuccess(
+                date = date,
+                customerReceipt = customerReceipt,
+                merchantReceipt = merchantReceipt,
+                rawData = rawData,
+                data = data?.let {
+                    TransactionData(
+                        terminalType = Terminal.ZVT.TYPE,
+                        terminalId = it.tid,
+                        transactionId = it.receiptNo.toString(),
+                        cardCircuit = it.cardName,
+                        cardPan = it.chipData,
+                        paymentProvider = it.additionalText
+                    )
+                }
+            )
+            val payment: TerminalOperationStatus.Payment.Success by lazy {
+                TerminalOperationStatus.Payment.Success(terminalOperation)
+            }
+            val refund: TerminalOperationStatus.Refund.Success by lazy {
+                TerminalOperationStatus.Refund.Success(terminalOperation)
+            }
+            val reversal: TerminalOperationStatus.Reversal.Success by lazy {
+                TerminalOperationStatus.Reversal.Success(terminalOperation)
+            }
+            val connect: TerminalOperationStatus.Login.Connected by lazy {
+                TerminalOperationStatus.Login.Connected(
                     date = date,
-                    customerReceipt = customerReceipt,
-                    merchantReceipt = merchantReceipt,
                     rawData = rawData,
-                    data = data?.let {
-                        TransactionData(
-                            terminalId = it.tid,
-                            transactionId = it.receiptNo.toString(),
-                            cardCircuit = it.cardName,
-                            cardPan = it.chipData,
-                            paymentProvider = it.additionalText
-                        )
-                    }
+                    terminalType = Terminal.ZVT.TYPE,
+                    terminalId = data?.tid.orEmpty()
                 )
+            }
+            val reconciliation: TerminalOperationStatus.Reconciliation.Success by lazy {
+                TerminalOperationStatus.Reconciliation.Success(terminalOperation)
+            }
         }
 
         data object OperationAborted : State()
