@@ -6,6 +6,7 @@ import de.tillhub.paymentengine.CardManager
 import de.tillhub.paymentengine.ConnectionManager
 import de.tillhub.paymentengine.PaymentManager
 import de.tillhub.paymentengine.ReconciliationManager
+import de.tillhub.paymentengine.RecoveryManager
 import de.tillhub.paymentengine.RefundManager
 import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
@@ -24,6 +25,7 @@ class MainViewModel : ViewModel() {
     private lateinit var reversalManager: ReversalManager
     private lateinit var reconciliationManager: ReconciliationManager
     private lateinit var connectionManager: ConnectionManager
+    private lateinit var recoveryManager: RecoveryManager
 
     val cardManagerState: StateFlow<TerminalOperationStatus> by lazy {
         merge(
@@ -31,7 +33,8 @@ class MainViewModel : ViewModel() {
             refundManager.observePaymentState(),
             reversalManager.observePaymentState(),
             reconciliationManager.observePaymentState(),
-            connectionManager.observePaymentState()
+            connectionManager.observePaymentState(),
+            recoveryManager.observePaymentState()
         ).stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
@@ -65,6 +68,12 @@ class MainViewModel : ViewModel() {
 
     fun initConnectionManager(connectionManager: ConnectionManager) {
         this.connectionManager = connectionManager.apply {
+            setupTerminalConfigs(this)
+        }
+    }
+
+    fun initRecoveryManager(newRecoveryManager: RecoveryManager) {
+        this.recoveryManager = newRecoveryManager.apply {
             setupTerminalConfigs(this)
         }
     }
@@ -141,8 +150,12 @@ class MainViewModel : ViewModel() {
         connectionManager.startSPOSDisconnect(CONFIG_IN_USE)
     }
 
+    fun startRecovery() {
+        recoveryManager.startRecovery(CONFIG_IN_USE)
+    }
+
     companion object {
-        private const val CONFIG_IN_USE = "zvt-remote"
+        private const val CONFIG_IN_USE = "s-pos"
         private const val REMOTE_IP = "192.168.100.39"
     }
 }
