@@ -1,7 +1,9 @@
 package de.tillhub.paymentengine.opi.data
 
 import de.tillhub.paymentengine.data.ResultCodeSets
-import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
+import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionData
 import java.time.Instant
 
@@ -40,8 +42,6 @@ internal sealed class OPIOperationStatus {
         abstract val data: CardServiceResponse?
         abstract val serviceData: ServiceResponse?
 
-        abstract fun toTerminalOperation(): TerminalOperationStatus
-
         data class Error(
             override val date: Instant,
             override val customerReceipt: String,
@@ -50,34 +50,35 @@ internal sealed class OPIOperationStatus {
             override val data: CardServiceResponse? = null,
             override val serviceData: ServiceResponse? = null
         ) : Result() {
-            override fun toTerminalOperation() =
-                TerminalOperationStatus.Error.OPI(
-                    date = date,
-                    customerReceipt = customerReceipt,
-                    merchantReceipt = merchantReceipt,
-                    rawData = rawData,
-                    data = data?.let {
-                        TransactionData(
-                            terminalId = it.terminal?.terminalId.orEmpty(),
-                            transactionId = it.terminal?.stan.orEmpty(),
-                            cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
-                            cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
-                            paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
-                        )
-                    } ?: serviceData?.let {
-                        TransactionData(
-                            terminalId = it.terminal?.terminalId.orEmpty(),
-                            transactionId = "",
-                            cardCircuit = "",
-                            cardPan = "",
-                            paymentProvider = it.authorisation?.acquirerID.orEmpty()
-                        )
-                    },
-                    resultCode = ResultCodeSets.getOPICode(
-                        resultCode = data?.tender?.authorisation?.actionCode?.toIntOrNull()
-                            ?: serviceData?.privateData?.errorCode?.value?.toIntOrNull()
+            fun toTerminalOperation() = TerminalOperationError(
+                date = date,
+                customerReceipt = customerReceipt,
+                merchantReceipt = merchantReceipt,
+                rawData = rawData,
+                data = data?.let {
+                    TransactionData(
+                        terminalType = Terminal.OPI.TYPE,
+                        terminalId = it.terminal?.terminalId.orEmpty(),
+                        transactionId = it.terminal?.stan.orEmpty(),
+                        cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
+                        cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
+                        paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
                     )
+                } ?: serviceData?.let {
+                    TransactionData(
+                        terminalType = Terminal.OPI.TYPE,
+                        terminalId = it.terminal?.terminalId.orEmpty(),
+                        transactionId = "",
+                        cardCircuit = "",
+                        cardPan = "",
+                        paymentProvider = it.authorisation?.acquirerID.orEmpty()
+                    )
+                },
+                resultCode = ResultCodeSets.getOPICode(
+                    resultCode = data?.tender?.authorisation?.actionCode?.toIntOrNull()
+                        ?: serviceData?.privateData?.errorCode?.value?.toIntOrNull()
                 )
+            )
         }
 
         data class Success(
@@ -88,30 +89,31 @@ internal sealed class OPIOperationStatus {
             override val data: CardServiceResponse? = null,
             override val serviceData: ServiceResponse? = null
         ) : Result() {
-            override fun toTerminalOperation() =
-                TerminalOperationStatus.Success.OPI(
-                    date = date,
-                    customerReceipt = customerReceipt,
-                    merchantReceipt = merchantReceipt,
-                    rawData = rawData,
-                    data = data?.let {
-                        TransactionData(
-                            terminalId = it.terminal?.terminalId.orEmpty(),
-                            transactionId = it.terminal?.stan.orEmpty(),
-                            cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
-                            cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
-                            paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
-                        )
-                    } ?: serviceData?.let {
-                        TransactionData(
-                            terminalId = it.terminal?.terminalId.orEmpty(),
-                            transactionId = "",
-                            cardCircuit = "",
-                            cardPan = "",
-                            paymentProvider = it.authorisation?.acquirerID.orEmpty()
-                        )
-                    }
-                )
+            fun toTerminalOperation() = TerminalOperationSuccess(
+                date = date,
+                customerReceipt = customerReceipt,
+                merchantReceipt = merchantReceipt,
+                rawData = rawData,
+                data = data?.let {
+                    TransactionData(
+                        terminalType = Terminal.OPI.TYPE,
+                        terminalId = it.terminal?.terminalId.orEmpty(),
+                        transactionId = it.terminal?.stan.orEmpty(),
+                        cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
+                        cardPan = it.cardValue?.cardPAN?.value.orEmpty(),
+                        paymentProvider = it.tender?.authorisation?.acquirerID.orEmpty()
+                    )
+                } ?: serviceData?.let {
+                    TransactionData(
+                        terminalType = Terminal.OPI.TYPE,
+                        terminalId = it.terminal?.terminalId.orEmpty(),
+                        transactionId = "",
+                        cardCircuit = "",
+                        cardPan = "",
+                        paymentProvider = it.authorisation?.acquirerID.orEmpty()
+                    )
+                }
+            )
         }
     }
 }

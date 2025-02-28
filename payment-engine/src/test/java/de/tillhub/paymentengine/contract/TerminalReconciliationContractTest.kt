@@ -10,6 +10,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull
@@ -156,36 +157,36 @@ class TerminalReconciliationContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Success>()
     }
 
     test("parseResult SPOS: result CANCELED") {
-        val intent = Intent().apply {
-            putExtra(SPOSKey.ResultExtra.ERROR, "CARD_PAYMENT_NOT_ONBOARDED")
-        }
+        val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Canceled>()
     }
 
     test("parseResult OPI + ZVT: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
-                TerminalOperationStatus.Success.OPI(
-                    date = mockk(),
-                    customerReceipt = "customerReceipt",
-                    merchantReceipt = "merchantReceipt",
-                    rawData = "rawData",
-                    data = null
+                TerminalOperationStatus.Reconciliation.Success(
+                    TerminalOperationSuccess(
+                        date = mockk(),
+                        customerReceipt = "customerReceipt",
+                        merchantReceipt = "merchantReceipt",
+                        rawData = "rawData",
+                        data = null
+                    )
                 )
             )
         }
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Success.OPI>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Success>()
     }
 
     test("parseResult OPI + ZVT: result CANCELED") {
@@ -193,7 +194,7 @@ class TerminalReconciliationContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Canceled>()
     }
 }) {
     companion object {

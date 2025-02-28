@@ -3,7 +3,8 @@ package de.tillhub.paymentengine.opi
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TerminalOperationError
+import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import io.kotest.core.spec.style.FunSpec
@@ -122,7 +123,7 @@ class OPIServiceTest : FunSpec({
             rawData = "rawData",
         )
         target.opiOperationState.value shouldBe OPIService.State.ResultError(
-            data = TerminalOperationStatus.Error.OPI(
+            data = TerminalOperationError(
                 date = instant,
                 customerReceipt = "customerReceipt",
                 merchantReceipt = "merchantReceipt",
@@ -142,7 +143,7 @@ class OPIServiceTest : FunSpec({
             rawData = "rawData",
         )
         target.opiOperationState.value shouldBe OPIService.State.ResultSuccess(
-            data = TerminalOperationStatus.Success.OPI(
+            data = TerminalOperationSuccess(
                 date = instant,
                 customerReceipt = "customerReceipt",
                 merchantReceipt = "merchantReceipt",

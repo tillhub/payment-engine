@@ -1,9 +1,7 @@
 package de.tillhub.paymentengine.zvt.ui
 
-import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -114,6 +112,8 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     abstract fun showIntermediateStatus(status: String)
     abstract fun startOperation()
     abstract fun setCancelVisibility(visible: Boolean)
+    abstract fun finishWithError(state: CardTerminalViewModel.State.Error)
+    abstract fun finishWithSuccess(state: CardTerminalViewModel.State.Success)
 
     override fun transportConfiguration(): TransportConfiguration {
         return TransportConfiguration().apply {
@@ -188,22 +188,6 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     override fun onError(error: String) {
         super.onError(error)
         viewModel.onError(::moveAppToFront)
-    }
-
-    private fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
-        )
-        finish()
-    }
-
-    private fun finishWithError(state: CardTerminalViewModel.State.Error) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.toTerminalOperation()) }
-        )
-        finish()
     }
 
     protected fun moveAppToFront() {

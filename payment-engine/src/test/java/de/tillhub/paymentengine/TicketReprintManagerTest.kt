@@ -3,7 +3,7 @@ package de.tillhub.paymentengine
 import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
-import de.tillhub.paymentengine.contract.PaymentRecoveryContract
+import de.tillhub.paymentengine.contract.TicketReprintContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
@@ -16,74 +16,74 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 
-class RecoveryManagerTest : FunSpec({
+class TicketReprintManagerTest : FunSpec({
 
     lateinit var configs: MutableMap<String, Terminal>
     lateinit var terminalState: MutableStateFlow<TerminalOperationStatus>
     lateinit var resultCaller: ActivityResultCaller
-    lateinit var recoveryContract: ActivityResultLauncher<Terminal>
+    lateinit var ticketReprintContract: ActivityResultLauncher<Terminal>
 
-    lateinit var target: RecoveryManager
+    lateinit var target: TicketReprintManager
 
     beforeTest {
         configs = mutableMapOf("spos" to Terminal.SPOS(id = "spos"))
         terminalState = MutableStateFlow(TerminalOperationStatus.Waiting)
         resultCaller = mockk(relaxed = true)
-        recoveryContract = mockk(relaxed = true)
+        ticketReprintContract = mockk(relaxed = true)
 
         every {
-            resultCaller.registerForActivityResult(ofType(PaymentRecoveryContract::class), any())
-        } returns recoveryContract
+            resultCaller.registerForActivityResult(ofType(TicketReprintContract::class), any())
+        } returns ticketReprintContract
 
-        target = RecoveryManagerImpl(
+        target = TicketReprintManagerImpl(
             configs = configs,
             terminalState = terminalState,
             resultCaller = resultCaller,
-            recoveryContract = recoveryContract
+            ticketReprintContract = ticketReprintContract
         )
     }
 
-    test("startSPOSRecovery by default terminal") {
-        target.startRecovery()
+    test("startTicketReprint by default terminal") {
+        target.startTicketReprint()
 
         verify {
-            recoveryContract.launch(Terminal.SPOS(id = "spos"))
+            ticketReprintContract.launch(Terminal.SPOS(id = "spos"))
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
+        terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
     }
 
-    test("startSPOSRecovery by config name") {
+    test("startTicketReprint by config name") {
         configs["spos2"] = Terminal.SPOS(id = "spos2")
-        target.startRecovery("spos2")
+        target.startTicketReprint("spos2")
 
         verify {
-            recoveryContract.launch(Terminal.SPOS(id = "spos2"))
+            ticketReprintContract.launch(Terminal.SPOS(id = "spos2"))
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
+        terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
     }
 
-    test("startSPOSRecovery by terminal") {
-        target.startRecovery(Terminal.SPOS())
+    test("startTicketReprint by terminal") {
+        target.startTicketReprint(Terminal.SPOS())
 
         verify {
-            recoveryContract.launch(Terminal.SPOS())
+            ticketReprintContract.launch(Terminal.SPOS())
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
+        terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
     }
 
     test("contract failing to launch recovery request due to no activity") {
-        every { recoveryContract.launch(any()) } answers {
+        every { ticketReprintContract.launch(any()) } answers {
             throw ActivityNotFoundException("Spos not installed")
         }
 
-        target.startRecovery(Terminal.SPOS())
+        target.startTicketReprint(Terminal.SPOS())
 
         val result = terminalState.first()
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Error>()
-        result.response.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+        result.shouldBeInstanceOf<TerminalOperationStatus.TicketReprint.Error>()
+        result.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

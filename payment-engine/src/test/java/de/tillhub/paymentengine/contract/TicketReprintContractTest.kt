@@ -9,6 +9,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.data.SPOSKey
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -23,12 +24,12 @@ import org.robolectric.annotation.Config
 
 @RobolectricTest
 @Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
-class TerminalDisconnectContractTest : FunSpec({
+class TicketReprintContractTest : FunSpec({
 
     lateinit var context: Context
     lateinit var analytics: PaymentAnalytics
 
-    lateinit var target: TerminalDisconnectContract
+    lateinit var target: TicketReprintContract
 
     beforeTest {
         context = spyk(RuntimeEnvironment.getApplication())
@@ -37,22 +38,22 @@ class TerminalDisconnectContractTest : FunSpec({
             every { logCommunication(any(), any()) } just Runs
         }
 
-        target = TerminalDisconnectContract(analytics)
+        target = TicketReprintContract(analytics)
     }
 
     test("createIntent SPOS") {
         val result = target.createIntent(
             context,
-            SPOS
+            Terminal.SPOS(
+                id = "s-pos",
+            )
         )
 
-        result.shouldBeInstanceOf<Intent>()
-        result.action shouldBe "de.spayment.akzeptanz.S_SWITCH_DISCONNECT"
-        result.extras?.getString(SPOSKey.Extra.APP_ID) shouldBe "TESTCLIENT"
+        result.action shouldBe "de.spayment.akzeptanz.REPRINT_TICKET"
 
         verify {
             analytics.logOperation(
-                "Operation: TERMINAL_DISCONNECT" +
+                "Operation: REPRINT_TICKET" +
                         "\nTerminal.SPOS(" +
                         "id=s-pos, " +
                         "appId=TESTCLIENT, " +
@@ -70,58 +71,42 @@ class TerminalDisconnectContractTest : FunSpec({
         }
     }
 
-    test("createIntent OPI + ZVT") {
-        try {
-            target.createIntent(
-                context,
-                OPI
-            )
-        } catch (e: Exception) {
-            e.shouldBeInstanceOf<UnsupportedOperationException>()
-            e.message shouldBe "Disconnect only supported for S-POS terminals"
+    test("createIntent OPI") {
+        val result = shouldThrow<UnsupportedOperationException> {
+            target.createIntent(context, Terminal.OPI())
         }
+
         verify(inverse = true) {
             analytics.logOperation(any())
         }
+
+        result.message shouldBe "Ticket reprint only supported for S-POS terminals"
+    }
+
+    test("createIntent ZVT") {
+        val result = shouldThrow<UnsupportedOperationException> {
+            target.createIntent(context, Terminal.ZVT())
+        }
+
+        verify(inverse = true) {
+            analytics.logOperation(any())
+        }
+
+        result.message shouldBe "Ticket reprint only supported for S-POS terminals"
     }
 
     test("parseResult SPOS: result OK") {
-        val intent = Intent()
+        val intent = Intent().apply {
+            putExtra(SPOSKey.ResultExtra.RESULT_STATE, "Success")
+            putExtra(SPOSKey.ResultExtra.TRANSACTION_RESULT, "ACCEPTED")
+            putExtra(SPOSKey.ResultExtra.TERMINAL_ID, "terminal_id")
+            putExtra(SPOSKey.ResultExtra.TRANSACTION_DATA, "transaction_data")
+            putExtra(SPOSKey.ResultExtra.CARD_CIRCUIT, "card_circuit")
+            putExtra(SPOSKey.ResultExtra.CARD_PAN, "card_pan")
+        }
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Disconnected>()
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT OK"
-            )
-        }
+        result.shouldBeInstanceOf<TerminalOperationStatus.TicketReprint.Success>()
     }
-
-    test("parseResult SPOS: result CANCELED") {
-        val intent = Intent()
-
-        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT CANCELED"
-            )
-        }
-    }
-}) {
-    companion object {
-        val OPI = Terminal.OPI(
-            id = "opi",
-            ipAddress = "127.0.0.1",
-            port = 20002,
-            port2 = 20007
-        )
-        val SPOS = Terminal.SPOS(
-            id = "s-pos",
-        )
-    }
-}
+})

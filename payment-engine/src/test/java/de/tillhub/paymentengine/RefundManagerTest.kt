@@ -69,7 +69,7 @@ class RefundManagerTest : FunSpec({
             )
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
+        terminalState.value shouldBe TerminalOperationStatus.Refund.Pending(amount, currency)
     }
 
     test("startRefundTransaction with configId should launch refund contract") {
@@ -97,7 +97,7 @@ class RefundManagerTest : FunSpec({
             )
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
+        terminalState.value shouldBe TerminalOperationStatus.Refund.Pending(amount, currency)
     }
 
     test("startRefundTransaction with custom Terminal should launch refund contract") {
@@ -124,7 +124,7 @@ class RefundManagerTest : FunSpec({
             )
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Pending.Refund(amount, currency)
+        terminalState.value shouldBe TerminalOperationStatus.Refund.Pending(amount, currency)
     }
 
     test("contract failing to launch request due to no activity") {
@@ -155,8 +155,8 @@ class RefundManagerTest : FunSpec({
             )
         }
 
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Error.SPOS>()
-        (terminalState.value as TerminalOperationStatus.Error.SPOS)
-            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Refund.Error>()
+        (terminalState.value as TerminalOperationStatus.Refund.Error)
+            .response.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

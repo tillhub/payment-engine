@@ -4,10 +4,9 @@ import androidx.annotation.Keep
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import de.tillhub.paymentengine.data.Payment
-import de.tillhub.paymentengine.data.errorIfNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -19,29 +18,31 @@ internal class LavegoTransactionDataConverter(
     private fun createTxJsonAdapter(): JsonAdapter<TransactionDataDto> =
         moshi.adapter(TransactionDataDto::class.java)
 
-    suspend fun convertFromTxJson(json: String): Payment<LavegoTransactionData> =
+    suspend fun convertFromTxJson(json: String): Result<LavegoTransactionData> =
         try {
             withContext(Dispatchers.IO) {
-                @Suppress("BlockingMethodInNonBlockingContext")
-                createTxJsonAdapter().fromJson(json)?.toDomain()
-            }.errorIfNull("data could not be converted to transaction data: $json")
+                createTxJsonAdapter().fromJson(json)?.toDomain()?.let {
+                    Result.success(it)
+                }
+            } ?: Result.failure(JsonDataException("data could not be converted to transaction data: $json"))
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Timber.v(e, "data could not be converted to transaction data: %s", json)
-            Payment.Error("data could not be converted to transaction data: $json")
+            Result.failure(JsonDataException("data could not be converted to transaction data: $json"))
         }
 
     private fun createLoginJsonAdapter(): JsonAdapter<LoginDataDto> =
         moshi.adapter(LoginDataDto::class.java)
 
-    suspend fun convertFromLoginJson(json: String): Payment<LavegoLoginData> =
+    suspend fun convertFromLoginJson(json: String): Result<LavegoLoginData> =
         try {
             withContext(Dispatchers.IO) {
-                @Suppress("BlockingMethodInNonBlockingContext")
-                createLoginJsonAdapter().fromJson(json)?.toDomain()
-            }.errorIfNull("data could not be converted to login data: $json")
+                createLoginJsonAdapter().fromJson(json)?.toDomain()?.let {
+                    Result.success(it)
+                }
+            } ?: Result.failure(JsonDataException("data could not be converted to login data: $json"))
         } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
             Timber.v(e, "data could not be converted to login data: %s", json)
-            Payment.Error("data could not be converted to login data: $json")
+            Result.failure(JsonDataException("data could not be converted to login data: $json"))
         }
 
     private fun TransactionDataDto.toDomain(): LavegoTransactionData =

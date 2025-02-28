@@ -50,6 +50,7 @@ sealed class Terminal : Parcelable {
             const val DEFAULT_PORT = 40007
             const val DEFAULT_CURRENCY_CODE = "0978"
             private const val DEFAULT_PRINTER_AVAILABLE = true
+            const val TYPE = "ZVT"
         }
     }
 
@@ -93,6 +94,7 @@ sealed class Terminal : Parcelable {
             const val DEFAULT_PORT_1 = 20002
             const val DEFAULT_PORT_2 = 20007
             const val DEFAULT_CURRENCY_CODE = "EUR"
+            const val TYPE = "OPI"
         }
     }
 
@@ -128,6 +130,7 @@ sealed class Terminal : Parcelable {
             private const val DEFAULT_APP_ID = "TESTCLIENT"
             private const val DEFAULT_CONNECTION = false
             const val DEFAULT_CURRENCY_CODE = "EUR"
+            const val TYPE = "SPOS"
         }
     }
 }

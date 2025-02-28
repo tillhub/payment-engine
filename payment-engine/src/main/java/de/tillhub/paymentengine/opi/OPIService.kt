@@ -7,7 +7,8 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TerminalOperationError
+import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.opi.common.modifyAmountForOpi
 import de.tillhub.paymentengine.opi.common.startAsForegroundService
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
@@ -154,11 +155,11 @@ internal class OPIService(
         ) : State()
 
         data class ResultError(
-            val data: TerminalOperationStatus.Error,
+            val data: TerminalOperationError,
         ) : State()
 
         data class ResultSuccess(
-            val data: TerminalOperationStatus.Success
+            val data: TerminalOperationSuccess
         ) : State()
     }
 }

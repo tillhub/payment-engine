@@ -39,6 +39,7 @@
 -keep class de.tillhub.paymentengine.ReversalManager { *; }
 -keep class de.tillhub.paymentengine.ConnectionManager { *; }
 -keep class de.tillhub.paymentengine.RecoveryManager { *; }
+-keep class de.tillhub.paymentengine.TicketReprintManager { *; }
 -keep class de.tillhub.paymentengine.helper.SingletonHolder { *; }
 -keep class de.tillhub.paymentengine.analytics.PaymentAnalytics { *; }
 
@@ -46,11 +47,12 @@
 -keep class de.tillhub.paymentengine.data.CardSaleConfig { *; }
 -keep class de.tillhub.paymentengine.data.CardSaleConfig$* { *; }
 -keep class de.tillhub.paymentengine.data.ISOAlphaCurrency { *; }
--keep class de.tillhub.paymentengine.data.Payment { *; }
 -keep class de.tillhub.paymentengine.data.Terminal { *; }
 -keep class de.tillhub.paymentengine.data.Terminal$* { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus$* { *; }
+-keep class de.tillhub.paymentengine.data.TerminalOperationSuccess { *; }
+-keep class de.tillhub.paymentengine.data.TerminalOperationError { *; }
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode$* { *; }

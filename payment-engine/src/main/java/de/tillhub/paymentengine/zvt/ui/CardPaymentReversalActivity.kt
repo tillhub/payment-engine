@@ -1,5 +1,7 @@
 package de.tillhub.paymentengine.zvt.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -57,6 +59,22 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
 
     override fun setCancelVisibility(visible: Boolean) {
         binding.buttonCancel.isVisible = visible
+    }
+
+    override fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.reversal) }
+        )
+        finish()
+    }
+
+    override fun finishWithError(state: CardTerminalViewModel.State.Error) {
+        setResult(
+            Activity.RESULT_OK,
+            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.reversal) }
+        )
+        finish()
     }
 
     /**

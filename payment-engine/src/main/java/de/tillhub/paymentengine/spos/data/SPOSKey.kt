@@ -7,6 +7,7 @@ internal object SPOSKey {
         const val TRANSACTION_ACTION = "de.spayment.akzeptanz.TRANSACTION"
         const val RECONCILIATION_ACTION = "de.spayment.akzeptanz.RECONCILIATION"
         const val RECOVERY_ACTION = "de.spayment.akzeptanz.REPEAT_LAST_MESSAGE"
+        const val TICKET_REPRINT_ACTION = "de.spayment.akzeptanz.REPRINT_TICKET"
     }
 
     object Extra {

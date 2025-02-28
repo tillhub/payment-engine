@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @ExperimentalCoroutinesApi
@@ -21,7 +22,9 @@ class CardManagerTest : FunSpec({
         configs = mockk(relaxed = true)
         terminalState = spyk(MutableStateFlow(TerminalOperationStatus.Waiting))
 
-        target = object : CardManagerImpl(configs, terminalState) {}
+        target = object : CardManagerImpl(configs, terminalState) {
+            override fun observePaymentState(): Flow<TerminalOperationStatus> = terminalState
+        }
     }
 
     test("putTerminalConfig should add terminal to the configs map") {
