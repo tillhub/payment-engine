@@ -4,7 +4,6 @@ import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationError
-import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus

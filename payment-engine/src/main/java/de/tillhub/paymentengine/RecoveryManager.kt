@@ -52,7 +52,7 @@ internal class RecoveryManagerImpl(
             recoveryContract.launch(config)
         } catch (_: UnsupportedOperationException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
+                TerminalOperationStatus.Recovery.Error(
                     TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
@@ -61,7 +61,7 @@ internal class RecoveryManagerImpl(
             )
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
+                TerminalOperationStatus.Recovery.Error(
                     TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR

@@ -123,7 +123,7 @@ internal class ReversalManagerImpl(
             )
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
+                TerminalOperationStatus.Reversal.Error(
                     TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR

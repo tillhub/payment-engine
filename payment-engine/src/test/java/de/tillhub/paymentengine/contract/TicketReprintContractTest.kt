@@ -107,6 +107,6 @@ class TicketReprintContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.TicketReprint.Success>()
     }
 })

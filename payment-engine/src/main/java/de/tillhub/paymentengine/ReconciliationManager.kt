@@ -53,7 +53,7 @@ internal class ReconciliationManagerImpl(
             reconciliationContract.launch(config)
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
+                TerminalOperationStatus.Reconciliation.Error(
                     TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR

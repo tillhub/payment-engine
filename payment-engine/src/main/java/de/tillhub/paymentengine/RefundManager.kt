@@ -94,7 +94,7 @@ internal class RefundManagerImpl(
             )
         } catch (_: ActivityNotFoundException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
+                TerminalOperationStatus.Refund.Error(
                     TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR

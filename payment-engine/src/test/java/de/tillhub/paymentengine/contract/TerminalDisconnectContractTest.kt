@@ -90,7 +90,7 @@ class TerminalDisconnectContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Success.SPOS>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Disconnected>()
         verify {
             analytics.logCommunication(
                 protocol = "SPOS",
@@ -104,7 +104,7 @@ class TerminalDisconnectContractTest : FunSpec({
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
-        result.shouldBeInstanceOf<TerminalOperationStatus.Canceled>()
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
         verify {
             analytics.logCommunication(
                 protocol = "SPOS",
