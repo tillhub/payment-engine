@@ -10,7 +10,6 @@ import java.util.Objects
 sealed class TerminalOperationStatus private constructor(
     private val type: StatusType
 ) : Parcelable {
-    fun isWaiting(): Boolean = type == StatusType.WAITING
     fun isPending(): Boolean = type == StatusType.PENDING
     fun isSuccess(): Boolean = type == StatusType.SUCCESS
     fun isError(): Boolean = type == StatusType.ERROR
