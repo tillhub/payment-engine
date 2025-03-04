@@ -165,6 +165,7 @@ internal object SPOSResponseHandler {
             merchantReceipt = merchantReceipt.orEmpty(),
             rawData = intent?.extras?.toRawData().orEmpty(),
             data = intent?.extras?.toTransactionData(),
+            reprintRequired = customerReceipt.isNullOrEmpty() && merchantReceipt.isNullOrEmpty()
         )
 
     private fun createError(intent: Intent?, customerReceipt: String?, merchantReceipt: String?, error: String?) =

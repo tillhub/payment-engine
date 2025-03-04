@@ -12,6 +12,7 @@ class TerminalOperationSuccess(
     val merchantReceipt: String,
     val rawData: String,
     val data: TransactionData?,
+    val reprintRequired: Boolean = false
 ) : Parcelable {
 
     override fun equals(other: Any?) = other is TerminalOperationSuccess &&
