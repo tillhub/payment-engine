@@ -10,6 +10,8 @@ import de.tillhub.paymentengine.spos.data.ReceiptDto
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.spos.data.StringToReceiptDtoConverter
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Runs
@@ -236,7 +238,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
             }
         }
 
-        it("success") {
+        it("success reprintRequired = false") {
             every {
                 intent.extras?.keySet()
             } returns setOf(
@@ -312,6 +314,86 @@ class SPOSResponseHandlerTest : DescribeSpec({
             result.response.data?.cardCircuit shouldBe "card_circuit"
             result.response.data?.cardPan shouldBe "card_pan"
             result.response.data?.paymentProvider shouldBe "merchant"
+            result.response.reprintRequired.shouldBeFalse()
+        }
+
+        it("success reprintRequired = true") {
+            every {
+                intent.extras?.keySet()
+            } returns setOf(
+                SPOSKey.ResultExtra.RECEIPT_MERCHANT,
+                SPOSKey.ResultExtra.RECEIPT_CUSTOMER,
+                SPOSKey.ResultExtra.RESULT_STATE,
+                SPOSKey.ResultExtra.TRANSACTION_RESULT,
+                SPOSKey.ResultExtra.TERMINAL_ID,
+                SPOSKey.ResultExtra.TRANSACTION_DATA,
+                SPOSKey.ResultExtra.CARD_CIRCUIT,
+                SPOSKey.ResultExtra.CARD_PAN,
+                SPOSKey.ResultExtra.MERCHANT
+            )
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.RECEIPT_MERCHANT)
+            } returns null
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.RECEIPT_CUSTOMER)
+            } returns null
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.RESULT_STATE)
+            } returns "Success"
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.TRANSACTION_RESULT)
+            } returns "ACCEPTED"
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.TERMINAL_ID)
+            } returns "terminal_id"
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.TRANSACTION_DATA)
+            } returns "transaction_data"
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.CARD_CIRCUIT)
+            } returns "card_circuit"
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.CARD_PAN)
+            } returns "card_pan"
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.MERCHANT)
+            } returns "merchant"
+
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.ERROR)
+            } returns null
+            every {
+                intent.extras?.getString(SPOSKey.ResultExtra.ERROR_MESSAGE)
+            } returns null
+
+            val result = SPOSResponseHandler.handleTransactionResult(
+                Activity.RESULT_OK,
+                intent,
+                analytics,
+                TerminalOperationStatus.Payment::class,
+                receiptConverter
+            )
+
+            result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Success>()
+            result.response.customerReceipt shouldBe ""
+            result.response.merchantReceipt shouldBe ""
+            result.response.rawData shouldBe "Extras {\n" +
+                    "${SPOSKey.ResultExtra.RECEIPT_MERCHANT} = null\n" +
+                    "${SPOSKey.ResultExtra.RECEIPT_CUSTOMER} = null\n" +
+                    "${SPOSKey.ResultExtra.RESULT_STATE} = Success\n" +
+                    "${SPOSKey.ResultExtra.TRANSACTION_RESULT} = ACCEPTED\n" +
+                    "${SPOSKey.ResultExtra.TERMINAL_ID} = terminal_id\n" +
+                    "${SPOSKey.ResultExtra.TRANSACTION_DATA} = transaction_data\n" +
+                    "${SPOSKey.ResultExtra.CARD_CIRCUIT} = card_circuit\n" +
+                    "${SPOSKey.ResultExtra.CARD_PAN} = card_pan\n" +
+                    "${SPOSKey.ResultExtra.MERCHANT} = merchant\n" +
+                    "}"
+            result.response.data?.terminalId shouldBe "terminal_id"
+            result.response.data?.transactionId shouldBe "transaction_data"
+            result.response.data?.cardCircuit shouldBe "card_circuit"
+            result.response.data?.cardPan shouldBe "card_pan"
+            result.response.data?.paymentProvider shouldBe "merchant"
+            result.response.reprintRequired.shouldBeTrue()
         }
     }
 })
