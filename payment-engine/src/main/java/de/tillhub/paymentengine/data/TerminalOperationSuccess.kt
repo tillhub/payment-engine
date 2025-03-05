@@ -12,6 +12,7 @@ class TerminalOperationSuccess(
     val merchantReceipt: String,
     val rawData: String,
     val data: TransactionData?,
+    val reprintRequired: Boolean = false
 ) : Parcelable {
 
     override fun equals(other: Any?) = other is TerminalOperationSuccess &&
@@ -19,14 +20,16 @@ class TerminalOperationSuccess(
             customerReceipt == other.customerReceipt &&
             merchantReceipt == other.merchantReceipt &&
             rawData == other.rawData &&
-            data == other.data
+            data == other.data &&
+            reprintRequired == other.reprintRequired
 
     override fun hashCode() = Objects.hash(
         date,
         customerReceipt,
         merchantReceipt,
         rawData,
-        data
+        data,
+        reprintRequired
     )
 
     override fun toString() = "Success(" +
@@ -34,6 +37,7 @@ class TerminalOperationSuccess(
             "customerReceipt=$customerReceipt, " +
             "merchantReceipt=$merchantReceipt, " +
             "rawData=$rawData, " +
-            "data=$data" +
+            "data=$data," +
+            "reprintRequired=$reprintRequired" +
             ")"
 }
