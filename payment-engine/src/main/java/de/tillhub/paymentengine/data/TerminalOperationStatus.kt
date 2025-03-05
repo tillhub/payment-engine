@@ -8,38 +8,18 @@ import java.util.Objects
 
 @Parcelize
 sealed class TerminalOperationStatus private constructor(
-    private val type: StatusType
+    internal open val type: StatusType
 ) : Parcelable {
     fun isPending(): Boolean = type == StatusType.PENDING
     fun isSuccess(): Boolean = type == StatusType.SUCCESS
     fun isError(): Boolean = type == StatusType.ERROR
     fun isCanceled(): Boolean = type == StatusType.CANCELED
 
-    fun getSuccessData(): TerminalOperationSuccess? = when (this) {
-        is Payment.Success -> response
-        is Reversal.Success -> response
-        is Refund.Success -> response
-        is Reconciliation.Success -> response
-        is Recovery.Success -> response
-
-        else -> null
-    }
-
-    fun getErrorData(): TerminalOperationError? = when (this) {
-        is Payment.Error -> response
-        is Reversal.Error -> response
-        is Refund.Error -> response
-        is Reconciliation.Error -> response
-        is Recovery.Error -> response
-
-        else -> null
-    }
-
     data object Waiting : TerminalOperationStatus(StatusType.WAITING)
 
     @Parcelize
     sealed class Payment private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         class Pending(
             val amount: BigDecimal,
@@ -59,7 +39,7 @@ sealed class TerminalOperationStatus private constructor(
 
     @Parcelize
     sealed class Reversal private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         class Pending(val receiptNo: String) : Reversal(StatusType.PENDING) {
             override fun equals(other: Any?) = other is Pending &&
@@ -75,7 +55,7 @@ sealed class TerminalOperationStatus private constructor(
 
     @Parcelize
     sealed class Refund private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         class Pending(
             val amount: BigDecimal,
@@ -95,7 +75,7 @@ sealed class TerminalOperationStatus private constructor(
 
     @Parcelize
     sealed class Reconciliation private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         data object Pending : Reconciliation(StatusType.PENDING)
         class Success(val response: TerminalOperationSuccess) : Reconciliation(StatusType.SUCCESS)
@@ -105,7 +85,7 @@ sealed class TerminalOperationStatus private constructor(
 
     @Parcelize
     sealed class Recovery private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         data object Pending : Recovery(StatusType.PENDING)
         class Success(val response: TerminalOperationSuccess) : Recovery(StatusType.SUCCESS)
@@ -115,7 +95,7 @@ sealed class TerminalOperationStatus private constructor(
 
     @Parcelize
     sealed class Login private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         data object Pending : Login(StatusType.PENDING)
         class Connected(
@@ -137,7 +117,7 @@ sealed class TerminalOperationStatus private constructor(
 
     @Parcelize
     sealed class TicketReprint private constructor(
-        private val type: StatusType
+        override val type: StatusType
     ) : TerminalOperationStatus(type) {
         data object Pending : TicketReprint(StatusType.PENDING)
         class Success(
