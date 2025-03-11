@@ -31,6 +31,8 @@ compose-bom = "2024.02.02"
 
 retrofit-simplexml = "2.10.0"
 
+softpay = "2.0.05"
+
 [libraries]
 # Define the libraries
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -69,6 +71,10 @@ simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref =
 
 # OPI
 retrofit-simplexml = { group = "com.squareup.retrofit2", name = "converter-simplexml", version.ref = "retrofit-simplexml" }
+
+# Softpay
+softpay-sdk = { group = "io.softpay", name = "softpay-sdk", version.ref = "softpay" }
+softpay-sdk-sandbox = { group = "io.softpay", name = "softpay-sdk-sandbox", version.ref = "softpay" }
 
 # Unit testing
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
