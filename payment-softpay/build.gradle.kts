@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
@@ -46,6 +44,12 @@ android {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 detekt {
@@ -78,16 +82,16 @@ dependencies {
     releaseImplementation(libs.softpay.sdk)
 }
 
-//afterEvaluate {
-//    publishing {
-//        publications {
-//            create<MavenPublication>("payment-engine-softpay") {
-//                groupId = "de.tillhub.paymentengine.softpay"
-//                artifactId = "payment-engine:softpay"
-//                version = "3.4.1"
-//
-//                from(components.getByName("release"))
-//            }
-//        }
-//    }
-//}
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("payment-softpay") {
+                groupId = "de.tillhub.paymentengine.softpay"
+                artifactId = "payment-softpay"
+                version = "1.0.0"
+
+                from(components.getByName("release"))
+            }
+        }
+    }
+}
