@@ -34,7 +34,6 @@
 -keep class de.tillhub.paymentengine.CardManager { *; }
 -keep class de.tillhub.paymentengine.CardManagerImpl { *; }
 -keep class de.tillhub.paymentengine.PaymentManager { *; }
--keep class de.tillhub.paymentengine.PaymentManagerImpl { *; }
 -keep class de.tillhub.paymentengine.ReconciliationManager { *; }
 -keep class de.tillhub.paymentengine.RefundManager { *; }
 -keep class de.tillhub.paymentengine.ReversalManager { *; }

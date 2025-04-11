@@ -5,31 +5,35 @@ on:
         branches: [ "master" ]
 
 jobs:
-    basic-tests:
+  production-release:
+    name: Build & deploy production
+    runs-on: tillhub-org-runner
 
-        name: Run all tests
-        runs-on: ubuntu-latest
+    steps:
+      - name: Checking out branch
+        uses: actions/checkout@v4
 
-        steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-            - name: Checking out branch
-              uses: actions/checkout@v4
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-            - name: set up JDK 17
-              uses: actions/setup-java@v4
-              with:
-                  java-version: '17'
-                  distribution: 'temurin'
-                  cache: gradle
+      - name: Run Detekt Code Analysis
+        run: ./gradlew detekt
 
-            - name: Setup Android SDK
-              uses: android-actions/setup-android@v3
+      - name: Assemble release build
+        run: ./gradlew assembleRelease
 
-            - name: Run Detekt Code Analysis
-              run: ./gradlew detekt
-
-            - name: Run Unit tests
-              run: ./gradlew testDebug
+      - name: Deploy release build to Nexus
+        env:
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: ./gradlew publish
 
 #          # Hardware accelerated Android virtualization on Actions Linux larger hosted runners
 #            - name: Enable KVM
