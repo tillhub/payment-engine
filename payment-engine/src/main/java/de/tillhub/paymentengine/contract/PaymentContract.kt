@@ -34,6 +34,12 @@ class PaymentResultContract(
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
             is Terminal.SPOS -> SPOSIntentFactory.createPaymentIntent(input)
+
+            is Terminal.External -> Intent(context, input.config.paymentActivity).apply {
+                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
+                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
+                putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
+            }
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createPaymentOperation(input))
         }

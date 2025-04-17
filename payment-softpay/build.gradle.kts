@@ -1,5 +1,3 @@
-import java.net.URI
-
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
@@ -7,7 +5,6 @@ plugins {
     id("kotlin-parcelize")
     id("maven-publish")
 }
-
 
 android {
     namespace = "de.tillhub.paymentengine.softpay"
@@ -58,20 +55,11 @@ android {
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     allRules = false // activate all available (even unstable) rules.
-    config.setFrom("$projectDir/config/detekt.yml")
-}
-
-repositories {
-    maven {
-        url = URI.create("https://nexus.softpay.io/repository/softpay-external-sdk/")
-        credentials {
-            username = "**your-nexus-username**"
-            password = "**your-nexus-password**"
-        }
-    }
+    config.setFrom("$rootDir/payment-engine/config/detekt.yml")
 }
 
 dependencies {
+    implementation(project(":payment-engine"))
 
     // Core Dependencies
     implementation(libs.core.ktx)
@@ -90,17 +78,17 @@ dependencies {
     testImplementation(libs.bundles.robolectric)
 
     // Softpay
-    debugImplementation(libs.softpay.sdk.sandbox)
+    //debugImplementation(libs.softpay.sdk.sandbox)
     releaseImplementation(libs.softpay.sdk)
 }
 
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("payment-softpay") {
+            create<MavenPublication>("payment-engine-softpay") {
                 groupId = "de.tillhub.paymentengine.softpay"
-                artifactId = "payment-softpay"
-                version = "1.0.0"
+                artifactId = "payment-engine:softpay"
+                version = "3.4.1"
 
                 from(components.getByName("release"))
             }

@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine.data
 
 import android.os.Parcelable
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
@@ -131,6 +132,40 @@ sealed class Terminal : Parcelable {
             private const val DEFAULT_CONNECTION = false
             const val DEFAULT_CURRENCY_CODE = "EUR"
             const val TYPE = "SPOS"
+        }
+    }
+
+    open class External(
+        override val id: String = DEFAULT_EXTERNAL_ID,
+        override val saleConfig: CardSaleConfig = CardSaleConfig(),
+    ) : Terminal() {
+        @IgnoredOnParcel
+        open val connectActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val paymentActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val refundActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val reversalActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val reconciliationActivity: Class<*>? = null
+
+        override fun toString() = "Terminal.External(" +
+                "id=$id, " +
+                "saleConfig=$saleConfig" +
+                ")"
+
+        override fun equals(other: Any?) = other is SPOS &&
+                id == other.id &&
+                saleConfig == other.saleConfig
+
+        override fun hashCode() = Objects.hash(
+            id,
+            saleConfig,
+        )
+
+        companion object {
+            private const val DEFAULT_EXTERNAL_ID = "Default:External"
         }
     }
 }

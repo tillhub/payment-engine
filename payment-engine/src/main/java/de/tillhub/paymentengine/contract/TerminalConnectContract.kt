@@ -30,6 +30,10 @@ class TerminalConnectContract(
             is Terminal.ZVT -> Intent(context, TerminalLoginActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
+
+            is Terminal.External -> Intent(context, input.connectActivity).apply {
+                putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            }
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createConnectOperation(input))
         }

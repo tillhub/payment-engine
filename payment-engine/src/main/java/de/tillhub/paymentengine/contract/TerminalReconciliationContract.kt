@@ -29,6 +29,10 @@ class TerminalReconciliationContract(
             }
 
             is Terminal.SPOS -> SPOSIntentFactory.createReconciliationIntent()
+
+            is Terminal.External -> Intent(context, input.reconciliationActivity).apply {
+                putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            }
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReconciliationOperation(input))
         }
