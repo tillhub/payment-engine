@@ -78,17 +78,17 @@ dependencies {
     testImplementation(libs.bundles.robolectric)
 
     // Softpay
-    debugImplementation(libs.softpay.sdk.sandbox)
+    //debugImplementation(libs.softpay.sdk.sandbox)
     releaseImplementation(libs.softpay.sdk)
 }
 
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("payment-softpay") {
+            create<MavenPublication>("payment-engine-softpay") {
                 groupId = "de.tillhub.paymentengine.softpay"
-                artifactId = "payment-softpay"
-                version = "1.0.0"
+                artifactId = "payment-engine:softpay"
+                version = "3.4.1"
 
                 from(components.getByName("release"))
             }

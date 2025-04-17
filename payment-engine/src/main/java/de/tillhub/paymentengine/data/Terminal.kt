@@ -6,6 +6,7 @@ import android.os.Parcelable
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
@@ -141,6 +142,40 @@ sealed class Terminal : Parcelable {
                 ")"
 
         override fun equals(other: Any?) = other is External &&
+                id == other.id &&
+                saleConfig == other.saleConfig
+
+        override fun hashCode() = Objects.hash(
+            id,
+            saleConfig,
+        )
+
+        companion object {
+            private const val DEFAULT_EXTERNAL_ID = "Default:External"
+        }
+    }
+
+    open class External(
+        override val id: String = DEFAULT_EXTERNAL_ID,
+        override val saleConfig: CardSaleConfig = CardSaleConfig(),
+    ) : Terminal() {
+        @IgnoredOnParcel
+        open val connectActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val paymentActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val refundActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val reversalActivity: Class<*>? = null
+        @IgnoredOnParcel
+        open val reconciliationActivity: Class<*>? = null
+
+        override fun toString() = "Terminal.External(" +
+                "id=$id, " +
+                "saleConfig=$saleConfig" +
+                ")"
+
+        override fun equals(other: Any?) = other is SPOS &&
                 id == other.id &&
                 saleConfig == other.saleConfig
 
