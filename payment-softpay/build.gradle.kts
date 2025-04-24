@@ -80,7 +80,7 @@ dependencies {
     testImplementation(libs.bundles.robolectric)
 
     // Softpay
-    //debugImplementation(libs.softpay.sdk.sandbox)
+    debugImplementation(libs.softpay.sdk.sandbox)
     releaseImplementation(libs.softpay.sdk)
 }
 
