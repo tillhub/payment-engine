@@ -3,8 +3,8 @@ package de.tillhub.paymentengine.softpay.ui.connect
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.ui.SoftpayTerminalActivity
-import io.softpay.sdk.failure.Failure
 
 internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
 
@@ -12,6 +12,20 @@ internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel.state.collectWithOwner(this) { state ->
+            when (state) {
+                ConnectState.Idle,
+                ConnectState.Loading -> showLoader()
+
+                ConnectState.CredentialsInput -> startOperation()
+
+                ConnectState.Error.WrongCredentials -> TODO()
+                is ConnectState.Error.General -> TODO()
+
+                ConnectState.Success -> TODO()
+            }
+        }
 
         viewModel.init(softpay.loginManager)
     }
