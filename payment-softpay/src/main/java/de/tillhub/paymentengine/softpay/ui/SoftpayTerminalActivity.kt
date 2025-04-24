@@ -8,7 +8,6 @@ import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.databinding.ActivityTerminalBinding
 import de.tillhub.paymentengine.softpay.helpers.FlowListenerImpl
 import de.tillhub.paymentengine.softpay.helpers.viewBinding
-import io.softpay.sdk.LogOptions
 import io.softpay.sdk.Softpay
 import io.softpay.sdk.SoftpayFactory
 import io.softpay.sdk.SoftpayOptions

@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 
 internal class SoftpayConnectViewModel : ViewModel()  {
 
-    private val _viewState = MutableStateFlow<ConnectState>(ConnectState.Idle)
-    val viewState: StateFlow<ConnectState> = _viewState
+    private val _state = MutableStateFlow<ConnectState>(ConnectState.Idle)
+    val state: StateFlow<ConnectState> = _state
 
     private lateinit var flow: LoginFlow
 
@@ -34,47 +34,47 @@ internal class SoftpayConnectViewModel : ViewModel()  {
         model.update()?.let { update ->
             when (update) {
                 // Some Input is requested.
-                is InputRequest ->
-                    when {
-                        // Merchant Credentials are requested.
-                        model.awaits(CredentialsInput::class.java) -> {
-                            val (reason, failure) = model.inputArgs2<CredentialsInput.Reason,Failure?>()
-                            _viewState.value = when (reason) {
-                                CredentialsInput.Reason.FIRST -> ConnectState.Error.CredentialsInput
-                                CredentialsInput.Reason.INVALID -> ConnectState.Error.WrongCredentials
-                                CredentialsInput.Reason.FAILURE -> failure.failure()?.let {
-                                    ConnectState.Error.General(it)
-                                } ?: ConnectState.Error.General(
-                                    failure = failureOf("Login failed")
-                                )
+                is InputRequest -> when {
+                    // Merchant Credentials are requested.
+                    model.awaits(CredentialsInput::class.java) -> {
+                        val (reason, failure) = model.inputArgs2<CredentialsInput.Reason,Failure?>()
+                        _state.value = when (reason) {
+                            CredentialsInput.Reason.FIRST -> ConnectState.CredentialsInput
+                            CredentialsInput.Reason.INVALID -> {
+                                ConnectState.Error.WrongCredentials
                             }
+                            CredentialsInput.Reason.FAILURE -> failure.failure()?.let {
+                                ConnectState.Error.General(it)
+                            } ?: ConnectState.Error.General(
+                                failure = failureOf("Login failed")
+                            )
                         }
-                        model.awaits(LoginFlowInput.UnlockTokenInput::class.java) -> {
-                            // todo handle UnlockTokenInput
-                            null
-                        }
-                        else -> null
                     }
-                else ->
-                    when {
-                        // SDK is either attesting or still processing.
-                        model.state.attesting || model.state.processing -> {
-                            _viewState.value = ConnectState.Loading
+                    model.awaits(LoginFlowInput.UnlockTokenInput::class.java) -> {
+                        // todo handle UnlockTokenInput
+                        null
+                    }
+                    else -> null
+                }
+                else -> when {
+                    // SDK is either attesting or still processing.
+                    model.state.attesting || model.state.processing -> {
+                        _state.value = ConnectState.Loading
+                    }
+                    // Final state: Login was successful.
+                    model.state.success -> {
+                        _state.value = ConnectState.Success
+                    }
+                    // Final state: Login failed.
+                    model.state.failure -> {
+                        viewModelScope.launch {
+                            val failureUpdate = update as Update.Failure
+                            _state.value = ConnectState.Error.General(failureUpdate.failure)
                         }
-                        // Final state: Login was successful.
-                        model.state.success -> {
-                            _viewState.value = ConnectState.Success
-                        }
-                        // Final state: Login failed.
-                        model.state.failure -> {
-                            viewModelScope.launch {
-                                val failureUpdate = update as Update.Failure
-                                _viewState.value = ConnectState.Error.General(failureUpdate.failure)
-                            }
-                        }
+                    }
 
-                        else -> null
-                    }
+                    else -> null
+                }
             }
         }
         true
@@ -107,10 +107,10 @@ internal class SoftpayConnectViewModel : ViewModel()  {
 internal sealed class ConnectState {
     data object Idle: ConnectState()
     data object Loading: ConnectState()
-    sealed class Error: ConnectState() {
-        data object CredentialsInput: Error()
-        data object WrongCredentials: Error()
+    data object CredentialsInput: ConnectState()
 
+    sealed class Error: ConnectState() {
+        data object WrongCredentials: Error()
         data class General(val failure: Failure): Error()
     }
     data object Success: ConnectState()
