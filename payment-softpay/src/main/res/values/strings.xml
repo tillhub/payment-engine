@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="softpay_error_general">Something went wrong.</string>
+    <string name="softpay_error_wrong_credentials">Wrong merchant credential provided to Softpay integration.</string>
+    <string name="softpay_error_login_failure">Softpay integration could not login into the merchant account.</string>
+    <string name="softpay_error_terminal_not_configured">Softpay terminal not configured.</string>
+
+    <string name="softpay_recovery_contact_support">Contact support for help.</string>
+    <string name="softpay_recovery_wrong_credentials">Softpay merchant account should be configured on the dashboard.</string>
+    <string name="softpay_recovery_terminal_not_configured">Softpay terminal should be configured on the dashboard.</string>
+</resources>
