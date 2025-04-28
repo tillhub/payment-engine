@@ -29,9 +29,10 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity(), SoftpayPr
     protected val softpay: Softpay by lazy {
         SoftpayFactory.getOrCreate {
             val integrator = Integrator.Builder()
+                .integrator(config.config.integratorId)
                 .access(
                     accessId = config.config.accessId,
-                    accessSecret = config.config.accessId.toCharArray()
+                    accessSecret = config.config.accessSecret.toCharArray()
                 )
                 .build()
 

@@ -28,8 +28,8 @@ import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 
 internal class SoftpayConnectViewModel(
-    private val terminalConfig: TerminalConfig = TerminalConfigImpl(),
-) : ViewModel()  {
+    private val terminalConfig: TerminalConfig = TerminalConfigImpl()
+) : ViewModel() {
 
     private val _state = MutableStateFlow<ConnectState>(ConnectState.Idle)
     val state: StateFlow<ConnectState> = _state
@@ -44,7 +44,7 @@ internal class SoftpayConnectViewModel(
                 is InputRequest -> when {
                     // Merchant Credentials are requested.
                     model.awaits(CredentialsInput::class.java) -> {
-                        val (reason, failure) = model.inputArgs2<CredentialsInput.Reason,Failure?>()
+                        val (reason, failure) = model.inputArgs2<CredentialsInput.Reason, Failure?>()
                         _state.value = when (reason) {
                             CredentialsInput.Reason.FIRST -> ConnectState.CredentialsInput
                             CredentialsInput.Reason.INVALID -> {
@@ -163,31 +163,31 @@ internal class SoftpayConnectViewModel(
 }
 
 internal sealed class ConnectState {
-    data object Idle: ConnectState()
-    data object Loading: ConnectState()
-    data object CredentialsInput: ConnectState()
+    data object Idle : ConnectState()
+    data object Loading : ConnectState()
+    data object CredentialsInput : ConnectState()
 
-    sealed class Error: ConnectState() {
+    sealed class Error : ConnectState() {
         abstract val date: Instant
         abstract val resultCode: TransactionResultCode
 
         data class WrongCredentials(
             override val date: Instant,
             override val resultCode: TransactionResultCode
-        ): Error()
+        ) : Error()
         data class NotConfigured(
             override val date: Instant,
             override val resultCode: TransactionResultCode
-        ): Error()
+        ) : Error()
         data class General(
             override val date: Instant,
             override val resultCode: TransactionResultCode,
             val failure: Failure
-        ): Error()
+        ) : Error()
     }
-    data object LoggedIn: ConnectState()
+    data object LoggedIn : ConnectState()
     data class Success(
         val date: Instant,
         val terminalId: String
-    ): ConnectState()
+    ) : ConnectState()
 }
