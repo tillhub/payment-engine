@@ -31,21 +31,13 @@ internal class FlowListenerImpl : FlowListener {
         }
 
         return when (flow) {
-            is LoginFlow -> {
-                startLogin(softpay.loginManager)
-            }
+            is LoginFlow -> startLogin(softpay.loginManager)
 
-            is ConfigFlow -> {
-                startConfig(softpay.configManager)
-            }
+            is ConfigFlow -> startConfig(softpay.configManager)
 
-            is TransactionFlow -> {
-                startTransaction(flow)
-            }
+            is TransactionFlow -> startTransaction(flow)
 
-            else -> {
-                false
-            }
+            else -> false
         }
     }
 
@@ -81,6 +73,11 @@ internal class FlowListenerImpl : FlowListener {
         }
     }
 
-    private val <O : FlowOptions, M : FlowModel, A : FlowAction, F : Flow<M, A>> FlowFactory<O, M, A, F>.isAppBusy: Boolean
+    private val <
+            O : FlowOptions,
+            M : FlowModel,
+            A : FlowAction,
+            F : Flow<M, A>
+        > FlowFactory<O, M, A, F>.isAppBusy: Boolean
         get() = filter(active = false) { it.subscribedTo(Entity.APP) }.isNotEmpty()
 }

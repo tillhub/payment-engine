@@ -782,4 +782,5 @@ libraries:
             - '**/main/java/de/tillhub/paymentengine/data/TerminalOperationSuccess.kt'
             - '**/main/java/de/tillhub/paymentengine/helper/SingletonHolder.kt'
             - '**/main/java/de/tillhub/paymentengine/analytics/PaymentAnalytics.kt'
-            - '**/main/java/de/tillhub/paymentengine/softpay/SoftpayTerminal.kt'
+            - '**/main/java/de/tillhub/paymentengine/softpay/data/SoftpayTerminal.kt'
+            - '**/main/java/de/tillhub/paymentengine/softpay/data/SoftpayConfig.kt'

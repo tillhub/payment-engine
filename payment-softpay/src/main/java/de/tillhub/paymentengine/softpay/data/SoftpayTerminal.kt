@@ -12,13 +12,13 @@ class SoftpayTerminal(
     @IgnoredOnParcel
     override val connectActivity: Class<*> = SoftpayConnectActivity::class.java
     @IgnoredOnParcel
-    override val paymentActivity: Class<*>? = null
+    override val paymentActivity: Class<*>? = null // TODO
     @IgnoredOnParcel
-    override val refundActivity: Class<*>? = null
+    override val refundActivity: Class<*>? = null // TODO
     @IgnoredOnParcel
-    override val reversalActivity: Class<*>? = null
+    override val reversalActivity: Class<*>? = null // TODO
     @IgnoredOnParcel
-    override val reconciliationActivity: Class<*>? = null
+    override val reconciliationActivity: Class<*>? = null // TODO
 
     override fun toString() = "SoftpayTerminal(" +
             "id=$id, " +

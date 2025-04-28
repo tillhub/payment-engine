@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
@@ -86,4 +85,3 @@ internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
         finish()
     }
 }
-
