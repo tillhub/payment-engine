@@ -39,5 +39,6 @@ class SoftpayTerminal(
 
     companion object {
         private const val DEFAULT_SOFTPAY_ID = "Default:SOFTPAY"
+        const val TYPE = "SOFTPAY"
     }
 }

@@ -50,7 +50,4 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity(), SoftpayPr
     }
 
     override fun softpay(): Softpay? = softpay
-
-    abstract fun showLoader()
-    abstract fun startOperation()
 }
