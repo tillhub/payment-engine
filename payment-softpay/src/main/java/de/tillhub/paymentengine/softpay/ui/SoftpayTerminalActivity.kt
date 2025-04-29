@@ -4,18 +4,15 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.softpay.SoftpayApplication
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.databinding.ActivityTerminalBinding
-import de.tillhub.paymentengine.softpay.helpers.FlowListenerImpl
 import de.tillhub.paymentengine.softpay.helpers.viewBinding
 import io.softpay.sdk.Softpay
-import io.softpay.sdk.SoftpayFactory
-import io.softpay.sdk.SoftpayOptions
-import io.softpay.sdk.SoftpayProvider
-import io.softpay.sdk.domain.Integrator
-import io.softpay.sdk.meta.DelicateSoftpayApi
+import io.softpay.sdk.meta.ExperimentalSoftpayApi
 
-internal abstract class SoftpayTerminalActivity : AppCompatActivity(), SoftpayProvider {
+@ExperimentalSoftpayApi
+internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
 
     protected val binding by viewBinding(ActivityTerminalBinding::inflate)
 
@@ -25,23 +22,12 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity(), SoftpayPr
         } ?: throw IllegalArgumentException("SoftpayTerminalActivity: Extras is null")
     }
 
-    @DelicateSoftpayApi
     protected val softpay: Softpay by lazy {
-        SoftpayFactory.getOrCreate {
-            val integrator = Integrator.Builder()
-                .integrator(config.config.integratorId)
-                .access(
-                    accessId = config.config.accessId,
-                    accessSecret = config.config.accessSecret.toCharArray()
-                )
-                .build()
+        require(application is SoftpayApplication) { "Application type is not SoftpayApplication" }
 
-            SoftpayOptions.Builder()
-                .context(this)
-                .integrator(integrator)
-                .flags(debug = true)
-                .flowListener(FlowListenerImpl())
-                .build()
+        (application as SoftpayApplication).let {
+            it.setConfig(config.config)
+            it.softpay()
         }
     }
 
@@ -50,5 +36,5 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity(), SoftpayPr
         setContentView(binding.root)
     }
 
-    override fun softpay(): Softpay? = softpay
+
 }

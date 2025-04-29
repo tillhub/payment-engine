@@ -14,10 +14,10 @@ import io.softpay.sdk.flow.FlowRequirement
 import io.softpay.sdk.flow.result
 import io.softpay.sdk.login.LoginFlow
 import io.softpay.sdk.login.LoginManager
-import io.softpay.sdk.meta.DelicateSoftpayApi
+import io.softpay.sdk.meta.ExperimentalSoftpayApi
 import io.softpay.sdk.transaction.TransactionFlow
 
-@DelicateSoftpayApi
+@ExperimentalSoftpayApi
 internal class FlowListenerImpl : FlowListener {
 
     override fun onFlowStart(softpay: Softpay, flow: Flow<FlowModel, FlowAction>): Boolean {

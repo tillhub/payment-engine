@@ -1,3 +1,5 @@
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -19,6 +21,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val projectProperties = readProperties(file("$rootDir/local_secrets.properties"))
+        buildConfigField("String", "ACCESS_ID", "\"${projectProperties["accessId"]}\"")
+        buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["accessSecret"]}\"")
+        buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["integratorId"]}\"")
     }
 
     buildTypes {
@@ -54,6 +61,7 @@ android {
 dependencies {
     implementation(project(":payment-engine"))
     implementation(project(":payment-spos"))
+    implementation(project(":payment-softpay"))
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     implementation(libs.core.ktx)
@@ -67,4 +75,10 @@ dependencies {
     implementation(libs.timber)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+}
+
+fun readProperties(propertiesFile: File) = Properties().apply {
+    propertiesFile.inputStream().use { fis ->
+        load(fis)
+    }
 }
