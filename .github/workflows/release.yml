@@ -26,6 +26,9 @@ jobs:
       - name: Run Detekt Code Analysis
         run: ./gradlew detekt
 
+      - name: Run Unit tests
+        run: ./gradlew testDebug
+
       - name: Assemble release build
         run: ./gradlew assembleRelease
 
