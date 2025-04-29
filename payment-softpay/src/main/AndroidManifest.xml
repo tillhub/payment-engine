@@ -5,6 +5,11 @@
             android:name=".ui.connect.SoftpayConnectActivity"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Payment"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="de.tillhub.paymentengine.softpay.ACTION_CONNECT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

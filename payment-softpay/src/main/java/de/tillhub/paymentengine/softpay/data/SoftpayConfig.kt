@@ -1,14 +1,17 @@
 package de.tillhub.paymentengine.softpay.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
+@Parcelize
 class SoftpayConfig(
     val integratorId: String,
     val accessId: String,
     val accessSecret: String,
     val merchantUsername: String,
     val merchantPassword: String
-) {
+): Parcelable {
     override fun toString() = "SoftpayConfig(" +
             "integratorId=$integratorId, " +
             "accessId=$accessId, " +

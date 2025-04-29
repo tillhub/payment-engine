@@ -12,6 +12,8 @@ import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.softpay.data.SoftpayConfig
+import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
@@ -106,6 +108,18 @@ class MainViewModel : ViewModel() {
                 id = "s-pos",
             )
         )
+        cardManager.putTerminalConfig(
+            SoftpayTerminal(
+                id = "softpay",
+                config = SoftpayConfig(
+                    integratorId = BuildConfig.INTEGRATOR_ID,
+                    accessId = BuildConfig.ACCESS_ID,
+                    accessSecret = BuildConfig.ACCESS_SECRET,
+                    merchantUsername = "PTCMGVCG",
+                    merchantPassword = "StxLsXvsY/msDBr10SjU5k61CklbPdTKuuaGHcl1k9YzmisXFYkVltJ/5cPcyp54oA5l92XCwP97Fb4oetXoj9pA/cvUCYmpILvEw9LZ6SBqJTuoqk5GgoGmaFchvmDgIqykTmXQBFqJW7AKdGrCVe9/Tfpy22h73d9616fxybA=",
+                )
+            )
+        )
     }
 
     fun startPayment() {
@@ -155,7 +169,7 @@ class MainViewModel : ViewModel() {
     }
 
     companion object {
-        private const val CONFIG_IN_USE = "s-pos"
+        private const val CONFIG_IN_USE = "softpay"
         private const val REMOTE_IP = "192.168.100.39"
     }
 }
