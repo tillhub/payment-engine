@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class io.softpay.sdk.** { *; }
+
+-keeppackagenames de.tillhub.paymentengine.softpay.**
+
+# Data classes
+-keep class de.tillhub.paymentengine.softpay.data.SoftpayTerminal { *; }
+-keep class de.tillhub.paymentengine.softpay.data.SoftpayConfig { *; }

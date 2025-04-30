@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.softpay.data
 
+import android.content.Context
 import android.content.Intent
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
@@ -15,33 +16,40 @@ class SoftpayTerminal(
     val config: SoftpayConfig
 ) : Terminal.External(id) {
 
-    override fun connectIntent(input: Terminal): Intent =
+    override fun connectIntent(context: Context, input: Terminal): Intent =
         Intent(INTENT_ACTION_CONNECT).apply {
             putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            // This is needed for devices with API 34+
+            `package` = context.packageName
         }
 
-    override fun paymentIntent(input: PaymentRequest): Intent =
+    override fun paymentIntent(context: Context, input: PaymentRequest): Intent =
         Intent(INTENT_ACTION_PAYMENT).apply {
             putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
             putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
             putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
+            `package` = context.packageName
         }
 
-    override fun refundIntent(input: RefundRequest): Intent = Intent(INTENT_ACTION_REFUND).apply {
-        putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-        putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
-        putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
-    }
+    override fun refundIntent(context: Context, input: RefundRequest): Intent =
+        Intent(INTENT_ACTION_REFUND).apply {
+            putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
+            putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
+            putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
+            `package` = context.packageName
+        }
 
-    override fun reversalIntent(input: ReversalRequest): Intent =
+    override fun reversalIntent(context: Context, input: ReversalRequest): Intent =
         Intent(INTENT_ACTION_REVERSAL).apply {
             putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
             putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
+            `package` = context.packageName
         }
 
-    override fun reconciliationIntent(input: Terminal): Intent =
+    override fun reconciliationIntent(context: Context, input: Terminal): Intent =
         Intent(INTENT_ACTION_RECONCILIATION).apply {
             putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            `package` = context.packageName
         }
 
     override fun toString() = "SoftpayTerminal(" +
