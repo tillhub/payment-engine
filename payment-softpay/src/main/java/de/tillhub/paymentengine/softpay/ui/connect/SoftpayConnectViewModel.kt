@@ -113,7 +113,11 @@ internal class SoftpayConnectViewModel(
     }
 
     fun init(loginManager: LoginManager) {
-        setupLoginFlow(loginManager)
+        if (loginManager.authenticated) {
+            _state.value = ConnectState.LoggedIn
+        } else {
+            setupLoginFlow(loginManager)
+        }
     }
 
     fun login(username: String, password: String) {
@@ -159,6 +163,11 @@ internal class SoftpayConnectViewModel(
         }
 
         loginFlow.subscribe(loginReceiver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        loginFlow.unsubscribe()
     }
 }
 
