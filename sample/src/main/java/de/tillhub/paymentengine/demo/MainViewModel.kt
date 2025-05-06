@@ -115,8 +115,8 @@ class MainViewModel : ViewModel() {
                     integratorId = BuildConfig.INTEGRATOR_ID,
                     accessId = BuildConfig.ACCESS_ID,
                     accessSecret = BuildConfig.ACCESS_SECRET,
-                    merchantUsername = "PTCMGVCG",
-                    merchantPassword = "CiFmbGJQEXQXhSEDJLI/M17nCWXWJ6FrXAh6YIjvVDlvWQTz+d8OCbfvREhrLQ9fPk+H14wuMBzfMAw0hU+krbRA/3boKCugKNaPxT4uT0eZfa/7Ei5GQEeWSmGL7zt9xy3x2OcqGKVbCtjuYowFfytTVjP1luWC1LuMrKZ1XJI=",
+                    merchantUsername = "RKDGDLKN",
+                    merchantPassword = "FYWEAXC6YALF",
                 )
             )
         )
