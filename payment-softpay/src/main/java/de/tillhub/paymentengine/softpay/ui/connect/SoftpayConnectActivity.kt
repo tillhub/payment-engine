@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
@@ -22,33 +21,14 @@ internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
 
         viewModel.state.collectWithOwner(this) { state ->
             when (state) {
-                ConnectState.Idle,
-                ConnectState.Loading -> showLoader()
-
-                ConnectState.CredentialsInput -> startLogin()
-                ConnectState.LoggedIn -> fetchTerminal()
-
+                ConnectState.Idle -> Unit
                 is ConnectState.Error -> showError(state)
-
                 is ConnectState.Success -> handleSuccess(state)
             }
         }
-
-        viewModel.init(softpay.loginManager)
     }
 
-    private fun showLoader() {
-        binding.loader.isVisible = true
-    }
-
-    private fun startLogin() {
-        viewModel.login(
-            username = config.config.merchantUsername,
-            password = config.config.merchantPassword
-        )
-    }
-
-    private fun fetchTerminal() {
+    override fun startOperation() {
         viewModel.readTerminal(softpay.configManager)
     }
 

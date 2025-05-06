@@ -22,10 +22,12 @@ abstract class SoftpayApplication : Application(), SoftpayProvider  {
         SoftpayFactory.getOrCreate {
             val integrator = Integrator.Builder()
                 .integrator(config.integratorId)
+                .merchant("Testpay") // TODO remove
                 .access(
                     accessId = config.accessId,
                     accessSecret = config.accessSecret.toCharArray()
                 )
+                .external(externalSecret = "73658FA522AC4A0FA108D1E0A191B715".toCharArray())  // TODO remove
                 .build()
 
             SoftpayOptions.Builder()

@@ -116,7 +116,7 @@ class MainViewModel : ViewModel() {
                     accessId = BuildConfig.ACCESS_ID,
                     accessSecret = BuildConfig.ACCESS_SECRET,
                     merchantUsername = "PTCMGVCG",
-                    merchantPassword = "StxLsXvsY/msDBr10SjU5k61CklbPdTKuuaGHcl1k9YzmisXFYkVltJ/5cPcyp54oA5l92XCwP97Fb4oetXoj9pA/cvUCYmpILvEw9LZ6SBqJTuoqk5GgoGmaFchvmDgIqykTmXQBFqJW7AKdGrCVe9/Tfpy22h73d9616fxybA=",
+                    merchantPassword = "CiFmbGJQEXQXhSEDJLI/M17nCWXWJ6FrXAh6YIjvVDlvWQTz+d8OCbfvREhrLQ9fPk+H14wuMBzfMAw0hU+krbRA/3boKCugKNaPxT4uT0eZfa/7Ei5GQEeWSmGL7zt9xy3x2OcqGKVbCtjuYowFfytTVjP1luWC1LuMrKZ1XJI=",
                 )
             )
         )
