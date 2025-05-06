@@ -22,7 +22,7 @@ android {
             useSupportLibrary = true
         }
 
-        val projectProperties = readProperties(file("$rootDir/local_secrets.properties"))
+        val projectProperties = readProperties(file("$rootDir/local.properties"))
         buildConfigField("String", "ACCESS_ID", "\"${projectProperties["accessId"]}\"")
         buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["accessSecret"]}\"")
         buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["integratorId"]}\"")
