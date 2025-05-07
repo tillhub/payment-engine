@@ -1,7 +1,6 @@
 package de.tillhub.paymentengine.softpay.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.softpay.R
 import de.tillhub.paymentengine.softpay.helpers.TerminalConfig
@@ -9,8 +8,6 @@ import de.tillhub.paymentengine.softpay.helpers.TerminalConfigImpl
 import de.tillhub.paymentengine.softpay.helpers.activeFlow
 import de.tillhub.paymentengine.softpay.helpers.toTransactionResultCode
 import io.softpay.sdk.config.ConfigFlow
-import io.softpay.sdk.config.ConfigFlowInput.AppAuthorizeConfirmation
-import io.softpay.sdk.config.ConfigFlowInput.PinInput
 import io.softpay.sdk.config.ConfigFlowInput.StoreInput
 import io.softpay.sdk.config.ConfigFlowModel
 import io.softpay.sdk.config.ConfigFlowModel.State.ABORTED
@@ -18,21 +15,16 @@ import io.softpay.sdk.config.ConfigFlowOptions
 import io.softpay.sdk.config.ConfigFlowReceiver
 import io.softpay.sdk.config.ConfigFlowVariant
 import io.softpay.sdk.config.ConfigManager
-import io.softpay.sdk.config.dispatch
-import io.softpay.sdk.domain.Store
 import io.softpay.sdk.failure.Failure
 import io.softpay.sdk.failure.failure
 import io.softpay.sdk.failure.failureOf
 import io.softpay.sdk.flow.component1
 import io.softpay.sdk.flow.component2
-import io.softpay.sdk.flow.component3
-import io.softpay.sdk.flow.component4
-import io.softpay.sdk.flow.inputArg
 import io.softpay.sdk.flow.inputArgs2
-import io.softpay.sdk.flow.inputArgs4
 import io.softpay.sdk.login.LoginFlow
 import io.softpay.sdk.login.LoginFlowInput
 import io.softpay.sdk.login.LoginFlowInput.CredentialsInput
+import io.softpay.sdk.login.LoginFlowModel
 import io.softpay.sdk.login.LoginFlowModel.Update
 import io.softpay.sdk.login.LoginFlowModel.Update.InputRequest
 import io.softpay.sdk.login.LoginFlowOptions
@@ -41,7 +33,6 @@ import io.softpay.sdk.login.LoginFlowVariant
 import io.softpay.sdk.login.LoginManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import java.time.Instant
 
 internal class SoftpayTerminalViewModel(
@@ -54,7 +45,7 @@ internal class SoftpayTerminalViewModel(
     private lateinit var loginFlow: LoginFlow
     private lateinit var configFlow: ConfigFlow
 
-    private val loginReceiver = LoginFlowReceiver { model ->
+    private val loginReceiver = LoginFlowReceiver { model: LoginFlowModel ->
         // Invoked on a worker thread, never on the main thread.
         model.update()?.let { update ->
             when (update) {
@@ -211,7 +202,7 @@ internal class SoftpayTerminalViewModel(
         }
     }
 
-    fun login(username: String, password: String) {
+    fun merchantLogin(username: String, password: String) {
         loginFlow.dispatch(
             CredentialsInput(
                 username = username.toCharArray(),
@@ -230,7 +221,6 @@ internal class SoftpayTerminalViewModel(
             val options = LoginFlowOptions.of(variant = variant)
             loginManager.newFlow(options)
         }
-
         loginFlow.subscribe(loginReceiver)
     }
 
