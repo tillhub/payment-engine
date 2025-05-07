@@ -21,11 +21,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        val projectProperties = readProperties(file("$rootDir/local.properties"))
-        buildConfigField("String", "ACCESS_ID", "\"${projectProperties["accessId"]}\"")
-        buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["accessSecret"]}\"")
-        buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["integratorId"]}\"")
     }
 
     buildTypes {
@@ -74,10 +69,4 @@ dependencies {
     implementation(libs.timber)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
-}
-
-fun readProperties(propertiesFile: File) = Properties().apply {
-    propertiesFile.inputStream().use { fis ->
-        load(fis)
-    }
 }

@@ -112,11 +112,9 @@ class MainViewModel : ViewModel() {
             SoftpayTerminal(
                 id = "softpay",
                 config = SoftpayConfig(
-                    integratorId = BuildConfig.INTEGRATOR_ID,
-                    accessId = BuildConfig.ACCESS_ID,
-                    accessSecret = BuildConfig.ACCESS_SECRET,
                     merchantUsername = "RKDGDLKN",
                     merchantPassword = "FYWEAXC6YALF",
+                    storeId = "4017dca9-ff86-4445-b537-e24e33a45d3e"
                 )
             )
         )

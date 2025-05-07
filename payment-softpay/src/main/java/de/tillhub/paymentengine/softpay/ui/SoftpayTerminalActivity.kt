@@ -33,10 +33,7 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
     protected val softpay: Softpay by lazy {
         require(application is SoftpayApplication) { "Application type is not SoftpayApplication" }
 
-        (application as SoftpayApplication).let {
-            it.setConfig(config.config)
-            it.softpay()
-        }
+        (application as SoftpayApplication).softpay()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,13 +46,15 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
                 LoginState.Loading -> showLoader()
 
                 LoginState.CredentialsInput -> startLogin()
-                LoginState.LoggedIn -> startOperation()
 
                 is LoginState.Error -> showError(state)
+
+                LoginState.LoggedIn -> startStoreConfig()
+                LoginState.StoreConfigured -> startOperation()
             }
         }
 
-        loginViewModel.init(softpay.loginManager)
+        loginViewModel.initLogin(softpay.loginManager)
     }
 
     private fun startLogin() {
@@ -63,6 +62,10 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
             username = config.config.merchantUsername,
             password = config.config.merchantPassword
         )
+    }
+
+    private fun startStoreConfig() {
+        loginViewModel.initStoreConfiguration(softpay.configManager, config.config.storeId)
     }
 
     private fun showLoader() {
