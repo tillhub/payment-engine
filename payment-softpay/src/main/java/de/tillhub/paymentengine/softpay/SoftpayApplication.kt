@@ -1,8 +1,8 @@
 package de.tillhub.paymentengine.softpay
 
 import android.app.Application
-import de.tillhub.paymentengine.softpay.data.SoftpayConfig
 import de.tillhub.paymentengine.softpay.helpers.FlowListenerImpl
+import io.softpay.sdk.LogOptions
 import io.softpay.sdk.Softpay
 import io.softpay.sdk.SoftpayFactory
 import io.softpay.sdk.SoftpayOptions
@@ -11,20 +11,15 @@ import io.softpay.sdk.domain.Integrator
 import io.softpay.sdk.meta.ExperimentalSoftpayApi
 
 abstract class SoftpayApplication : Application(), SoftpayProvider  {
-    private lateinit var config: SoftpayConfig
-
-    fun setConfig(config: SoftpayConfig) {
-        this.config = config
-    }
 
     @ExperimentalSoftpayApi
     private val softpay: Softpay by lazy {
         SoftpayFactory.getOrCreate {
             val integrator = Integrator.Builder()
-                .integrator(config.integratorId)
+                .integrator(BuildConfig.INTEGRATOR_ID)
                 .access(
-                    accessId = config.accessId,
-                    accessSecret = config.accessSecret.toCharArray()
+                    accessId = BuildConfig.ACCESS_ID,
+                    accessSecret =  BuildConfig.ACCESS_SECRET.toCharArray()
                 )
                 .build()
 
@@ -32,6 +27,9 @@ abstract class SoftpayApplication : Application(), SoftpayProvider  {
                 .context(this)
                 .integrator(integrator)
                 .flags(debug = true)
+                .logOptions(object: LogOptions {
+                    override val logLevel = android.util.Log.DEBUG
+                })
                 .flowListener(FlowListenerImpl())
                 .build()
         }

@@ -14,6 +14,11 @@ android {
 
     defaultConfig {
         minSdk = Configs.MIN_SDK_SOFTPAY
+
+        val projectProperties = readProperties(file("$rootDir/local.properties"))
+        buildConfigField("String", "ACCESS_ID", "\"${projectProperties["accessId"]}\"")
+        buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["accessSecret"]}\"")
+        buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["integratorId"]}\"")
     }
 
     buildTypes {
@@ -89,5 +94,11 @@ afterEvaluate {
                 from(components.getByName("release"))
             }
         }
+    }
+}
+
+fun readProperties(propertiesFile: File) = Properties().apply {
+    propertiesFile.inputStream().use { fis ->
+        load(fis)
     }
 }
