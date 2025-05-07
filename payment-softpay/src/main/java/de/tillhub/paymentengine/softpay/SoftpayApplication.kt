@@ -8,11 +8,9 @@ import io.softpay.sdk.SoftpayFactory
 import io.softpay.sdk.SoftpayOptions
 import io.softpay.sdk.SoftpayProvider
 import io.softpay.sdk.domain.Integrator
-import io.softpay.sdk.meta.ExperimentalSoftpayApi
 
 abstract class SoftpayApplication : Application(), SoftpayProvider  {
 
-    @ExperimentalSoftpayApi
     private val softpay: Softpay by lazy {
         SoftpayFactory.getOrCreate {
             val integrator = Integrator.Builder()
@@ -35,6 +33,6 @@ abstract class SoftpayApplication : Application(), SoftpayProvider  {
         }
     }
 
-    @ExperimentalSoftpayApi
+
     override fun softpay(): Softpay = softpay
 }

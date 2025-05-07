@@ -11,7 +11,6 @@ import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.ui.SoftpayTerminalActivity
 import io.softpay.sdk.meta.ExperimentalSoftpayApi
 
-@ExperimentalSoftpayApi
 internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
 
     private val viewModel by viewModels<SoftpayConnectViewModel>()

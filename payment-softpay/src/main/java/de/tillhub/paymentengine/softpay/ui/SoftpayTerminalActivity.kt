@@ -15,9 +15,7 @@ import de.tillhub.paymentengine.softpay.databinding.ActivityTerminalBinding
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.helpers.viewBinding
 import io.softpay.sdk.Softpay
-import io.softpay.sdk.meta.ExperimentalSoftpayApi
 
-@ExperimentalSoftpayApi
 internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
 
     private val loginViewModel by viewModels<SoftpayTerminalViewModel>()
@@ -58,7 +56,7 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
     }
 
     private fun startLogin() {
-        loginViewModel.login(
+        loginViewModel.merchantLogin(
             username = config.config.merchantUsername,
             password = config.config.merchantPassword
         )
