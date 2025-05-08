@@ -9,7 +9,6 @@ import io.softpay.sdk.flow.FlowAction
 import io.softpay.sdk.flow.FlowFactory
 import io.softpay.sdk.flow.FlowListener
 import io.softpay.sdk.flow.FlowModel
-import io.softpay.sdk.flow.FlowOptions
 import io.softpay.sdk.flow.FlowRequirement
 import io.softpay.sdk.flow.result
 import io.softpay.sdk.login.LoginFlow
@@ -33,33 +32,18 @@ internal class FlowListenerImpl : FlowListener {
 
             is ConfigFlow -> startConfig(softpay.configManager)
 
-            is TransactionFlow -> startTransaction(flow)
+            is TransactionFlow -> true
 
             else -> false
         }
     }
 
     private fun startLogin(loginManager: LoginManager): Boolean {
-        if (loginManager.isAppBusy) {
-            return false
-        }
-
-        // todo
-        return true
+        return !loginManager.isAppBusy
     }
 
     private fun startConfig(configManager: ConfigManager): Boolean {
-        if (configManager.isAppBusy) {
-            return false
-        }
-
-        // todo
-        return true
-    }
-
-    private fun startTransaction(flow: TransactionFlow): Boolean {
-        // todo
-        return true
+        return !configManager.isAppBusy
     }
 
     private fun Flow<FlowModel, FlowAction>.subscribeSilently() {
@@ -71,11 +55,6 @@ internal class FlowListenerImpl : FlowListener {
         }
     }
 
-    private val <
-            O : FlowOptions,
-            M : FlowModel,
-            A : FlowAction,
-            F : Flow<M, A>
-        > FlowFactory<O, M, A, F>.isAppBusy: Boolean
+    private val FlowFactory<*, *, *, *>.isAppBusy: Boolean
         get() = filter(active = false) { it.subscribedTo(Entity.APP) }.isNotEmpty()
 }

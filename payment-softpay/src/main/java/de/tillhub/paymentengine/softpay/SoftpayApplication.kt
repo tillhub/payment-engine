@@ -9,7 +9,7 @@ import io.softpay.sdk.SoftpayOptions
 import io.softpay.sdk.SoftpayProvider
 import io.softpay.sdk.domain.Integrator
 
-abstract class SoftpayApplication : Application(), SoftpayProvider  {
+abstract class SoftpayApplication : Application(), SoftpayProvider {
 
     private val softpay: Softpay by lazy {
         SoftpayFactory.getOrCreate {
@@ -17,7 +17,7 @@ abstract class SoftpayApplication : Application(), SoftpayProvider  {
                 .integrator(BuildConfig.INTEGRATOR_ID)
                 .access(
                     accessId = BuildConfig.ACCESS_ID,
-                    accessSecret =  BuildConfig.ACCESS_SECRET.toCharArray()
+                    accessSecret = BuildConfig.ACCESS_SECRET.toCharArray()
                 )
                 .build()
 
@@ -25,14 +25,13 @@ abstract class SoftpayApplication : Application(), SoftpayProvider  {
                 .context(this)
                 .integrator(integrator)
                 .flags(debug = true)
-                .logOptions(object: LogOptions {
+                .logOptions(object : LogOptions {
                     override val logLevel = android.util.Log.DEBUG
                 })
                 .flowListener(FlowListenerImpl())
                 .build()
         }
     }
-
 
     override fun softpay(): Softpay = softpay
 }

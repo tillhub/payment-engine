@@ -1,8 +1,13 @@
 package de.tillhub.paymentengine.softpay.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.softpay.R
+import de.tillhub.paymentengine.softpay.SoftpayApplication
 import de.tillhub.paymentengine.softpay.helpers.TerminalConfig
 import de.tillhub.paymentengine.softpay.helpers.TerminalConfigImpl
 import de.tillhub.paymentengine.softpay.helpers.activeFlow
@@ -18,9 +23,7 @@ import io.softpay.sdk.config.ConfigManager
 import io.softpay.sdk.failure.Failure
 import io.softpay.sdk.failure.failure
 import io.softpay.sdk.failure.failureOf
-import io.softpay.sdk.flow.component1
-import io.softpay.sdk.flow.component2
-import io.softpay.sdk.flow.inputArgs2
+import io.softpay.sdk.flow.inputArg
 import io.softpay.sdk.login.LoginFlow
 import io.softpay.sdk.login.LoginFlowInput
 import io.softpay.sdk.login.LoginFlowInput.CredentialsInput
@@ -36,14 +39,27 @@ import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 
 internal class SoftpayTerminalViewModel(
+    private val loginManager: LoginManager,
+    private val configManager: ConfigManager,
     private val terminalConfig: TerminalConfig = TerminalConfigImpl()
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<LoginState>(LoginState.Idle)
     val state: StateFlow<LoginState> = _state
 
-    private lateinit var loginFlow: LoginFlow
-    private lateinit var configFlow: ConfigFlow
+    private val loginFlow: LoginFlow = loginManager.activeFlow ?: run {
+        val variant = if (loginManager.locked) {
+            LoginFlowVariant.UNLOCK
+        } else {
+            LoginFlowVariant.LOGIN
+        }
+        val options = LoginFlowOptions.of(variant = variant)
+        loginManager.newFlow(options)
+    }
+    private val configFlow: ConfigFlow = configManager.activeFlow ?: run {
+        val options = ConfigFlowOptions.of(variant = ConfigFlowVariant.INSTALL)
+        configManager.newFlow(options)
+    }
 
     private val loginReceiver = LoginFlowReceiver { model: LoginFlowModel ->
         // Invoked on a worker thread, never on the main thread.
@@ -53,7 +69,8 @@ internal class SoftpayTerminalViewModel(
                 is InputRequest -> when {
                     // Merchant Credentials are requested.
                     model.awaits(CredentialsInput::class.java) -> {
-                        val (reason, failure) = model.inputArgs2<CredentialsInput.Reason, Failure?>()
+                        val reason = model.inputArg<CredentialsInput.Reason>(1)
+                        val failure = model.inputArg<Failure?>(2)
                         _state.value = when (reason) {
                             CredentialsInput.Reason.FIRST -> LoginState.CredentialsInput
                             CredentialsInput.Reason.INVALID -> {
@@ -118,7 +135,6 @@ internal class SoftpayTerminalViewModel(
         }
         true
     }
-
     private val configReceiver = ConfigFlowReceiver { model ->
         model.update()?.let { update ->
             when (update) {
@@ -150,12 +166,7 @@ internal class SoftpayTerminalViewModel(
                         val failureUpdate = update as ConfigFlowModel.Update.Failure
                         _state.value = LoginState.Error.General(
                             date = terminalConfig.timeNow(),
-                            resultCode = TransactionResultCode.Known(
-                                errorMessage = R.string.softpay_error_login_failure,
-                                recoveryMessages = listOf(
-                                    R.string.softpay_recovery_contact_support,
-                                )
-                            ),
+                            resultCode = failureUpdate.failure.toTransactionResultCode(),
                             failure = failureUpdate.failure
                         )
                     }
@@ -166,28 +177,34 @@ internal class SoftpayTerminalViewModel(
         true
     }
 
-    fun initLogin(loginManager: LoginManager) {
+    fun initLogin() {
         if (loginManager.authenticated) {
             _state.value = LoginState.LoggedIn
         } else {
             _state.value = LoginState.Loading
-            setupLoginFlow(loginManager)
+            loginFlow.subscribe(loginReceiver)
         }
     }
 
-    fun initStoreConfiguration(configManager: ConfigManager, storeId: String) {
+    fun initStoreConfiguration(storeId: String) {
         if (configManager.configured) {
             _state.value = LoginState.StoreConfigured
         } else {
             _state.value = LoginState.Loading
 
-            setupStoreConfigFlow(configManager)
+            configFlow.subscribe(configReceiver)
 
             configManager.getStoreByAcquirerStoreId(storeId) { store, failure ->
                 if (failure == null && store != null) {
                     configFlow.dispatch(StoreInput.SelectStore(store))
                 } else {
-                    _state.value = LoginState.Error.General(
+                    _state.value = failure?.let {
+                        LoginState.Error.General(
+                            date = terminalConfig.timeNow(),
+                            resultCode = failure.toTransactionResultCode(),
+                            failure = failure
+                        )
+                    } ?: LoginState.Error.General(
                         date = terminalConfig.timeNow(),
                         resultCode = TransactionResultCode.Known(
                             errorMessage = R.string.softpay_error_store_not_found,
@@ -195,7 +212,7 @@ internal class SoftpayTerminalViewModel(
                                 R.string.softpay_recovery_contact_support,
                             )
                         ),
-                        failure = failure ?: failureOf("Store not found")
+                        failure = failureOf("Store not found")
                     )
                 }
             }
@@ -211,36 +228,25 @@ internal class SoftpayTerminalViewModel(
         )
     }
 
-    private fun setupLoginFlow(loginManager: LoginManager) {
-        loginFlow = loginManager.activeFlow ?: run {
-            val variant = if (loginManager.locked) {
-                LoginFlowVariant.UNLOCK
-            } else {
-                LoginFlowVariant.LOGIN
-            }
-            val options = LoginFlowOptions.of(variant = variant)
-            loginManager.newFlow(options)
-        }
-        loginFlow.subscribe(loginReceiver)
-    }
-
-    private fun setupStoreConfigFlow(configManager: ConfigManager) {
-        configFlow = configManager.activeFlow ?: run {
-            val options = ConfigFlowOptions.of(variant = ConfigFlowVariant.INSTALL)
-            configManager.newFlow(options)
-        }
-
-        configFlow.subscribe(configReceiver)
-    }
-
     override fun onCleared() {
         super.onCleared()
-
-        if (::loginFlow.isInitialized) {
+        if (loginManager.subscriptions > 0) {
             loginFlow.unsubscribe()
         }
-        if (::configFlow.isInitialized) {
+        if (configManager.subscriptions > 0) {
             configFlow.unsubscribe()
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as SoftpayApplication)
+                SoftpayTerminalViewModel(
+                    loginManager = application.softpay().loginManager,
+                    configManager = application.softpay().configManager,
+                )
+            }
         }
     }
 }

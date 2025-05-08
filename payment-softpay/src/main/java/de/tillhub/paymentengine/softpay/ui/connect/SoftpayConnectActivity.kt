@@ -9,11 +9,10 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.ui.SoftpayTerminalActivity
-import io.softpay.sdk.meta.ExperimentalSoftpayApi
 
 internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
 
-    private val viewModel by viewModels<SoftpayConnectViewModel>()
+    private val viewModel by viewModels<SoftpayConnectViewModel> { SoftpayConnectViewModel.Factory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +27,7 @@ internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
     }
 
     override fun startOperation() {
-        viewModel.readTerminal(softpay.configManager)
+        viewModel.readTerminal()
     }
 
     private fun showError(error: ConnectState.Error) {

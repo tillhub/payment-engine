@@ -9,7 +9,7 @@ class SoftpayConfig(
     val merchantUsername: String,
     val merchantPassword: String,
     val storeId: String,
-): Parcelable {
+) : Parcelable {
     override fun toString() = "SoftpayConfig(" +
             "merchantUsername=$merchantUsername, " +
             "merchantPassword=$merchantPassword," +

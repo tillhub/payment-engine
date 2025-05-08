@@ -14,12 +14,12 @@ import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.databinding.ActivityTerminalBinding
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.helpers.viewBinding
-import io.softpay.sdk.Softpay
 
 internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
 
-    private val loginViewModel by viewModels<SoftpayTerminalViewModel>()
-
+    private val loginViewModel by viewModels<SoftpayTerminalViewModel> {
+        SoftpayTerminalViewModel.Factory
+    }
     protected val binding by viewBinding(ActivityTerminalBinding::inflate)
 
     protected val config: SoftpayTerminal by lazy {
@@ -28,14 +28,10 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
         } ?: throw IllegalArgumentException("SoftpayTerminalActivity: Extras is null")
     }
 
-    protected val softpay: Softpay by lazy {
-        require(application is SoftpayApplication) { "Application type is not SoftpayApplication" }
-
-        (application as SoftpayApplication).softpay()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        require(application is SoftpayApplication) { "Application type is not SoftpayApplication" }
+
         setContentView(binding.root)
 
         loginViewModel.state.collectWithOwner(this) { state ->
@@ -52,7 +48,7 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
             }
         }
 
-        loginViewModel.initLogin(softpay.loginManager)
+        loginViewModel.initLogin()
     }
 
     private fun startLogin() {
@@ -63,7 +59,7 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
     }
 
     private fun startStoreConfig() {
-        loginViewModel.initStoreConfiguration(softpay.configManager, config.config.storeId)
+        loginViewModel.initStoreConfiguration(config.config.storeId)
     }
 
     private fun showLoader() {
