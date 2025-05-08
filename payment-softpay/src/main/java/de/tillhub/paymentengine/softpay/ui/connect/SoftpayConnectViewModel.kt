@@ -1,8 +1,13 @@
 package de.tillhub.paymentengine.softpay.ui.connect
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.softpay.R
+import de.tillhub.paymentengine.softpay.SoftpayApplication
 import de.tillhub.paymentengine.softpay.helpers.TerminalConfig
 import de.tillhub.paymentengine.softpay.helpers.TerminalConfigImpl
 import io.softpay.sdk.config.ConfigManager
@@ -11,13 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 
 internal class SoftpayConnectViewModel(
+    private val configManager: ConfigManager,
     private val terminalConfig: TerminalConfig = TerminalConfigImpl()
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ConnectState>(ConnectState.Idle)
     val state: StateFlow<ConnectState> = _state
 
-    fun readTerminal(configManager: ConfigManager) {
+    fun readTerminal() {
         _state.value = if (configManager.configured) {
             ConnectState.Success(
                 date = terminalConfig.timeNow(),
@@ -34,6 +40,17 @@ internal class SoftpayConnectViewModel(
                     )
                 )
             )
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as SoftpayApplication)
+                SoftpayConnectViewModel(
+                    configManager = application.softpay().configManager,
+                )
+            }
         }
     }
 }
