@@ -47,7 +47,10 @@ internal class SoftpayTerminalViewModel(
     private val _state = MutableStateFlow<LoginState>(LoginState.Idle)
     val state: StateFlow<LoginState> = _state
 
+    // Create a LoginFlow in order to authenticate the merchant.
     private val loginFlow: LoginFlow = loginManager.activeFlow ?: run {
+        // If the SDK is in a locked state we start the login flow with UNLOCK variant.
+        // Otherwise, in LOGIN variant.
         val variant = if (loginManager.locked) {
             LoginFlowVariant.UNLOCK
         } else {
