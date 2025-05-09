@@ -8,8 +8,12 @@ import io.softpay.sdk.SoftpayFactory
 import io.softpay.sdk.SoftpayOptions
 import io.softpay.sdk.SoftpayProvider
 import io.softpay.sdk.domain.Integrator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 abstract class SoftpayApplication : Application(), SoftpayProvider {
+    private val applicationScope = CoroutineScope(Dispatchers.IO)
 
     private val softpay: Softpay by lazy {
         SoftpayFactory.getOrCreate {
@@ -34,4 +38,12 @@ abstract class SoftpayApplication : Application(), SoftpayProvider {
     }
 
     override fun softpay(): Softpay = softpay
+
+    override fun onCreate() {
+        super.onCreate()
+
+        applicationScope.launch {
+            softpay
+        }
+    }
 }
