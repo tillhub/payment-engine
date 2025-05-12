@@ -31,7 +31,7 @@ internal class ReconciliationManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ReconciliationManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.Reconciliation> =
-        terminalState.filterIsInstance(TerminalOperationStatus.Reconciliation::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.Reconciliation>()
 
     override fun startReconciliation() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()

@@ -1,7 +1,7 @@
 package de.tillhub.paymentengine.softpay.helpers
 
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +14,7 @@ import io.softpay.sdk.flow.FlowModel
 import io.softpay.sdk.flow.FlowOptions
 import kotlinx.coroutines.launch
 
-internal inline fun <T : ViewBinding> AppCompatActivity.viewBinding(
+internal inline fun <T : ViewBinding> ComponentActivity.viewBinding(
     crossinline bindingInflater: (LayoutInflater) -> T,
 ) = lazy(LazyThreadSafetyMode.NONE) { bindingInflater.invoke(layoutInflater) }
 

@@ -51,7 +51,7 @@ internal class RefundManagerImpl(
 ) : CardManagerImpl(configs, terminalState), RefundManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.Refund> =
-        terminalState.filterIsInstance(TerminalOperationStatus.Refund::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.Refund>()
 
     override fun startRefundTransaction(
         transactionId: String,

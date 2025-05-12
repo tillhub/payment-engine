@@ -3,19 +3,18 @@ package de.tillhub.paymentengine.softpay.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.softpay.SoftpayApplication
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.databinding.ActivityTerminalBinding
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.helpers.viewBinding
 
-internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
+internal abstract class SoftpayTerminalActivity : ComponentActivity() {
 
     private val loginViewModel by viewModels<SoftpayTerminalViewModel> {
         SoftpayTerminalViewModel.Factory
@@ -30,8 +29,6 @@ internal abstract class SoftpayTerminalActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        require(application is SoftpayApplication) { "Application type is not SoftpayApplication" }
-
         setContentView(binding.root)
 
         loginViewModel.state.collectWithOwner(this) { state ->

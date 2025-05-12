@@ -33,7 +33,7 @@ internal class RecoveryManagerImpl(
 ) : CardManagerImpl(configs, terminalState), RecoveryManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.Recovery> =
-        terminalState.filterIsInstance(TerminalOperationStatus.Recovery::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.Recovery>()
 
     override fun startRecovery() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()

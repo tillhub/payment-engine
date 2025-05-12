@@ -46,6 +46,9 @@ internal class SoftpayConnectViewModel(
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
+                require(this[APPLICATION_KEY] is SoftpayApplication) {
+                    "Application type is not SoftpayApplication"
+                }
                 val application = (this[APPLICATION_KEY] as SoftpayApplication)
                 SoftpayConnectViewModel(
                     configManager = application.softpay().configManager,

@@ -113,8 +113,8 @@ class MainViewModel : ViewModel() {
             SoftpayTerminal(
                 id = "softpay",
                 config = SoftpayConfig(
-                    merchantUsername = "RKDGDLKN",
-                    merchantPassword = "FYWEAXC6YALF",
+                    merchantUsername = "RJMNMRGK",
+                    merchantPassword = "P5GQX2TX5NUM",
                     storeId = "4017dca9-ff86-4445-b537-e24e33a45d3e"
                 )
             )

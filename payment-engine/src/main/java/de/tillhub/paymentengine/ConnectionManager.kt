@@ -42,7 +42,7 @@ internal class ConnectionManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ConnectionManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.Login> =
-        terminalState.filterIsInstance(TerminalOperationStatus.Login::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.Login>()
 
     override fun startConnect() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()

@@ -54,7 +54,7 @@ internal class PaymentManagerImpl(
 ) : CardManagerImpl(configs, terminalState), PaymentManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.Payment> =
-        terminalState.filterIsInstance(TerminalOperationStatus.Payment::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.Payment>()
 
     override fun startPaymentTransaction(
         transactionId: String,

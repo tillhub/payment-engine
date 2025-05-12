@@ -32,7 +32,7 @@ internal class TicketReprintManagerImpl(
 ) : CardManagerImpl(configs, terminalState), TicketReprintManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.TicketReprint> =
-        terminalState.filterIsInstance(TerminalOperationStatus.TicketReprint::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.TicketReprint>()
 
     override fun startTicketReprint() {
         val configId = configs.values.firstOrNull()?.id.orEmpty()

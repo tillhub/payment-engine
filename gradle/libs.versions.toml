@@ -25,9 +25,9 @@ androidxCoreTest = "1.6.1"
 kotestRobolectric = "0.4.0"
 kotestExtensionsAndroid = "0.1.1"
 
-lifecycle = "2.7.0"
+lifecycle = "2.6.2"
 activity-compose = "1.8.2"
-compose-bom = "2024.02.02"
+compose-bom = "2023.10.00"
 
 retrofit-simplexml = "2.10.0"
 
