@@ -62,7 +62,7 @@ internal class ReversalManagerImpl(
 ) : CardManagerImpl(configs, terminalState), ReversalManager {
 
     override fun observePaymentState(): Flow<TerminalOperationStatus.Reversal> =
-        terminalState.filterIsInstance(TerminalOperationStatus.Reversal::class)
+        terminalState.filterIsInstance<TerminalOperationStatus.Reversal>()
 
     override fun startReversalTransaction(
         transactionId: String,
