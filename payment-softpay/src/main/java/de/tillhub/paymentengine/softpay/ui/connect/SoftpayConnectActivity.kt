@@ -6,9 +6,11 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.ui.SoftpayTerminalActivity
+import java.time.Instant
 
 internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
 
@@ -20,7 +22,7 @@ internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
         viewModel.state.collectWithOwner(this) { state ->
             when (state) {
                 ConnectState.Idle -> Unit
-                is ConnectState.Error -> showError(state)
+                is ConnectState.Error -> handleError(state)
                 is ConnectState.Success -> handleSuccess(state)
             }
         }
@@ -30,22 +32,25 @@ internal class SoftpayConnectActivity : SoftpayTerminalActivity() {
         viewModel.readTerminal()
     }
 
-    private fun showError(error: ConnectState.Error) {
+    override fun handleError(date: Instant, resultCode: TransactionResultCode) {
         setResult(
             Activity.RESULT_OK,
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Login.Error(
-                        date = error.date,
+                        date = date,
                         rawData = "",
-                        resultCode = error.resultCode
+                        resultCode = resultCode
                     )
                 )
             }
         )
         finish()
     }
+
+    private fun handleError(error: ConnectState.Error) =
+        handleError(error.date, error.resultCode)
 
     private fun handleSuccess(success: ConnectState.Success) {
         setResult(

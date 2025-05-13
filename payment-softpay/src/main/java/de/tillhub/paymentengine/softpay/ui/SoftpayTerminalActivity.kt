@@ -1,18 +1,17 @@
 package de.tillhub.paymentengine.softpay.ui
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.softpay.data.SoftpayTerminal
 import de.tillhub.paymentengine.softpay.databinding.ActivityTerminalBinding
 import de.tillhub.paymentengine.softpay.helpers.collectWithOwner
 import de.tillhub.paymentengine.softpay.helpers.viewBinding
+import java.time.Instant
 
 internal abstract class SoftpayTerminalActivity : ComponentActivity() {
 
@@ -38,7 +37,7 @@ internal abstract class SoftpayTerminalActivity : ComponentActivity() {
 
                 LoginState.CredentialsInput -> startLogin()
 
-                is LoginState.Error -> showError(state)
+                is LoginState.Error -> handleError(state)
 
                 LoginState.LoggedIn -> startStoreConfig()
                 LoginState.StoreConfigured -> startOperation()
@@ -63,22 +62,9 @@ internal abstract class SoftpayTerminalActivity : ComponentActivity() {
         binding.loader.isVisible = true
     }
 
-    private fun showError(error: LoginState.Error) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().apply {
-                putExtra(
-                    ExtraKeys.EXTRAS_RESULT,
-                    TerminalOperationStatus.Login.Error(
-                        date = error.date,
-                        rawData = "",
-                        resultCode = error.resultCode
-                    )
-                )
-            }
-        )
-        finish()
-    }
+    private fun handleError(error: LoginState.Error) =
+        handleError(error.date, error.resultCode)
 
     abstract fun startOperation()
+    abstract fun handleError(date: Instant, resultCode: TransactionResultCode)
 }
