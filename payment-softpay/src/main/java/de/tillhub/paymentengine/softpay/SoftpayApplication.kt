@@ -30,7 +30,7 @@ abstract class SoftpayApplication : Application(), SoftpayProvider {
                 .integrator(integrator)
                 .flags(debug = true)
                 .logOptions(object : LogOptions {
-                    override val logLevel = android.util.Log.DEBUG
+                    override val logLevel = android.util.Log.VERBOSE
                 })
                 .flowListener(FlowListenerImpl())
                 .build()
@@ -42,8 +42,6 @@ abstract class SoftpayApplication : Application(), SoftpayProvider {
     override fun onCreate() {
         super.onCreate()
 
-        applicationScope.launch {
-            softpay
-        }
+        applicationScope.launch { softpay }
     }
 }

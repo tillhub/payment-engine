@@ -86,9 +86,9 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("payment-engine-softpay") {
-                groupId = "de.tillhub.paymentengine.softpay"
-                artifactId = "payment-engine:softpay"
+            create<MavenPublication>("release-softpay") {
+                groupId = "de.tillhub.paymentengine"
+                artifactId = "softpay"
                 version = "3.4.1"
 
                 from(components.getByName("release"))
