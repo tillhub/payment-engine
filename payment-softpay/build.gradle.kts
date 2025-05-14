@@ -138,11 +138,11 @@ fun readSecretsProperties() = Properties().apply {
             load(fis)
         }
     } else {
-        put("sandboxAccessId", System.getenv("SOFTPAY_SANDBOX_ACCESS_ID"))
-        put("sandboxAccessSecret", System.getenv("SOFTPAY_SANDBOX_ACCESS_SECRET"))
+        this["sandboxAccessId"] = System.getenv("SOFTPAY_SANDBOX_ACCESS_ID")
+        this["sandboxAccessSecret"] = System.getenv("SOFTPAY_SANDBOX_ACCESS_SECRET")
 
-        put("accessId", System.getenv("SOFTPAY_ACCESS_ID"))
-        put("accessSecret", System.getenv("SOFTPAY_ACCESS_SECRET"))
-        put("integratorId", System.getenv("SOFTPAY_INTEGRATOR_ID"))
+        this["accessId"] = System.getenv("SOFTPAY_ACCESS_ID")
+        this["accessSecret"] = System.getenv("SOFTPAY_ACCESS_SECRET")
+        this["integratorId"] = System.getenv("SOFTPAY_INTEGRATOR_ID")
     }
 }
