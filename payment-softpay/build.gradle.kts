@@ -141,8 +141,9 @@ fun readSecretsProperties() = Properties().apply {
         this["sandboxAccessId"] = System.getenv("SOFTPAY_SANDBOX_ACCESS_ID")
         this["sandboxAccessSecret"] = System.getenv("SOFTPAY_SANDBOX_ACCESS_SECRET")
 
-        this["accessId"] = System.getenv("SOFTPAY_ACCESS_ID")
-        this["accessSecret"] = System.getenv("SOFTPAY_ACCESS_SECRET")
+        // TODO remove comments
+        //this["accessId"] = System.getenv("SOFTPAY_ACCESS_ID")
+        //this["accessSecret"] = System.getenv("SOFTPAY_ACCESS_SECRET")
         this["integratorId"] = System.getenv("SOFTPAY_INTEGRATOR_ID")
     }
 }
