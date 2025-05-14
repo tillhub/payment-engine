@@ -22,10 +22,19 @@ android {
     }
 
     buildTypes {
+        val projectProperties = readSecretsProperties()
         debug {
+            buildConfigField("String", "ACCESS_ID", "\"${projectProperties["sandboxAccessId"]}\"")
+            buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["sandboxAccessSecret"]}\"")
+            buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["ntegratorId"]}\"")
+
             isMinifyEnabled = false
         }
-        release {
+        val release by getting {
+            buildConfigField("String", "ACCESS_ID", "\"${projectProperties["accessId"]}\"")
+            buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["accessSecret"]}\"")
+            buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["integratorId"]}\"")
+
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -34,6 +43,13 @@ android {
             consumerProguardFiles(
                 "consumer-rules.pro"
             )
+        }
+        create("staging") {
+            initWith(release)
+
+            buildConfigField("String", "ACCESS_ID", "\"${projectProperties["sandboxAccessId"]}\"")
+            buildConfigField("String", "ACCESS_SECRET", "\"${projectProperties["sandboxAccessSecret"]}\"")
+            buildConfigField("String", "INTEGRATOR_ID", "\"${projectProperties["integratorId"]}\"")
         }
     }
     compileOptions {
@@ -87,18 +103,45 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("release-softpay") {
-                groupId = "de.tillhub.paymentengine"
+                groupId = Configs.APPLICATION_ID
                 artifactId = "softpay"
-                version = "3.4.1"
+                version = Configs.VERSION_CODE
 
                 from(components.getByName("release"))
+            }
+            create<MavenPublication>("sandbox-softpay") {
+                groupId = Configs.APPLICATION_ID
+                artifactId = "softpay-sanbox"
+                version = Configs.VERSION_CODE
+
+                from(components.getByName("staging"))
+            }
+        }
+        repositories {
+            maven {
+                url = uri("https://nexus.infra.unzer.io/repository/tillhub-payment-engine-hosted/")
+                credentials {
+                    username = System.getenv("NEXUS_USERNAME")
+                    password = System.getenv("NEXUS_PASSWORD")
+                }
             }
         }
     }
 }
 
-fun readProperties(propertiesFile: File) = Properties().apply {
-    propertiesFile.inputStream().use { fis ->
-        load(fis)
+fun readSecretsProperties() = Properties().apply {
+    val propertiesFile = file("$rootDir/local.properties")
+
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use { fis ->
+            load(fis)
+        }
+    } else {
+        put("sandboxAccessId", System.getenv("SOFTPAY_SANDBOX_ACCESS_ID"))
+        put("sandboxAccessSecret", System.getenv("SOFTPAY_SANDBOX_ACCESS_SECRET"))
+
+        put("accessId", System.getenv("SOFTPAY_ACCESS_ID"))
+        put("accessSecret", System.getenv("SOFTPAY_ACCESS_SECRET"))
+        put("integratorId", System.getenv("SOFTPAY_INTEGRATOR_ID"))
     }
 }

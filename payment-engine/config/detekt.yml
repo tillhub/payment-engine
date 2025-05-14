@@ -785,3 +785,4 @@ libraries:
             - '**/main/java/de/tillhub/paymentengine/spos/data/SPOSTerminal.kt'
             - '**/main/java/de/tillhub/paymentengine/softpay/data/SoftpayTerminal.kt'
             - '**/main/java/de/tillhub/paymentengine/softpay/data/SoftpayConfig.kt'
+            - '**/main/java/de/tillhub/paymentengine/softpay/SoftpayApplication.kt'
