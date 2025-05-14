@@ -155,7 +155,7 @@ class TimeoutManagerTest : FunSpec({
 
             advanceTimeBy(29_000)
 
-            owner.setCurrentState(Lifecycle.State.STARTED)
+            owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
             advanceTimeBy(1_001)
 
@@ -163,7 +163,7 @@ class TimeoutManagerTest : FunSpec({
                 callback.cancelEnabled()
             }
 
-            owner.setCurrentState(Lifecycle.State.RESUMED)
+            owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
             advanceTimeBy(30_001)
 
@@ -179,7 +179,7 @@ class TimeoutManagerTest : FunSpec({
 
             advanceTimeBy(29_000)
 
-            owner.setCurrentState(Lifecycle.State.DESTROYED)
+            owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
 
             advanceTimeBy(1_001)
 

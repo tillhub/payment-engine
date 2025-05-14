@@ -63,12 +63,6 @@ android {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
 }
 
 detekt {
