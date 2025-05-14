@@ -58,6 +58,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     tasks.withType<Test> {
         useJUnitPlatform()
