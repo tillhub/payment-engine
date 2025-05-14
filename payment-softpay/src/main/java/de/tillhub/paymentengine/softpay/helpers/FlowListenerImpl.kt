@@ -17,26 +17,23 @@ import io.softpay.sdk.transaction.TransactionFlow
 
 internal class FlowListenerImpl : FlowListener {
 
-    override fun onFlowStart(softpay: Softpay, flow: Flow<FlowModel, FlowAction>): Boolean {
-        if (flow.subscriptionRequired() != FlowRequirement.MANDATORY) {
-            return false
+    override fun onFlowStart(softpay: Softpay, flow: Flow<FlowModel, FlowAction>): Boolean =
+        when {
+            flow.subscriptionRequired() != FlowRequirement.MANDATORY -> false
+            flow.foregroundRequired() == FlowRequirement.DISALLOWED -> {
+                flow.subscribeSilently()
+                true
+            }
+            else -> when (flow) {
+                is LoginFlow -> startLogin(softpay.loginManager)
+
+                is ConfigFlow -> startConfig(softpay.configManager)
+
+                is TransactionFlow -> true
+
+                else -> false
+            }
         }
-
-        if (flow.foregroundRequired() == FlowRequirement.DISALLOWED) {
-            flow.subscribeSilently()
-            return true
-        }
-
-        return when (flow) {
-            is LoginFlow -> startLogin(softpay.loginManager)
-
-            is ConfigFlow -> startConfig(softpay.configManager)
-
-            is TransactionFlow -> true
-
-            else -> false
-        }
-    }
 
     private fun startLogin(loginManager: LoginManager): Boolean {
         return !loginManager.isAppBusy
