@@ -7,6 +7,12 @@ on:
 jobs:
   production-release:
     name: Build & deploy production
+    env:
+      SOFTPAY_NEXUS_USERNAME: ${{ secrets.SOFTPAY_NEXUS_USERNAME }}
+      SOFTPAY_NEXUS_PASSWORD: ${{ secrets.SOFTPAY_NEXUS_PASSWORD }}
+      SOFTPAY_INTEGRATOR_ID: ${{ secrets.SOFTPAY_INTEGRATOR_ID }}
+      SOFTPAY_SANDBOX_ACCESS_ID: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_ID }}
+      SOFTPAY_SANDBOX_ACCESS_SECRET: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_SECRET }}
     runs-on: tillhub-org-runner
     env:
       SOFTPAY_NEXUS_USERNAME: ${{ secrets.SOFTPAY_NEXUS_USERNAME }}
@@ -39,32 +45,15 @@ jobs:
         run: ./gradlew detekt
 
       - name: Run Unit tests
-        env:
-          SOFTPAY_NEXUS_USERNAME: ${{ secrets.SOFTPAY_NEXUS_USERNAME }}
-          SOFTPAY_NEXUS_PASSWORD: ${{ secrets.SOFTPAY_NEXUS_PASSWORD }}
-          SOFTPAY_INTEGRATOR_ID: ${{ secrets.SOFTPAY_INTEGRATOR_ID }}
-          SOFTPAY_SANDBOX_ACCESS_ID: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_ID }}
-          SOFTPAY_SANDBOX_ACCESS_SECRET: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_SECRET }}
         run: ./gradlew testDebug
 
       - name: Assemble release build
-        env:
-          SOFTPAY_NEXUS_USERNAME: ${{ secrets.SOFTPAY_NEXUS_USERNAME }}
-          SOFTPAY_NEXUS_PASSWORD: ${{ secrets.SOFTPAY_NEXUS_PASSWORD }}
-          SOFTPAY_INTEGRATOR_ID: ${{ secrets.SOFTPAY_INTEGRATOR_ID }}
-          SOFTPAY_SANDBOX_ACCESS_ID: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_ID }}
-          SOFTPAY_SANDBOX_ACCESS_SECRET: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_SECRET }}
         run: ./gradlew assembleRelease
 
       - name: Deploy release build to Nexus
         env:
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-          SOFTPAY_NEXUS_USERNAME: ${{ secrets.SOFTPAY_NEXUS_USERNAME }}
-          SOFTPAY_NEXUS_PASSWORD: ${{ secrets.SOFTPAY_NEXUS_PASSWORD }}
-          SOFTPAY_INTEGRATOR_ID: ${{ secrets.SOFTPAY_INTEGRATOR_ID }}
-          SOFTPAY_SANDBOX_ACCESS_ID: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_ID }}
-          SOFTPAY_SANDBOX_ACCESS_SECRET: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_SECRET }}
         run: ./gradlew publish
 
 #          # Hardware accelerated Android virtualization on Actions Linux larger hosted runners
