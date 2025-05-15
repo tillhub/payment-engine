@@ -103,42 +103,6 @@ sealed class Terminal : Parcelable {
         }
     }
 
-    class SPOS(
-        override val id: String = DEFAULT_SPOS_ID,
-        override val saleConfig: CardSaleConfig = CardSaleConfig(),
-        val appId: String = DEFAULT_APP_ID,
-        val connected: Boolean = DEFAULT_CONNECTION,
-        val currencyCode: String = DEFAULT_CURRENCY_CODE,
-    ) : Terminal() {
-        override fun toString() = "Terminal.SPOS(" +
-                "id=$id, " +
-                "appId=$appId, " +
-                "saleConfig=$saleConfig, " +
-                "currencyCode=$currencyCode" +
-                ")"
-
-        override fun equals(other: Any?) = other is SPOS &&
-                id == other.id &&
-                appId == other.appId &&
-                saleConfig == other.saleConfig &&
-                currencyCode == other.currencyCode
-
-        override fun hashCode() = Objects.hash(
-            id,
-            appId,
-            saleConfig,
-            currencyCode
-        )
-
-        companion object {
-            private const val DEFAULT_SPOS_ID = "Default:SPOS"
-            private const val DEFAULT_APP_ID = "TESTCLIENT"
-            private const val DEFAULT_CONNECTION = false
-            const val DEFAULT_CURRENCY_CODE = "EUR"
-            const val TYPE = "SPOS"
-        }
-    }
-
     open class External(
         override val id: String = DEFAULT_EXTERNAL_ID,
         override val saleConfig: CardSaleConfig = CardSaleConfig(),
@@ -175,7 +139,7 @@ sealed class Terminal : Parcelable {
                 "saleConfig=$saleConfig" +
                 ")"
 
-        override fun equals(other: Any?) = other is SPOS &&
+        override fun equals(other: Any?) = other is External &&
                 id == other.id &&
                 saleConfig == other.saleConfig
 
