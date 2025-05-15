@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
@@ -8,10 +10,10 @@ plugins {
 
 android {
     namespace = "de.tillhub.paymentengine.softpay"
-    compileSdk = 34
+    compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
-        minSdk = 24
+        minSdk = Configs.MIN_SDK
     }
 
     buildTypes {
@@ -30,12 +32,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = Configs.JAVA_VERSION
+        targetCompatibility = Configs.JAVA_VERSION
         isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = Configs.JVM_TARGET
         freeCompilerArgs = listOf("-Xjvm-default=all")
     }
     buildFeatures {

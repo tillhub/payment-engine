@@ -9,7 +9,6 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
 
 class TerminalDisconnectContract(
@@ -17,10 +16,10 @@ class TerminalDisconnectContract(
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.SPOS) {
-            SPOSIntentFactory.createDisconnectIntent(input)
+        return if (input is Terminal.External) {
+            input.disconnectIntent(context, input)
         } else {
-            throw UnsupportedOperationException("Disconnect only supported for S-POS terminals")
+            throw UnsupportedOperationException("Disconnect is not supported by this terminal")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createDisconnectOperation(input))
         }

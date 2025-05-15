@@ -35,10 +35,7 @@ class PaymentReversalContract(
 
             is Terminal.SPOS -> SPOSIntentFactory.createPaymentReversalIntent(input)
 
-            is Terminal.External -> Intent(context, input.config.reversalActivity).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-                putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
-            }
+            is Terminal.External -> input.config.reversalIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
         }

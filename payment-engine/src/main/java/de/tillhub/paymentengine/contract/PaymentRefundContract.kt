@@ -37,11 +37,7 @@ class PaymentRefundContract(
 
             is Terminal.SPOS -> SPOSIntentFactory.createPaymentRefundIntent(input)
 
-            is Terminal.External -> Intent(context, input.config.refundActivity).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-                putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount)
-                putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
-            }
+            is Terminal.External -> input.config.refundIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createRefundOperation(input))
         }

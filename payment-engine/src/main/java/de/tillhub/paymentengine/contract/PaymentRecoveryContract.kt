@@ -9,17 +9,16 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
 
 class PaymentRecoveryContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.SPOS) {
-            SPOSIntentFactory.createRecoveryIntent()
+        return if (input is Terminal.External) {
+            input.recoveryIntent(context, input)
         } else {
-            throw UnsupportedOperationException("Recovery only supported for S-POS terminals")
+            throw UnsupportedOperationException("Payment recovery is not supported by this terminal")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createRecoveryOperation(input))
         }

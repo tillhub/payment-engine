@@ -9,7 +9,6 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
 
 class TicketReprintContract(
@@ -17,10 +16,10 @@ class TicketReprintContract(
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.SPOS) {
-            SPOSIntentFactory.createTicketReprintIntent()
+        return if (input is Terminal.External) {
+            input.ticketReprintIntent(context, input)
         } else {
-            throw UnsupportedOperationException("Ticket reprint only supported for S-POS terminals")
+            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createTicketReprintOperation(input))
         }

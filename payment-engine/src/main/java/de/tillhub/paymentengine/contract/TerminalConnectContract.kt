@@ -31,9 +31,7 @@ class TerminalConnectContract(
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
 
-            is Terminal.External -> Intent(context, input.connectActivity).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input)
-            }
+            is Terminal.External -> input.connectIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createConnectOperation(input))
         }

@@ -40,35 +40,35 @@ class TerminalDisconnectContractTest : FunSpec({
         target = TerminalDisconnectContract(analytics)
     }
 
-    test("createIntent SPOS") {
-        val result = target.createIntent(
-            context,
-            SPOS
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.action shouldBe "de.spayment.akzeptanz.S_SWITCH_DISCONNECT"
-        result.extras?.getString(SPOSKey.Extra.APP_ID) shouldBe "TESTCLIENT"
-
-        verify {
-            analytics.logOperation(
-                "Operation: TERMINAL_DISCONNECT" +
-                        "\nTerminal.SPOS(" +
-                        "id=s-pos, " +
-                        "appId=TESTCLIENT, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "currencyCode=EUR" +
-                        ")"
-            )
-        }
-    }
+//    test("createIntent SPOS") {
+//        val result = target.createIntent(
+//            context,
+//            SPOS
+//        )
+//
+//        result.shouldBeInstanceOf<Intent>()
+//        result.action shouldBe "de.spayment.akzeptanz.S_SWITCH_DISCONNECT"
+//        result.extras?.getString(SPOSKey.Extra.APP_ID) shouldBe "TESTCLIENT"
+//
+//        verify {
+//            analytics.logOperation(
+//                "Operation: TERMINAL_DISCONNECT" +
+//                        "\nTerminal.SPOS(" +
+//                        "id=s-pos, " +
+//                        "appId=TESTCLIENT, " +
+//                        "saleConfig=CardSaleConfig(" +
+//                        "applicationName=Tillhub GO, " +
+//                        "operatorId=ah, " +
+//                        "saleId=registerProvider, " +
+//                        "pin=333333, " +
+//                        "poiId=66000001, " +
+//                        "poiSerialNumber=" +
+//                        "), " +
+//                        "currencyCode=EUR" +
+//                        ")"
+//            )
+//        }
+//    }
 
     test("createIntent OPI + ZVT") {
         try {
@@ -78,7 +78,7 @@ class TerminalDisconnectContractTest : FunSpec({
             )
         } catch (e: Exception) {
             e.shouldBeInstanceOf<UnsupportedOperationException>()
-            e.message shouldBe "Disconnect only supported for S-POS terminals"
+            e.message shouldBe "Disconnect is not supported by this terminal"
         }
         verify(inverse = true) {
             analytics.logOperation(any())
