@@ -11,8 +11,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPaymentActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.CardPaymentActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -33,7 +32,6 @@ class PaymentResultContract(
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
-            is Terminal.SPOS -> SPOSIntentFactory.createPaymentIntent(input)
 
             is Terminal.External -> input.config.paymentIntent(context, input)
         }.also {
@@ -45,7 +43,6 @@ class PaymentResultContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Payment::class
         )
 }

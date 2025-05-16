@@ -10,8 +10,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
 class TerminalReconciliationContract(
@@ -28,8 +27,6 @@ class TerminalReconciliationContract(
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
 
-            is Terminal.SPOS -> SPOSIntentFactory.createReconciliationIntent()
-
             is Terminal.External -> input.reconciliationIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReconciliationOperation(input))
@@ -40,7 +37,6 @@ class TerminalReconciliationContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Reconciliation::class
         )
 }

@@ -8,7 +8,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 
 class PaymentRecoveryContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
@@ -28,7 +28,6 @@ class PaymentRecoveryContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Recovery::class
         )
 }

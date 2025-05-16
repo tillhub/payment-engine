@@ -8,7 +8,6 @@ import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.data.SPOSKey
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -119,9 +118,6 @@ class TerminalDisconnectContractTest : FunSpec({
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
-        )
-        val SPOS = Terminal.SPOS(
-            id = "s-pos",
         )
     }
 }

@@ -103,6 +103,7 @@ sealed class Terminal : Parcelable {
         }
     }
 
+    @Suppress("TooManyFunctions")
     open class External(
         override val id: String = DEFAULT_EXTERNAL_ID,
         override val saleConfig: CardSaleConfig = CardSaleConfig(),

@@ -8,8 +8,8 @@ import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.helper.ResponseHandler
 
 class TerminalDisconnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
@@ -26,7 +26,11 @@ class TerminalDisconnectContract(
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return SPOSResponseHandler.handleTerminalDisconnectResponse(resultCode).also {
+        return ResponseHandler.parseResult(
+            resultCode,
+            intent,
+            TerminalOperationStatus.Login::class
+        ).also {
             if (resultCode == Activity.RESULT_OK) {
                 analytics?.logCommunication(
                     protocol = SPOS_PROTOCOL,

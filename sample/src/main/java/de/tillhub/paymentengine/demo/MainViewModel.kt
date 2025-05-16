@@ -12,6 +12,7 @@ import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.spos.data.SPOSTerminal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
@@ -102,7 +103,7 @@ class MainViewModel : ViewModel() {
             )
         )
         cardManager.putTerminalConfig(
-            Terminal.SPOS(
+            SPOSTerminal(
                 id = "s-pos",
             )
         )

@@ -23,7 +23,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
     lateinit var intent: Intent
     lateinit var receiptDto: ReceiptDto
-    lateinit var analytics: PaymentAnalytics
     lateinit var receiptConverter: StringToReceiptDtoConverter
 
     beforeTest {
@@ -33,11 +32,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
         intent = mockk {
             every { extras } returns null
-        }
-
-        analytics = mockk {
-            every { logOperation(any()) } just Runs
-            every { logCommunication(any(), any()) } just Runs
         }
 
         receiptConverter = mockk {
@@ -106,7 +100,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_CANCELED,
                 intent,
-                analytics,
                 TerminalOperationStatus.Payment::class
             )
 
@@ -129,7 +122,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_CANCELED,
                     intent,
-                    analytics,
                     TerminalOperationStatus.Payment::class
                 )
 
@@ -148,7 +140,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
                     intent,
-                    analytics,
                     TerminalOperationStatus.Payment::class
                 )
 
@@ -209,7 +200,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
                     intent,
-                    analytics,
                     TerminalOperationStatus.Payment::class,
                     receiptConverter
                 )
@@ -290,7 +280,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_OK,
                 intent,
-                analytics,
                 TerminalOperationStatus.Payment::class,
                 receiptConverter
             )
@@ -369,7 +358,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_OK,
                 intent,
-                analytics,
                 TerminalOperationStatus.Payment::class,
                 receiptConverter
             )

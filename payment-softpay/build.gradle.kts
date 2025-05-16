@@ -13,7 +13,7 @@ android {
     compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
-        minSdk = Configs.MIN_SDK
+        minSdk = Configs.MIN_SDK_SOFTPAY
     }
 
     buildTypes {
@@ -45,12 +45,6 @@ android {
     }
     tasks.withType<Test> {
         useJUnitPlatform()
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
     }
 }
 

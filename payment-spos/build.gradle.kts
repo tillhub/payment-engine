@@ -31,6 +31,9 @@ android {
     kotlinOptions {
         jvmTarget = Configs.JVM_TARGET
     }
+    buildFeatures {
+        viewBinding = true
+    }
     tasks.withType<Test> {
         useJUnitPlatform()
     }
@@ -39,7 +42,7 @@ android {
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     allRules = false // activate all available (even unstable) rules.
-    config.setFrom("$projectDir/config/detekt.yml")
+    config.setFrom("$rootDir/payment-engine/config/detekt.yml")
 }
 
 dependencies {

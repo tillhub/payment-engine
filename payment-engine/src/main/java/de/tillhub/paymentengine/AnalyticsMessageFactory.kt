@@ -1,12 +1,12 @@
-package de.tillhub.paymentengine.spos
+package de.tillhub.paymentengine
 
 import android.os.Bundle
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.spos.SPOSResponseHandler.toRawData
 
+@Suppress("TooManyFunctions")
 internal object AnalyticsMessageFactory {
     fun createPaymentOperation(input: PaymentRequest) = "Operation: CARD_PAYMENT(" +
             "amount: ${input.amount}, " +
@@ -36,6 +36,18 @@ internal object AnalyticsMessageFactory {
     fun createResultOk(extras: Bundle?) = "$RESPONSE_RESULT_OK\n${extras?.toRawData()}"
 
     fun createResultCanceled(extras: Bundle?) = "$RESPONSE_RESULT_CANCELED\n${extras?.toRawData()}"
+
+    private fun Bundle.toRawData(): String {
+        val builder = StringBuilder()
+        builder.appendLine("Extras {")
+
+        keySet().forEach {
+            builder.appendLine("$it = ${getString(it)}")
+        }
+
+        builder.append("}")
+        return builder.toString()
+    }
 
     const val RESPONSE_RESULT_OK = "RESPONSE: RESULT OK"
 

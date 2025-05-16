@@ -11,8 +11,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -33,8 +32,6 @@ class PaymentReversalContract(
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
             }
 
-            is Terminal.SPOS -> SPOSIntentFactory.createPaymentReversalIntent(input)
-
             is Terminal.External -> input.config.reversalIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
@@ -45,7 +42,6 @@ class PaymentReversalContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Reversal::class
         )
 }

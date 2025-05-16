@@ -11,8 +11,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPartialRefundActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.CardPaymentPartialRefundActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -35,8 +34,6 @@ class PaymentRefundContract(
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
 
-            is Terminal.SPOS -> SPOSIntentFactory.createPaymentRefundIntent(input)
-
             is Terminal.External -> input.config.refundIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createRefundOperation(input))
@@ -47,7 +44,6 @@ class PaymentRefundContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Refund::class
         )
 }
