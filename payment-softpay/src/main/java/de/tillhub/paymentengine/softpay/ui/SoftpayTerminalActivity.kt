@@ -40,6 +40,7 @@ internal abstract class SoftpayTerminalActivity : ComponentActivity() {
                 is LoginState.Error -> handleError(state)
 
                 LoginState.LoggedIn -> startStoreConfig()
+                LoginState.StoreInput -> selectStore()
                 LoginState.StoreConfigured -> startOperation()
             }
         }
@@ -55,7 +56,11 @@ internal abstract class SoftpayTerminalActivity : ComponentActivity() {
     }
 
     private fun startStoreConfig() {
-        loginViewModel.initStoreConfiguration(config.config.storeId)
+        loginViewModel.initStoreConfiguration()
+    }
+
+    private fun selectStore() {
+        loginViewModel.storeSelection(config.config.storeId)
     }
 
     private fun showLoader() {

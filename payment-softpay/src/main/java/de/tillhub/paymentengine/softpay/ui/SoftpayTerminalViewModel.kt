@@ -13,6 +13,7 @@ import de.tillhub.paymentengine.softpay.helpers.TerminalConfigImpl
 import de.tillhub.paymentengine.softpay.helpers.activeFlow
 import de.tillhub.paymentengine.softpay.helpers.toTransactionResultCode
 import io.softpay.sdk.config.ConfigFlow
+import io.softpay.sdk.config.ConfigFlowInput.AppAuthorizeConfirmation
 import io.softpay.sdk.config.ConfigFlowInput.StoreInput
 import io.softpay.sdk.config.ConfigFlowModel
 import io.softpay.sdk.config.ConfigFlowModel.State.ABORTED
@@ -20,6 +21,7 @@ import io.softpay.sdk.config.ConfigFlowOptions
 import io.softpay.sdk.config.ConfigFlowReceiver
 import io.softpay.sdk.config.ConfigFlowVariant
 import io.softpay.sdk.config.ConfigManager
+import io.softpay.sdk.config.dispatch
 import io.softpay.sdk.failure.Failure
 import io.softpay.sdk.failure.failure
 import io.softpay.sdk.failure.failureOf
@@ -141,7 +143,18 @@ internal class SoftpayTerminalViewModel(
     private val configReceiver = ConfigFlowReceiver { model ->
         model.update()?.let { update ->
             when (update) {
-                is ConfigFlowModel.Update.InputRequest -> null
+                is ConfigFlowModel.Update.InputRequest -> when {
+                    // Is the end-user allowed to configure this device?
+                    model.awaits(AppAuthorizeConfirmation::class.java) -> {
+                        // Confirm if end-user is allowed to configure this device or not (confirmed = false).
+                        model.dispatch(AppAuthorizeConfirmation(confirmed = true))
+                    }
+                    // Event is spawned when flow waits for store selection
+                    model.awaits(StoreInput::class.java) -> {
+                        _state.value = LoginState.StoreInput
+                    }
+                    else -> null
+                }
                 else -> when {
                     // Aborted by the end-user.
                     model.state == ABORTED -> {
@@ -189,35 +202,37 @@ internal class SoftpayTerminalViewModel(
         }
     }
 
-    fun initStoreConfiguration(storeId: String) {
+    fun initStoreConfiguration() {
         if (configManager.configured) {
             _state.value = LoginState.StoreConfigured
         } else {
             _state.value = LoginState.Loading
 
             configFlow.subscribe(configReceiver)
+        }
+    }
 
-            configManager.getStoreByAcquirerStoreId(storeId) { store, failure ->
-                if (failure == null && store != null) {
-                    configFlow.dispatch(StoreInput.SelectStore(store))
-                } else {
-                    _state.value = failure?.let {
-                        LoginState.Error.General(
-                            date = terminalConfig.timeNow(),
-                            resultCode = failure.toTransactionResultCode(),
-                            failure = failure
-                        )
-                    } ?: LoginState.Error.General(
+    fun storeSelection(storeId: String) {
+        configManager.getStoreByAcquirerStoreId(storeId) { store, failure ->
+            if (failure == null && store != null) {
+                configFlow.dispatch(StoreInput.SelectStore(store))
+            } else {
+                _state.value = failure?.let {
+                    LoginState.Error.General(
                         date = terminalConfig.timeNow(),
-                        resultCode = TransactionResultCode.Known(
-                            errorMessage = R.string.softpay_error_store_not_found,
-                            recoveryMessages = listOf(
-                                R.string.softpay_recovery_contact_support,
-                            )
-                        ),
-                        failure = failureOf("Store not found")
+                        resultCode = failure.toTransactionResultCode(),
+                        failure = failure
                     )
-                }
+                } ?: LoginState.Error.General(
+                    date = terminalConfig.timeNow(),
+                    resultCode = TransactionResultCode.Known(
+                        errorMessage = R.string.softpay_error_store_not_found,
+                        recoveryMessages = listOf(
+                            R.string.softpay_recovery_contact_support,
+                        )
+                    ),
+                    failure = failureOf("Store not found")
+                )
             }
         }
     }
@@ -279,5 +294,6 @@ internal sealed class LoginState {
     }
 
     data object LoggedIn : LoginState()
+    data object StoreInput : LoginState()
     data object StoreConfigured : LoginState()
 }
