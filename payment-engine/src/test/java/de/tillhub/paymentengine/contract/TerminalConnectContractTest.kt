@@ -10,7 +10,6 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.data.SPOSKey
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -19,7 +18,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.spyk
-import io.mockk.verify
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
@@ -42,36 +40,6 @@ class TerminalConnectContractTest : FunSpec({
         target = TerminalConnectContract(analytics)
     }
 
-    test("createIntent SPOS") {
-        val result = target.createIntent(
-            context,
-            SPOS
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.action shouldBe "de.spayment.akzeptanz.S_SWITCH_CONNECT"
-        result.extras?.getString(SPOSKey.Extra.APP_ID) shouldBe "TESTCLIENT"
-
-        verify {
-            analytics.logOperation(
-                "Operation: TERMINAL_CONNECT" +
-                        "\nTerminal.SPOS(" +
-                        "id=s-pos, " +
-                        "appId=TESTCLIENT, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "currencyCode=EUR" +
-                        ")"
-            )
-        }
-    }
-
     test("createIntent OPI") {
         val result = target.createIntent(
             context,
@@ -84,7 +52,7 @@ class TerminalConnectContractTest : FunSpec({
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
             Terminal.OPI::class.java
-        ) shouldBe PaymentResultContractTest.OPI
+        ) shouldBe PaymentContractTest.OPI
     }
 
     test("createIntent ZVT") {
@@ -100,39 +68,6 @@ class TerminalConnectContractTest : FunSpec({
             ExtraKeys.EXTRA_CONFIG,
             Terminal.ZVT::class.java
         ) shouldBe ZVT
-    }
-
-    test("parseResult SPOS: result OK") {
-        val intent = Intent()
-
-        val result = target.parseResult(Activity.RESULT_OK, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
-
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT OK"
-            )
-        }
-    }
-
-    test("parseResult SPOS: result CANCELED") {
-        val intent = Intent().apply {
-            putExtra(SPOSKey.ResultExtra.ERROR, "CARD_PAYMENT_NOT_ONBOARDED")
-        }
-
-        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
-
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT CANCELED\nExtras {\n" +
-                        "ERROR = CARD_PAYMENT_NOT_ONBOARDED\n}"
-            )
-        }
     }
 
     test("parseResult OPI + ZVT: result OK") {
@@ -172,9 +107,6 @@ class TerminalConnectContractTest : FunSpec({
             id = "zvt",
             ipAddress = "127.0.0.1",
             port = 20007,
-        )
-        val SPOS = Terminal.SPOS(
-            id = "s-pos",
         )
     }
 }

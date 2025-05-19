@@ -36,7 +36,7 @@ class TerminalConnectContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            TerminalOperationStatus.Reversal::class
+            TerminalOperationStatus.Login::class
         ).also {
             analytics?.logCommunication(
                 protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
