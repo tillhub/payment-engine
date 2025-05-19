@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.contract
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
@@ -30,22 +29,6 @@ class TerminalDisconnectContract(
             resultCode,
             intent,
             TerminalOperationStatus.Login::class
-        ).also {
-            if (resultCode == Activity.RESULT_OK) {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
-                )
-            } else {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_CANCELED
-                )
-            }
-        }
-    }
-
-    companion object {
-        private const val SPOS_PROTOCOL = "SPOS"
+        )
     }
 }

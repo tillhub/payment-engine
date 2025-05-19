@@ -83,24 +83,13 @@ internal class RefundManagerImpl(
         config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Refund.Pending(amount, currency))
-        try {
-            refundContract.launch(
-                RefundRequest(
-                    config = config,
-                    transactionId = transactionId,
-                    amount = amount,
-                    currency = currency
-                )
+        refundContract.launch(
+            RefundRequest(
+                config = config,
+                transactionId = transactionId,
+                amount = amount,
+                currency = currency
             )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Refund.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
-                )
-            )
-        }
+        )
     }
 }

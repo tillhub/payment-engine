@@ -57,17 +57,7 @@ internal class ConnectionManagerImpl(
 
     override fun startConnect(config: Terminal) {
         terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
-        try {
-            connectContract.launch(config)
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Login.Error(
-                    date = Instant.now(),
-                    rawData = "",
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                )
-            )
-        }
+        connectContract.launch(config)
     }
 
     override fun startSPOSDisconnect() {
@@ -84,12 +74,11 @@ internal class ConnectionManagerImpl(
         terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
         try {
             disconnectContract.launch(config)
-        } catch (_: ActivityNotFoundException) {
+        } catch (_: UnsupportedOperationException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.Login.Error(
+                TerminalOperationStatus.TicketReprint.Error(
                     date = Instant.now(),
-                    rawData = "",
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
+                    resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
                 )
             )
         }

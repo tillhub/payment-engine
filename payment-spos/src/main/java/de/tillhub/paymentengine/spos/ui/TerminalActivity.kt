@@ -1,6 +1,7 @@
 package de.tillhub.paymentengine.spos.ui
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
@@ -11,7 +12,9 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.spos.SPOSResponseHandler.getErrorAppNotFound
 import de.tillhub.paymentengine.spos.contracts.SPOSPaymentContract
 import de.tillhub.paymentengine.spos.contracts.SPOSPaymentRecoveryContract
 import de.tillhub.paymentengine.spos.contracts.SPOSPaymentRefundContract
@@ -22,8 +25,11 @@ import de.tillhub.paymentengine.spos.contracts.SPOSTerminalReconciliationContrac
 import de.tillhub.paymentengine.spos.contracts.SPOSTicketReprintContract
 import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
 import de.tillhub.paymentengine.spos.data.SPOSRequestBuilder
+import de.tillhub.paymentengine.spos.data.SPOSResultCodes
 import de.tillhub.paymentengine.spos.data.SPOSTerminal
 import de.tillhub.paymentengine.spos.databinding.ActivityTerminalBinding
+import java.time.Instant
+import kotlin.reflect.KClass
 
 internal class TerminalActivity : AppCompatActivity() {
 
@@ -70,48 +76,60 @@ internal class TerminalActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         when (action) {
-            SPOSExtraKeys.ACTION_CONNECT -> startConnect()
-            SPOSExtraKeys.ACTION_PAYMENT -> startPayment()
-            SPOSExtraKeys.ACTION_REVERSAL -> startReversal()
-            SPOSExtraKeys.ACTION_REFUND -> startRefund()
-            SPOSExtraKeys.ACTION_RECONCILIATION -> startReconciliation()
-            SPOSExtraKeys.ACTION_RECOVERY -> startRecovery()
-            SPOSExtraKeys.ACTION_DISCONNECT -> startDisconnect()
-            SPOSExtraKeys.ACTION_REPRINT -> startReprint()
+            SPOSExtraKeys.ACTION_CONNECT -> startOperation(
+                launcher = connectContract,
+                data = config,
+                errClass = TerminalOperationStatus.Login::class
+            )
+            SPOSExtraKeys.ACTION_PAYMENT -> startOperation(
+                launcher = paymentContract,
+                data = SPOSRequestBuilder.buildPaymentRequest(intent),
+                errClass = TerminalOperationStatus.Payment::class
+            )
+            SPOSExtraKeys.ACTION_REVERSAL -> startOperation(
+                launcher = paymentReversalContract,
+                data = SPOSRequestBuilder.buildReversalRequest(intent),
+                errClass = TerminalOperationStatus.Reversal::class
+            )
+            SPOSExtraKeys.ACTION_REFUND -> startOperation(
+                launcher = paymentRefundContract,
+                data = SPOSRequestBuilder.buildRefundRequest(intent),
+                errClass = TerminalOperationStatus.Refund::class
+            )
+            SPOSExtraKeys.ACTION_RECONCILIATION -> startOperation(
+                launcher = reconciliationContract,
+                data = config,
+                errClass = TerminalOperationStatus.Reconciliation::class
+            )
+            SPOSExtraKeys.ACTION_RECOVERY -> startOperation(
+                launcher = paymentRecoveryContract,
+                data = config,
+                errClass = TerminalOperationStatus.Recovery::class
+            )
+            SPOSExtraKeys.ACTION_DISCONNECT -> startOperation(
+                launcher = disconnectContract,
+                data = config,
+                errClass = TerminalOperationStatus.Login::class
+            )
+            SPOSExtraKeys.ACTION_REPRINT -> startOperation(
+                launcher = reprintContract,
+                data = config,
+                errClass = TerminalOperationStatus.TicketReprint::class
+            )
             else -> throw IllegalArgumentException("TerminalActivity: Argument action is invalid")
         }
     }
 
-    private fun startConnect() {
-        connectContract.launch(config)
-    }
-
-    private fun startDisconnect() {
-        disconnectContract.launch(config)
-    }
-
-    private fun startPayment() {
-        paymentContract.launch(SPOSRequestBuilder.buildPaymentRequest(intent))
-    }
-
-    private fun startRefund() {
-        paymentRefundContract.launch(SPOSRequestBuilder.buildRefundRequest(intent))
-    }
-
-    private fun startReversal() {
-        paymentReversalContract.launch(SPOSRequestBuilder.buildReversalRequest(intent))
-    }
-
-    private fun startRecovery() {
-        paymentRecoveryContract.launch(config)
-    }
-
-    private fun startReprint() {
-        reprintContract.launch(config)
-    }
-
-    private fun startReconciliation() {
-        reconciliationContract.launch(config)
+    private fun<T, U : TerminalOperationStatus> startOperation(
+        launcher: ActivityResultLauncher<T>,
+        data: T,
+        errClass: KClass<U>
+    ) {
+        try {
+            launcher.launch(data)
+        } catch (_: ActivityNotFoundException) {
+            handleResult(errClass.getErrorAppNotFound())
+        }
     }
 
     private fun handleResult(result: TerminalOperationStatus) {
@@ -121,4 +139,5 @@ internal class TerminalActivity : AppCompatActivity() {
         )
         finish()
     }
+
 }

@@ -23,7 +23,7 @@ internal object ResponseHandler {
         }
     }
 
-    internal fun <T : TerminalOperationStatus>getCanceledStatus(kClass: KClass<T>) = when (kClass) {
+    private fun <T : TerminalOperationStatus>getCanceledStatus(kClass: KClass<T>) = when (kClass) {
         TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Canceled
         TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Canceled
         TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Canceled
@@ -40,6 +40,18 @@ internal object ResponseHandler {
         TerminalOperationStatus.Refund.Success::class,
         TerminalOperationStatus.Reconciliation.Success::class,
         TerminalOperationStatus.Recovery.Success::class,
-        TerminalOperationStatus.TicketReprint.Success::class
+        TerminalOperationStatus.TicketReprint.Success::class,
+        TerminalOperationStatus.Login.Connected::class,
+        TerminalOperationStatus.Login.Disconnected::class
+    ).any { it == status::class }
+
+    internal fun isError(status: TerminalOperationStatus) = listOf(
+        TerminalOperationStatus.Payment.Error::class,
+        TerminalOperationStatus.Reversal.Error::class,
+        TerminalOperationStatus.Refund.Error::class,
+        TerminalOperationStatus.Reconciliation.Error::class,
+        TerminalOperationStatus.Recovery.Error::class,
+        TerminalOperationStatus.TicketReprint.Error::class,
+        TerminalOperationStatus.Login.Error::class,
     ).any { it == status::class }
 }

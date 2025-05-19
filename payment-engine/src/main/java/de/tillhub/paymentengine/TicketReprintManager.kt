@@ -56,13 +56,6 @@ internal class TicketReprintManagerImpl(
                     resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
                 )
             )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.TicketReprint.Error(
-                    date = Instant.now(),
-                    resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                )
-            )
         }
     }
 }

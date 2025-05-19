@@ -204,7 +204,7 @@ internal object SPOSResponseHandler {
         else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
     }
 
-    private fun <T : TerminalOperationStatus>getCanceledStatus(kClass: KClass<T>) = when (kClass) {
+    private fun <T : TerminalOperationStatus> getCanceledStatus(kClass: KClass<T>) = when (kClass) {
         TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Canceled
         TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Canceled
         TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Canceled
@@ -213,5 +213,54 @@ internal object SPOSResponseHandler {
         TerminalOperationStatus.Login::class -> TerminalOperationStatus.Login.Canceled
         TerminalOperationStatus.TicketReprint::class -> TerminalOperationStatus.TicketReprint.Canceled
         else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
+    }
+
+    fun <T : TerminalOperationStatus> KClass<T>.getErrorAppNotFound() = when (this) {
+        TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Reconciliation::class -> TerminalOperationStatus.Reconciliation.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Recovery::class -> TerminalOperationStatus.Recovery.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Login::class -> TerminalOperationStatus.Login.Error(
+            date = Instant.now(),
+            rawData = "",
+            resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+        )
+        TerminalOperationStatus.TicketReprint::class -> TerminalOperationStatus.TicketReprint.Error(
+            date = Instant.now(),
+            rawData = "",
+            resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+        )
+        else -> throw IllegalArgumentException("Unknown status class: ${this.java.name}")
     }
 }

@@ -59,15 +59,6 @@ internal class RecoveryManagerImpl(
                     )
                 )
             )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Recovery.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
-                )
-            )
         }
     }
 }

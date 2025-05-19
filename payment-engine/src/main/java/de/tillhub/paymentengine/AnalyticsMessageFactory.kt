@@ -35,8 +35,6 @@ internal object AnalyticsMessageFactory {
 
     fun createResultOk(extras: Bundle?) = "$RESPONSE_RESULT_OK\n${extras?.toRawData()}"
 
-    fun createResultCanceled(extras: Bundle?) = "$RESPONSE_RESULT_CANCELED\n${extras?.toRawData()}"
-
     private fun Bundle.toRawData(): String {
         val builder = StringBuilder()
         builder.appendLine("Extras {")
@@ -50,6 +48,4 @@ internal object AnalyticsMessageFactory {
     }
 
     const val RESPONSE_RESULT_OK = "RESPONSE: RESULT OK"
-
-    const val RESPONSE_RESULT_CANCELED = "RESPONSE: RESULT CANCELED"
 }

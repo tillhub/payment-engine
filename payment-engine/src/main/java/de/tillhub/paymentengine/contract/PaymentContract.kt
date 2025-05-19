@@ -44,7 +44,12 @@ class PaymentResultContract(
             resultCode,
             intent,
             TerminalOperationStatus.Payment::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = "",
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+            )
+        }
 }
 
 /***

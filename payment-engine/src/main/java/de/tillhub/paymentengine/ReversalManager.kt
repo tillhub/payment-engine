@@ -110,26 +110,15 @@ internal class ReversalManagerImpl(
         config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Reversal.Pending(receiptNo))
-        try {
-            reversalContract.launch(
-                ReversalRequest(
-                    transactionId = transactionId,
-                    amount = amount,
-                    tip = tip,
-                    currency = currency,
-                    config = config,
-                    receiptNo = receiptNo
-                )
+        reversalContract.launch(
+            ReversalRequest(
+                transactionId = transactionId,
+                amount = amount,
+                tip = tip,
+                currency = currency,
+                config = config,
+                receiptNo = receiptNo
             )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Reversal.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
-                )
-            )
-        }
+        )
     }
 }

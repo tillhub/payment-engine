@@ -31,17 +31,10 @@ class TicketReprintContract(
             intent,
             TerminalOperationStatus.TicketReprint::class
         ).also {
-            if (resultCode == Activity.RESULT_OK) {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
-                )
-            } else {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_CANCELED
-                )
-            }
+            analytics?.logCommunication(
+                protocol = SPOS_PROTOCOL,
+                message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
+            )
         }
 
     companion object {

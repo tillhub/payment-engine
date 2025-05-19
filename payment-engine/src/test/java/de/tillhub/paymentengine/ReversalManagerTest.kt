@@ -123,7 +123,7 @@ class ReversalManagerTest : FunSpec({
             amount = amount,
             tip = tip,
             currency = currency,
-            config = Terminal.SPOS(),
+            config = Terminal.OPI(),
             receiptNo = receiptNo
         )
 
@@ -134,50 +134,12 @@ class ReversalManagerTest : FunSpec({
                     amount = amount,
                     currency = currency,
                     tip = tip,
-                    config = Terminal.SPOS(),
+                    config = Terminal.OPI(),
                     receiptNo = receiptNo
                 )
             )
         }
 
         transactionState.value shouldBe TerminalOperationStatus.Reversal.Pending(receiptNo)
-    }
-
-    test("contract failing to launch request due to no activity") {
-        every { reversalContract.launch(any()) } answers {
-            throw ActivityNotFoundException()
-        }
-
-        val transactionId = "12345"
-        val amount = BigDecimal(100)
-        val currency = ISOAlphaCurrency("EUR")
-        val receiptNo = "R12345"
-        val tip = BigDecimal.ZERO
-
-        target.startReversalTransaction(
-            transactionId = transactionId,
-            amount = amount,
-            tip = tip,
-            currency = currency,
-            config = Terminal.SPOS(),
-            receiptNo = receiptNo
-        )
-
-        verify {
-            reversalContract.launch(
-                ReversalRequest(
-                    transactionId = transactionId,
-                    amount = amount,
-                    currency = currency,
-                    tip = tip,
-                    config = Terminal.SPOS(),
-                    receiptNo = receiptNo
-                )
-            )
-        }
-
-        transactionState.value.shouldBeInstanceOf<TerminalOperationStatus.Reversal.Error>()
-        (transactionState.value as TerminalOperationStatus.Reversal.Error)
-            .response.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

@@ -89,19 +89,8 @@ internal class PaymentManagerImpl(
         config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Payment.Pending(amount, currency))
-        try {
-            paymentResultContract.launch(
-                PaymentRequest(config, transactionId, amount, tip, currency)
-            )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
-                )
-            )
-        }
+        paymentResultContract.launch(
+            PaymentRequest(config, transactionId, amount, tip, currency)
+        )
     }
 }

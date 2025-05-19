@@ -26,7 +26,7 @@ class TicketReprintManagerTest : FunSpec({
     lateinit var target: TicketReprintManager
 
     beforeTest {
-        configs = mutableMapOf("spos" to Terminal.SPOS(id = "spos"))
+        configs = mutableMapOf("spos" to Terminal.External(id = "spos"))
         terminalState = MutableStateFlow(TerminalOperationStatus.Waiting)
         resultCaller = mockk(relaxed = true)
         ticketReprintContract = mockk(relaxed = true)
@@ -47,7 +47,7 @@ class TicketReprintManagerTest : FunSpec({
         target.startTicketReprint()
 
         verify {
-            ticketReprintContract.launch(Terminal.SPOS(id = "spos"))
+            ticketReprintContract.launch(Terminal.External(id = "spos"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.TicketReprint.Pending
