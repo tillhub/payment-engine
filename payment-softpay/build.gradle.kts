@@ -13,7 +13,7 @@ android {
     compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
-        minSdk = Configs.MIN_SDK
+        minSdk = Configs.SOFTPAY_MIN_SDK
     }
 
     buildTypes {
