@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
@@ -56,6 +57,10 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
             Activity.RESULT_OK,
             Intent().apply {
                 putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.OPI.TYPE
+                )
+                putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Reconciliation.Success(state.data)
                 )
@@ -68,6 +73,10 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
         setResult(
             Activity.RESULT_OK,
             Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.OPI.TYPE
+                )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Reconciliation.Error(state.data)

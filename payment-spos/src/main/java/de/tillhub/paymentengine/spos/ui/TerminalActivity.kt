@@ -12,7 +12,6 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.SPOSResponseHandler.getErrorAppNotFound
 import de.tillhub.paymentengine.spos.contracts.SPOSPaymentContract
@@ -25,10 +24,8 @@ import de.tillhub.paymentengine.spos.contracts.SPOSTerminalReconciliationContrac
 import de.tillhub.paymentengine.spos.contracts.SPOSTicketReprintContract
 import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
 import de.tillhub.paymentengine.spos.data.SPOSRequestBuilder
-import de.tillhub.paymentengine.spos.data.SPOSResultCodes
 import de.tillhub.paymentengine.spos.data.SPOSTerminal
 import de.tillhub.paymentengine.spos.databinding.ActivityTerminalBinding
-import java.time.Instant
 import kotlin.reflect.KClass
 
 internal class TerminalActivity : AppCompatActivity() {
@@ -135,9 +132,14 @@ internal class TerminalActivity : AppCompatActivity() {
     private fun handleResult(result: TerminalOperationStatus) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, result) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    SPOSTerminal.TYPE
+                )
+                putExtra(ExtraKeys.EXTRAS_RESULT, result)
+            }
         )
         finish()
     }
-
 }

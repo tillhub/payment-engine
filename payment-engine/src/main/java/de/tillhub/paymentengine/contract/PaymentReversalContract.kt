@@ -43,7 +43,12 @@ class PaymentReversalContract(
             resultCode,
             intent,
             TerminalOperationStatus.Reversal::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+            )
+        }
 }
 
 /***

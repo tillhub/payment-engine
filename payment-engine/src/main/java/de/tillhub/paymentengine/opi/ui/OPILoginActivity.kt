@@ -53,6 +53,10 @@ internal class OPILoginActivity : OPITerminalActivity() {
             Activity.RESULT_OK,
             Intent().apply {
                 putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.OPI.TYPE
+                )
+                putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Login.Connected(
                         date = state.data.date,
@@ -70,6 +74,10 @@ internal class OPILoginActivity : OPITerminalActivity() {
         setResult(
             Activity.RESULT_OK,
             Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.OPI.TYPE
+                )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Login.Error(

@@ -1,17 +1,16 @@
 package de.tillhub.paymentengine.contract
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.core.os.BundleCompat
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPILoginActivity
-import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.TerminalLoginActivity
 
 class TerminalConnectContract(
@@ -33,17 +32,15 @@ class TerminalConnectContract(
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return if (resultCode == Activity.RESULT_OK) {
-            intent?.extras?.let {
-                BundleCompat.getParcelable(
-                    it,
-                    ExtraKeys.EXTRAS_RESULT,
-                    TerminalOperationStatus::class.java
-                )
-            } ?: TerminalOperationStatus.Login.Canceled
-        } else {
-            TerminalOperationStatus.Login.Canceled
+    override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus =
+        ResponseHandler.parseResult(
+            resultCode,
+            intent,
+            TerminalOperationStatus.Reversal::class
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+            )
         }
-    }
 }

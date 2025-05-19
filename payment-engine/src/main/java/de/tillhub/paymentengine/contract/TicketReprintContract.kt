@@ -1,14 +1,14 @@
 package de.tillhub.paymentengine.contract
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.helper.ResponseHandler
 
 class TicketReprintContract(
@@ -32,12 +32,8 @@ class TicketReprintContract(
             TerminalOperationStatus.TicketReprint::class
         ).also {
             analytics?.logCommunication(
-                protocol = SPOS_PROTOCOL,
-                message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
             )
         }
-
-    companion object {
-        private const val SPOS_PROTOCOL = "SPOS"
-    }
 }

@@ -3,7 +3,6 @@ package de.tillhub.paymentengine.spos
 import android.app.Activity
 import android.content.Intent
 import de.tillhub.paymentengine.R
-import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.spos.data.ReceiptDto
@@ -14,9 +13,7 @@ import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 
 class SPOSResponseHandlerTest : DescribeSpec({

@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine
 
-import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract

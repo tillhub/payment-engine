@@ -8,6 +8,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.helper.ResponseHandler
 
 class TerminalDisconnectContract(
@@ -29,6 +30,11 @@ class TerminalDisconnectContract(
             resultCode,
             intent,
             TerminalOperationStatus.Login::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+            )
+        }
     }
 }

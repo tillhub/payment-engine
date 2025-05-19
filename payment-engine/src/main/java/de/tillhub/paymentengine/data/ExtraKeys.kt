@@ -6,4 +6,5 @@ object ExtraKeys {
     const val EXTRA_CURRENCY = "de.tillhub.paymentengine.Currency"
     const val EXTRA_RECEIPT_NO = "de.tillhub.paymentengine.ReceiptNumber"
     const val EXTRAS_RESULT = "de.tillhub.paymentengine.Result"
+    const val EXTRAS_PROTOCOL = "de.tillhub.paymentengine.Protocol"
 }

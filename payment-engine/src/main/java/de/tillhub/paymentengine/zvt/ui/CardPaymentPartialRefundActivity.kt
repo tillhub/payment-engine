@@ -12,6 +12,7 @@ import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentPartialRefundBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import java.math.BigDecimal
@@ -70,7 +71,13 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
     override fun finishWithError(state: CardTerminalViewModel.State.Error) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.refund) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.ZVT.TYPE
+                )
+                putExtra(ExtraKeys.EXTRAS_RESULT, state.refund)
+            }
         )
         finish()
     }
@@ -78,7 +85,13 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
     override fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.refund) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.ZVT.TYPE
+                )
+                putExtra(ExtraKeys.EXTRAS_RESULT, state.refund)
+            }
         )
         finish()
     }

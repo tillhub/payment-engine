@@ -9,6 +9,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExtraKeys
 
 class PaymentRecoveryContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
@@ -29,5 +30,10 @@ class PaymentRecoveryContract(
             resultCode,
             intent,
             TerminalOperationStatus.Recovery::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+            )
+        }
 }

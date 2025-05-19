@@ -38,5 +38,10 @@ class TerminalReconciliationContract(
             resultCode,
             intent,
             TerminalOperationStatus.Reconciliation::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+            )
+        }
 }
