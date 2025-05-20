@@ -75,8 +75,9 @@ internal class ConnectionManagerImpl(
             disconnectContract.launch(config)
         } catch (_: UnsupportedOperationException) {
             terminalState.tryEmit(
-                TerminalOperationStatus.TicketReprint.Error(
+                TerminalOperationStatus.Login.Error(
                     date = Instant.now(),
+                    rawData = "",
                     resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
                 )
             )
