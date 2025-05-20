@@ -110,4 +110,106 @@ class SPOSRequestBuilderTest : FunSpec({
         result.shouldBeInstanceOf<IllegalArgumentException>()
         result.message shouldBe "TerminalActivity: Extras is null"
     }
+
+    test("buildReversalRequest should throw an exception if argument config is missing") {
+        val intent = Intent().apply {
+            putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
+            putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
+            putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
+            putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
+            putExtra(ExtraKeys.EXTRA_RECEIPT_NO, "receipt_no")
+        }
+
+        val result = shouldThrow<IllegalArgumentException> {
+            SPOSRequestBuilder.buildReversalRequest(intent)
+        }
+
+        result.shouldBeInstanceOf<IllegalArgumentException>()
+        result.message shouldBe "TerminalActivity: Argument config is missing"
+    }
+
+    test("buildReversalRequest should throw an exception if argument tx id is missing") {
+        val intent = Intent().apply {
+            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
+            putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
+            putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
+            putExtra(ExtraKeys.EXTRA_RECEIPT_NO, "receipt_no")
+        }
+
+        val result = shouldThrow<IllegalArgumentException> {
+            SPOSRequestBuilder.buildReversalRequest(intent)
+        }
+
+        result.shouldBeInstanceOf<IllegalArgumentException>()
+        result.message shouldBe "TerminalActivity: Argument TxId is missing"
+    }
+
+    test("buildReversalRequest should throw an exception if argument amount is missing") {
+        val intent = Intent().apply {
+            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
+            putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
+            putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
+            putExtra(ExtraKeys.EXTRA_RECEIPT_NO, "receipt_no")
+        }
+
+        val result = shouldThrow<IllegalArgumentException> {
+            SPOSRequestBuilder.buildReversalRequest(intent)
+        }
+
+        result.shouldBeInstanceOf<IllegalArgumentException>()
+        result.message shouldBe "TerminalActivity: Argument amount is missing"
+    }
+
+    test("buildReversalRequest should throw an exception if argument tip is missing") {
+        val intent = Intent().apply {
+            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
+            putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
+            putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
+            putExtra(ExtraKeys.EXTRA_RECEIPT_NO, "receipt_no")
+        }
+
+        val result = shouldThrow<IllegalArgumentException> {
+            SPOSRequestBuilder.buildReversalRequest(intent)
+        }
+
+        result.shouldBeInstanceOf<IllegalArgumentException>()
+        result.message shouldBe "TerminalActivity: Argument tip is missing"
+    }
+
+    test("buildReversalRequest should throw an exception if argument currency is missing") {
+        val intent = Intent().apply {
+            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
+            putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
+            putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
+            putExtra(ExtraKeys.EXTRA_RECEIPT_NO, "receipt_no")
+        }
+
+        val result = shouldThrow<IllegalArgumentException> {
+            SPOSRequestBuilder.buildReversalRequest(intent)
+        }
+
+        result.shouldBeInstanceOf<IllegalArgumentException>()
+        result.message shouldBe "TerminalActivity: Argument currency is missing"
+    }
+
+    test("buildReversalRequest should throw an exception if argument receipt no is missing") {
+        val intent = Intent().apply {
+            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
+            putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
+            putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
+            putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
+        }
+
+        val result = shouldThrow<IllegalArgumentException> {
+            SPOSRequestBuilder.buildReversalRequest(intent)
+        }
+
+        result.shouldBeInstanceOf<IllegalArgumentException>()
+        result.message shouldBe "TerminalActivity: Argument ReceiptNo is missing"
+    }
 })
