@@ -34,6 +34,7 @@ internal object AnalyticsMessageFactory {
     fun createTicketReprintOperation(input: Terminal) = "Operation: REPRINT_TICKET\n$input"
 
     fun createResultOk(extras: Bundle?) = "$RESPONSE_RESULT_OK\n${extras?.toRawData()}"
+    fun createResultCanceled(extras: Bundle?) = "$RESPONSE_RESULT_CANCELED\n${extras?.toRawData()}"
 
     private fun Bundle.toRawData(): String {
         val builder = StringBuilder()
@@ -47,5 +48,6 @@ internal object AnalyticsMessageFactory {
         return builder.toString()
     }
 
-    const val RESPONSE_RESULT_OK = "RESPONSE: RESULT OK"
+    private const val RESPONSE_RESULT_OK = "RESPONSE: RESULT OK"
+    private const val RESPONSE_RESULT_CANCELED = "RESPONSE: RESULT CANCELED"
 }

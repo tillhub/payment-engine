@@ -12,6 +12,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -42,6 +43,42 @@ class PaymentContractTest : FunSpec({
         }
 
         target = PaymentResultContract(analytics)
+    }
+
+    test("createIntent External") {
+        val result = target.createIntent(
+            context,
+            PaymentRequest(
+                TestExternalTerminal("external"),
+                "UUID",
+                500.toBigDecimal(),
+                100.toBigDecimal(),
+                ISOAlphaCurrency("EUR")
+            )
+        )
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "PAYMENT"
+
+        verify {
+            analytics.logOperation(
+                "Operation: CARD_PAYMENT(" +
+                        "amount: 500, " +
+                        "tip: 100, " +
+                        "currency: ISOAlphaCurrency(value=EUR))" +
+                        "\nTerminal.External(" +
+                        "id=external, " +
+                        "saleConfig=CardSaleConfig(" +
+                        "applicationName=Tillhub GO, " +
+                        "operatorId=ah, " +
+                        "saleId=registerProvider, " +
+                        "pin=333333, " +
+                        "poiId=66000001, " +
+                        "poiSerialNumber=" +
+                        ")" +
+                        ")"
+            )
+        }
     }
 
     test("createIntent OPI") {
@@ -154,7 +191,7 @@ class PaymentContractTest : FunSpec({
         }
     }
 
-    test("parseResult OPI + ZVT: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
@@ -173,14 +210,22 @@ class PaymentContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Success>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 
-    test("parseResult OPI + ZVT: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 }) {
     companion object {

@@ -23,7 +23,7 @@ import de.tillhub.paymentengine.spos.contracts.SPOSTerminalDisconnectContract
 import de.tillhub.paymentengine.spos.contracts.SPOSTerminalReconciliationContract
 import de.tillhub.paymentengine.spos.contracts.SPOSTicketReprintContract
 import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
-import de.tillhub.paymentengine.spos.data.SPOSRequestBuilder
+import de.tillhub.paymentengine.spos.SPOSRequestBuilder
 import de.tillhub.paymentengine.spos.data.SPOSTerminal
 import de.tillhub.paymentengine.spos.databinding.ActivityTerminalBinding
 import kotlin.reflect.KClass

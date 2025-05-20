@@ -10,6 +10,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -18,6 +19,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.spyk
+import io.mockk.verify
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
@@ -38,6 +40,17 @@ class TerminalConnectContractTest : FunSpec({
         }
 
         target = TerminalConnectContract(analytics)
+    }
+
+    test("createIntent External") {
+        val result = target.createIntent(context, TestExternalTerminal("external"))
+
+        verify {
+            analytics.logOperation(any())
+        }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "CONNECT"
     }
 
     test("createIntent OPI") {
@@ -70,7 +83,7 @@ class TerminalConnectContractTest : FunSpec({
         ) shouldBe ZVT
     }
 
-    test("parseResult OPI + ZVT: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
@@ -86,14 +99,22 @@ class TerminalConnectContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 
-    test("parseResult OPI + ZVT: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 }) {
     companion object {

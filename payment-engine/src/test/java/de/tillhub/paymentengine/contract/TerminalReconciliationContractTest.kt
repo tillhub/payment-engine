@@ -11,6 +11,7 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -39,6 +40,17 @@ class TerminalReconciliationContractTest : FunSpec({
         }
 
         target = TerminalReconciliationContract(analytics)
+    }
+
+    test("createIntent External") {
+        val result = target.createIntent(context, TestExternalTerminal("external"))
+
+        verify {
+            analytics.logOperation(any())
+        }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "RECONCILIATION"
     }
 
     test("createIntent OPI") {
@@ -113,7 +125,7 @@ class TerminalReconciliationContractTest : FunSpec({
         }
     }
 
-    test("parseResult OPI + ZVT: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
@@ -132,14 +144,22 @@ class TerminalReconciliationContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Success>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 
-    test("parseResult OPI + ZVT: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 }) {
     companion object {

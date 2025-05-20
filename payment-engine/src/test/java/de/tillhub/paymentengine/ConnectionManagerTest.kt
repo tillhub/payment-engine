@@ -4,11 +4,13 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.mockk
@@ -16,6 +18,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 
 @ExperimentalCoroutinesApi
 class ConnectionManagerTest : FunSpec({
@@ -120,5 +123,22 @@ class ConnectionManagerTest : FunSpec({
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
+    }
+
+    test("startSPOSDisconnect by OPI terminal should throw error") {
+        every { disconnectContract.launch(any()) } answers {
+            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
+        }
+
+        target.startSPOSDisconnect(Terminal.OPI())
+
+        val result = terminalState.first()
+
+        verify {
+            disconnectContract.launch(Terminal.OPI())
+        }
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
+        result.resultCode shouldBe ResultCodeSets.ACTION_NOT_SUPPORTED
     }
 })

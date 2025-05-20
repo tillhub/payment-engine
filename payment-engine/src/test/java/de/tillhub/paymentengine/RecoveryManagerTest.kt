@@ -3,15 +3,18 @@ package de.tillhub.paymentengine
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.PaymentRecoveryContract
+import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 
 class RecoveryManagerTest : FunSpec({
 
@@ -40,7 +43,7 @@ class RecoveryManagerTest : FunSpec({
         )
     }
 
-    test("startSPOSRecovery by default terminal") {
+    test("startRecovery by default terminal") {
         target.startRecovery()
 
         verify {
@@ -50,7 +53,7 @@ class RecoveryManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
-    test("startSPOSRecovery by config name") {
+    test("startRecovery by config name") {
         configs["external_terminal2"] = TestExternalTerminal("external_terminal2")
         target.startRecovery("external_terminal2")
 
@@ -61,7 +64,7 @@ class RecoveryManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
-    test("startSPOSRecovery by terminal") {
+    test("startRecovery by terminal") {
         target.startRecovery(TestExternalTerminal("external_terminal"))
 
         verify {
@@ -69,5 +72,22 @@ class RecoveryManagerTest : FunSpec({
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
+    }
+
+    test("startTicketReprint by OPI terminal should throw error") {
+        every { recoveryContract.launch(any()) } answers {
+            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
+        }
+
+        target.startRecovery(Terminal.OPI())
+
+        val result = terminalState.first()
+
+        verify {
+            recoveryContract.launch(Terminal.OPI())
+        }
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Error>()
+        result.response.resultCode shouldBe ResultCodeSets.ACTION_NOT_SUPPORTED
     }
 })

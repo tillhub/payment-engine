@@ -1,10 +1,15 @@
 package de.tillhub.paymentengine.contract
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -36,6 +41,17 @@ class TerminalDisconnectContractTest : FunSpec({
         target = TerminalDisconnectContract(analytics)
     }
 
+    test("createIntent External") {
+        val result = target.createIntent(context, TestExternalTerminal("external"))
+
+        verify {
+            analytics.logOperation(any())
+        }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "DISCONNECT"
+    }
+
     test("createIntent OPI + ZVT") {
         try {
             target.createIntent(
@@ -48,6 +64,37 @@ class TerminalDisconnectContractTest : FunSpec({
         }
         verify(inverse = true) {
             analytics.logOperation(any())
+        }
+    }
+
+    test("parseResult: result OK") {
+        val intent = Intent().apply {
+            putExtra(
+                ExtraKeys.EXTRAS_RESULT,
+                TerminalOperationStatus.Login.Disconnected(
+                    date = mockk(),
+                )
+            )
+        }
+
+        val result = target.parseResult(Activity.RESULT_OK, intent)
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Disconnected>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
+    }
+
+    test("parseResult: result CANCELED") {
+        val intent = Intent()
+
+        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
         }
     }
 }) {

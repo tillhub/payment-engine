@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.contract
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
@@ -33,7 +34,11 @@ class TerminalDisconnectContract(
         ).also {
             analytics?.logCommunication(
                 protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
-                message = AnalyticsMessageFactory.createResultOk(intent?.extras)
+                message = if (resultCode == Activity.RESULT_OK) {
+                    AnalyticsMessageFactory.createResultOk(intent?.extras)
+                } else {
+                    AnalyticsMessageFactory.createResultCanceled(intent?.extras)
+                }
             )
         }
     }

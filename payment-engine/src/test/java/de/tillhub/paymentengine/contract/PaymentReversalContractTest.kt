@@ -12,6 +12,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -40,6 +41,27 @@ class PaymentReversalContractTest : FunSpec({
         }
 
         target = PaymentReversalContract(analytics)
+    }
+
+    test("createIntent External") {
+        val result = target.createIntent(
+            context,
+            ReversalRequest(
+                TestExternalTerminal("external"),
+                "UUID",
+                500.toBigDecimal(),
+                100.toBigDecimal(),
+                ISOAlphaCurrency("EUR"),
+                "receiptNo"
+            )
+        )
+
+        verify {
+            analytics.logOperation(any())
+        }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "REVERSAL"
     }
 
     test("createIntent OPI") {
@@ -132,7 +154,7 @@ class PaymentReversalContractTest : FunSpec({
         }
     }
 
-    test("parseResult OPI + ZVT: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
@@ -151,14 +173,22 @@ class PaymentReversalContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Reversal.Success>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 
-    test("parseResult OPI + ZVT: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Reversal.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 }) {
     companion object {

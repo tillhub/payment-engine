@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.spos.data
+package de.tillhub.paymentengine.spos
 
 import android.content.Intent
 import androidx.core.os.BundleCompat
@@ -7,6 +7,8 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
+import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
+import de.tillhub.paymentengine.spos.data.SPOSTerminal
 import java.math.BigDecimal
 
 internal object SPOSRequestBuilder {
