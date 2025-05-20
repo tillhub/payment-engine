@@ -32,29 +32,37 @@ internal class TerminalActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityTerminalBinding.inflate(layoutInflater) }
 
-    private val paymentContract: ActivityResultLauncher<PaymentRequest> =
+    private val paymentContract: ActivityResultLauncher<PaymentRequest> by lazy {
         registerForActivityResult(SPOSPaymentContract(), ::handleResult)
+    }
 
-    private val paymentRecoveryContract: ActivityResultLauncher<Terminal> =
+    private val paymentRecoveryContract: ActivityResultLauncher<Terminal> by lazy {
         registerForActivityResult(SPOSPaymentRecoveryContract(), ::handleResult)
+    }
 
-    private val paymentRefundContract: ActivityResultLauncher<RefundRequest> =
+    private val paymentRefundContract: ActivityResultLauncher<RefundRequest> by lazy {
         registerForActivityResult(SPOSPaymentRefundContract(), ::handleResult)
+    }
 
-    private val paymentReversalContract: ActivityResultLauncher<ReversalRequest> =
+    private val paymentReversalContract: ActivityResultLauncher<ReversalRequest> by lazy {
         registerForActivityResult(SPOSPaymentReversalContract(), ::handleResult)
+    }
 
-    private val connectContract: ActivityResultLauncher<SPOSTerminal> =
+    private val connectContract: ActivityResultLauncher<SPOSTerminal> by lazy {
         registerForActivityResult(SPOSTerminalConnectContract(), ::handleResult)
+    }
 
-    private val disconnectContract: ActivityResultLauncher<SPOSTerminal> =
+    private val disconnectContract: ActivityResultLauncher<SPOSTerminal> by lazy {
         registerForActivityResult(SPOSTerminalDisconnectContract(), ::handleResult)
+    }
 
-    private val reprintContract: ActivityResultLauncher<Terminal> =
+    private val reprintContract: ActivityResultLauncher<Terminal> by lazy {
         registerForActivityResult(SPOSTicketReprintContract(), ::handleResult)
+    }
 
-    private val reconciliationContract: ActivityResultLauncher<Terminal> =
+    private val reconciliationContract: ActivityResultLauncher<Terminal> by lazy {
         registerForActivityResult(SPOSTerminalReconciliationContract(), ::handleResult)
+    }
 
     private val action: String by lazy {
         intent.getStringExtra(SPOSExtraKeys.EXTRA_ACTION)
