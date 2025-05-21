@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.contract
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
@@ -11,8 +12,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -33,8 +33,6 @@ class PaymentReversalContract(
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
             }
 
-            is Terminal.SPOS -> SPOSIntentFactory.createPaymentReversalIntent(input)
-
             is Terminal.External -> input.config.reversalIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
@@ -45,9 +43,17 @@ class PaymentReversalContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Reversal::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = if (resultCode == Activity.RESULT_OK) {
+                    AnalyticsMessageFactory.createResultOk(intent?.extras)
+                } else {
+                    AnalyticsMessageFactory.createResultCanceled(intent?.extras)
+                }
+            )
+        }
 }
 
 /***

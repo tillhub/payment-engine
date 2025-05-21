@@ -8,6 +8,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
@@ -72,6 +73,10 @@ internal class OPIPaymentActivity : OPITerminalActivity() {
             Activity.RESULT_OK,
             Intent().apply {
                 putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.OPI.TYPE
+                )
+                putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Payment.Success(state.data)
                 )
@@ -84,6 +89,10 @@ internal class OPIPaymentActivity : OPITerminalActivity() {
         setResult(
             Activity.RESULT_OK,
             Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.OPI.TYPE
+                )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Payment.Error(state.data)

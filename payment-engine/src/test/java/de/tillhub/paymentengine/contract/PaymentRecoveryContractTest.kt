@@ -6,9 +6,11 @@ import android.content.Intent
 import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.data.SPOSKey
+import de.tillhub.paymentengine.data.TerminalOperationSuccess
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -41,35 +43,16 @@ class PaymentRecoveryContractTest : FunSpec({
         target = PaymentRecoveryContract(analytics)
     }
 
-//    test("createIntent SPOS") {
-//        val result = target.createIntent(
-//            context,
-//            Terminal.SPOS(
-//                id = "s-pos",
-//            )
-//        )
-//
-//        result.action shouldBe "de.spayment.akzeptanz.REPEAT_LAST_MESSAGE"
-//
-//        verify {
-//            analytics.logOperation(
-//                "Operation: TERMINAL_RECOVERY" +
-//                        "\nTerminal.SPOS(" +
-//                        "id=s-pos, " +
-//                        "appId=TESTCLIENT, " +
-//                        "saleConfig=CardSaleConfig(" +
-//                        "applicationName=Tillhub GO, " +
-//                        "operatorId=ah, " +
-//                        "saleId=registerProvider, " +
-//                        "pin=333333, " +
-//                        "poiId=66000001, " +
-//                        "poiSerialNumber=" +
-//                        "), " +
-//                        "currencyCode=EUR" +
-//                        ")"
-//            )
-//        }
-//    }
+    test("createIntent External") {
+        val result = target.createIntent(context, TestExternalTerminal("external"))
+
+        verify {
+            analytics.logOperation(any())
+        }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "RECOVERY"
+    }
 
     test("createIntent OPI") {
         val result = shouldThrow<UnsupportedOperationException> {
@@ -95,18 +78,40 @@ class PaymentRecoveryContractTest : FunSpec({
         result.message shouldBe "Payment recovery is not supported by this terminal"
     }
 
-    test("parseResult SPOS: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
-            putExtra(SPOSKey.ResultExtra.RESULT_STATE, "Success")
-            putExtra(SPOSKey.ResultExtra.TRANSACTION_RESULT, "ACCEPTED")
-            putExtra(SPOSKey.ResultExtra.TERMINAL_ID, "terminal_id")
-            putExtra(SPOSKey.ResultExtra.TRANSACTION_DATA, "transaction_data")
-            putExtra(SPOSKey.ResultExtra.CARD_CIRCUIT, "card_circuit")
-            putExtra(SPOSKey.ResultExtra.CARD_PAN, "card_pan")
+            putExtra(
+                ExtraKeys.EXTRAS_RESULT,
+                TerminalOperationStatus.Recovery.Success(
+                    TerminalOperationSuccess(
+                        date = mockk(),
+                        customerReceipt = "customerReceipt",
+                        merchantReceipt = "merchantReceipt",
+                        rawData = "rawData",
+                        data = null
+                    )
+                )
+            )
         }
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Success>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
+    }
+
+    test("parseResult: result CANCELED") {
+        val intent = Intent()
+
+        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
+
+        result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 })

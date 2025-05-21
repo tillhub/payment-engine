@@ -13,7 +13,7 @@ android {
     compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
-        minSdk = Configs.MIN_SDK
+        minSdk = Configs.MIN_SDK_SOFTPAY
     }
 
     buildTypes {
@@ -46,12 +46,6 @@ android {
     tasks.withType<Test> {
         useJUnitPlatform()
     }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
 }
 
 detekt {
@@ -80,20 +74,20 @@ dependencies {
     testImplementation(libs.bundles.robolectric)
 
     // Softpay
-    //debugImplementation(libs.softpay.sdk.sandbox)
+    debugImplementation(libs.softpay.sdk.sandbox)
     releaseImplementation(libs.softpay.sdk)
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("payment-engine-softpay") {
-                groupId = "de.tillhub.paymentengine.softpay"
-                artifactId = "payment-engine:softpay"
-                version = "3.4.1"
-
-                from(components.getByName("release"))
-            }
-        }
-    }
-}
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            create<MavenPublication>("payment-engine-softpay") {
+//                groupId = "de.tillhub.paymentengine.softpay"
+//                artifactId = "payment-engine:softpay"
+//                version = "3.4.1"
+//
+//                from(components.getByName("release"))
+//            }
+//        }
+//    }
+//}

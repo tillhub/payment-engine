@@ -1,12 +1,12 @@
 package de.tillhub.paymentengine
 
-import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.PaymentRecoveryContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -26,7 +26,7 @@ class RecoveryManagerTest : FunSpec({
     lateinit var target: RecoveryManager
 
     beforeTest {
-        configs = mutableMapOf("spos" to Terminal.SPOS(id = "spos"))
+        configs = mutableMapOf("external_terminal" to TestExternalTerminal("external_terminal"))
         terminalState = MutableStateFlow(TerminalOperationStatus.Waiting)
         resultCaller = mockk(relaxed = true)
         recoveryContract = mockk(relaxed = true)
@@ -43,47 +43,51 @@ class RecoveryManagerTest : FunSpec({
         )
     }
 
-    test("startSPOSRecovery by default terminal") {
+    test("startRecovery by default terminal") {
         target.startRecovery()
 
         verify {
-            recoveryContract.launch(Terminal.SPOS(id = "spos"))
+            recoveryContract.launch(TestExternalTerminal("external_terminal"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
-    test("startSPOSRecovery by config name") {
-        configs["spos2"] = Terminal.SPOS(id = "spos2")
-        target.startRecovery("spos2")
+    test("startRecovery by config name") {
+        configs["external_terminal2"] = TestExternalTerminal("external_terminal2")
+        target.startRecovery("external_terminal2")
 
         verify {
-            recoveryContract.launch(Terminal.SPOS(id = "spos2"))
+            recoveryContract.launch(TestExternalTerminal("external_terminal2"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
-    test("startSPOSRecovery by terminal") {
-        target.startRecovery(Terminal.SPOS())
+    test("startRecovery by terminal") {
+        target.startRecovery(TestExternalTerminal("external_terminal"))
 
         verify {
-            recoveryContract.launch(Terminal.SPOS())
+            recoveryContract.launch(TestExternalTerminal("external_terminal"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
-    test("contract failing to launch recovery request due to no activity") {
+    test("startTicketReprint by OPI terminal should throw error") {
         every { recoveryContract.launch(any()) } answers {
-            throw ActivityNotFoundException("Spos not installed")
+            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        target.startRecovery(Terminal.SPOS())
+        target.startRecovery(Terminal.OPI())
 
         val result = terminalState.first()
 
+        verify {
+            recoveryContract.launch(Terminal.OPI())
+        }
+
         result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Error>()
-        result.response.resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+        result.response.resultCode shouldBe ResultCodeSets.ACTION_NOT_SUPPORTED
     }
 })

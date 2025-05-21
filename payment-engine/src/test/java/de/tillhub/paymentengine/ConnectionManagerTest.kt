@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine
 
-import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract
@@ -8,6 +7,7 @@ import de.tillhub.paymentengine.contract.TerminalDisconnectContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -18,6 +18,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 
 @ExperimentalCoroutinesApi
 class ConnectionManagerTest : FunSpec({
@@ -53,7 +54,7 @@ class ConnectionManagerTest : FunSpec({
         )
     }
 
-    test("startSPOSConnect by default terminal ") {
+    test("startConnect by default terminal ") {
         target.startConnect()
 
         verify(ordering = Ordering.ORDERED) {
@@ -64,7 +65,7 @@ class ConnectionManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
-    test("startSPOSConnect by config name") {
+    test("startConnect by config name") {
         val terminal = Terminal.OPI()
         configs["opi"] = terminal
         target.startConnect("opi")
@@ -77,8 +78,8 @@ class ConnectionManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
-    test("startSPOSConnect by terminal") {
-        val terminal = Terminal.SPOS()
+    test("startConnect by terminal") {
+        val terminal = TestExternalTerminal("external_terminal")
         target.startConnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
@@ -113,7 +114,7 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startSPOSDisconnect by terminal") {
-        val terminal = Terminal.SPOS()
+        val terminal = TestExternalTerminal("external_terminal")
         target.startSPOSDisconnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
@@ -124,37 +125,20 @@ class ConnectionManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
-    test("contract failing to launch disconnect request due to no activity") {
+    test("startSPOSDisconnect by OPI terminal should throw error") {
         every { disconnectContract.launch(any()) } answers {
-            throw ActivityNotFoundException()
+            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        val terminal = Terminal.SPOS()
-        target.startSPOSDisconnect(terminal)
+        target.startSPOSDisconnect(Terminal.OPI())
 
-        verify(ordering = Ordering.ORDERED) {
-            disconnectContract.launch(terminal)
+        val result = terminalState.first()
+
+        verify {
+            disconnectContract.launch(Terminal.OPI())
         }
 
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
-        (terminalState.value as TerminalOperationStatus.Login.Error)
-            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
-    }
-
-    test("contract failing to launch connect request due to no activity") {
-        every { connectContract.launch(any()) } answers {
-            throw ActivityNotFoundException()
-        }
-
-        val terminal = Terminal.SPOS()
-        target.startConnect(terminal)
-
-        verify(ordering = Ordering.ORDERED) {
-            connectContract.launch(terminal)
-        }
-
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
-        (terminalState.value as TerminalOperationStatus.Login.Error)
-            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
+        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
+        result.resultCode shouldBe ResultCodeSets.ACTION_NOT_SUPPORTED
     }
 })

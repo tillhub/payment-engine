@@ -1,20 +1,16 @@
 package de.tillhub.paymentengine
 
-import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.PaymentResultContract
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
-import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import java.math.BigDecimal
-import java.time.Instant
 
 /**
  * This is called to start of a card payment transaction,
@@ -89,19 +85,8 @@ internal class PaymentManagerImpl(
         config: Terminal
     ) {
         terminalState.tryEmit(TerminalOperationStatus.Payment.Pending(amount, currency))
-        try {
-            paymentResultContract.launch(
-                PaymentRequest(config, transactionId, amount, tip, currency)
-            )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Payment.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
-                    )
-                )
-            )
-        }
+        paymentResultContract.launch(
+            PaymentRequest(config, transactionId, amount, tip, currency)
+        )
     }
 }

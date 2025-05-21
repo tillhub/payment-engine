@@ -7,6 +7,12 @@ jobs:
     basic-tests:
         name: Run code analysis and unit tests
         runs-on: ubuntu-latest
+        env:
+          SOFTPAY_NEXUS_USERNAME: ${{ secrets.SOFTPAY_NEXUS_USERNAME }}
+          SOFTPAY_NEXUS_PASSWORD: ${{ secrets.SOFTPAY_NEXUS_PASSWORD }}
+          SOFTPAY_INTEGRATOR_ID: ${{ secrets.SOFTPAY_INTEGRATOR_ID }}
+          SOFTPAY_SANDBOX_ACCESS_ID: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_ID }}
+          SOFTPAY_SANDBOX_ACCESS_SECRET: ${{ secrets.SOFTPAY_SANDBOX_ACCESS_SECRET }}
 
         steps:
             - name: Checking out branch

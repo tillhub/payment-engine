@@ -10,7 +10,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.data.SPOSKey
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -42,34 +42,15 @@ class TerminalConnectContractTest : FunSpec({
         target = TerminalConnectContract(analytics)
     }
 
-    test("createIntent SPOS") {
-        val result = target.createIntent(
-            context,
-            SPOS
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.action shouldBe "de.spayment.akzeptanz.S_SWITCH_CONNECT"
-        result.extras?.getString(SPOSKey.Extra.APP_ID) shouldBe "TESTCLIENT"
+    test("createIntent External") {
+        val result = target.createIntent(context, TestExternalTerminal("external"))
 
         verify {
-            analytics.logOperation(
-                "Operation: TERMINAL_CONNECT" +
-                        "\nTerminal.SPOS(" +
-                        "id=s-pos, " +
-                        "appId=TESTCLIENT, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "currencyCode=EUR" +
-                        ")"
-            )
+            analytics.logOperation(any())
         }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "CONNECT"
     }
 
     test("createIntent OPI") {
@@ -84,7 +65,7 @@ class TerminalConnectContractTest : FunSpec({
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
             Terminal.OPI::class.java
-        ) shouldBe PaymentResultContractTest.OPI
+        ) shouldBe PaymentContractTest.OPI
     }
 
     test("createIntent ZVT") {
@@ -102,40 +83,7 @@ class TerminalConnectContractTest : FunSpec({
         ) shouldBe ZVT
     }
 
-    test("parseResult SPOS: result OK") {
-        val intent = Intent()
-
-        val result = target.parseResult(Activity.RESULT_OK, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
-
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT OK"
-            )
-        }
-    }
-
-    test("parseResult SPOS: result CANCELED") {
-        val intent = Intent().apply {
-            putExtra(SPOSKey.ResultExtra.ERROR, "CARD_PAYMENT_NOT_ONBOARDED")
-        }
-
-        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
-
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT CANCELED\nExtras {\n" +
-                        "ERROR = CARD_PAYMENT_NOT_ONBOARDED\n}"
-            )
-        }
-    }
-
-    test("parseResult OPI + ZVT: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
@@ -151,14 +99,22 @@ class TerminalConnectContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Connected>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 
-    test("parseResult OPI + ZVT: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 }) {
     companion object {
@@ -172,9 +128,6 @@ class TerminalConnectContractTest : FunSpec({
             id = "zvt",
             ipAddress = "127.0.0.1",
             port = 20007,
-        )
-        val SPOS = Terminal.SPOS(
-            id = "s-pos",
         )
     }
 }

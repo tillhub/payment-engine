@@ -8,8 +8,9 @@ import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.helper.ResponseHandler
 
 class TerminalDisconnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
@@ -26,22 +27,19 @@ class TerminalDisconnectContract(
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return SPOSResponseHandler.handleTerminalDisconnectResponse(resultCode).also {
-            if (resultCode == Activity.RESULT_OK) {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
-                )
-            } else {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_CANCELED
-                )
-            }
+        return ResponseHandler.parseResult(
+            resultCode,
+            intent,
+            TerminalOperationStatus.Login::class
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = if (resultCode == Activity.RESULT_OK) {
+                    AnalyticsMessageFactory.createResultOk(intent?.extras)
+                } else {
+                    AnalyticsMessageFactory.createResultCanceled(intent?.extras)
+                }
+            )
         }
-    }
-
-    companion object {
-        private const val SPOS_PROTOCOL = "SPOS"
     }
 }
