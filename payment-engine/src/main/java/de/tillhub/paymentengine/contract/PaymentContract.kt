@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.contract
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
@@ -11,8 +12,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPaymentActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.CardPaymentActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -33,7 +33,8 @@ class PaymentResultContract(
                 putExtra(ExtraKeys.EXTRA_AMOUNT, input.amount + input.tip)
                 putExtra(ExtraKeys.EXTRA_CURRENCY, input.currency)
             }
-            is Terminal.SPOS -> SPOSIntentFactory.createPaymentIntent(input)
+
+            is Terminal.External -> input.config.paymentIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createPaymentOperation(input))
         }
@@ -43,9 +44,17 @@ class PaymentResultContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Payment::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = if (resultCode == Activity.RESULT_OK) {
+                    AnalyticsMessageFactory.createResultOk(intent?.extras)
+                } else {
+                    AnalyticsMessageFactory.createResultCanceled(intent?.extras)
+                }
+            )
+        }
 }
 
 /***

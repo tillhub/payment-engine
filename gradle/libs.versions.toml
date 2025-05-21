@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.2"
+agp = "8.10.0"
 kotlin = "1.9.0"
 core-ktx = "1.12.0"
 appcompat = "1.7.0"
@@ -30,6 +30,9 @@ activity-compose = "1.8.2"
 compose-bom = "2024.02.02"
 
 retrofit-simplexml = "2.10.0"
+
+softpay = "2.1.03"
+softpay-sandbox = "sandbox-2.1.03"
 
 [libraries]
 # Define the libraries
@@ -69,6 +72,12 @@ simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref =
 
 # OPI
 retrofit-simplexml = { group = "com.squareup.retrofit2", name = "converter-simplexml", version.ref = "retrofit-simplexml" }
+
+# Softpay
+#noinspection SimilarGradleDependency
+softpay-sdk = { group = "io.softpay", name = "softpay-sdk", version.ref = "softpay" }
+#noinspection SimilarGradleDependency
+softpay-sdk-sandbox = { group = "io.softpay", name = "softpay-sdk", version.ref = "softpay-sandbox" }
 
 # Unit testing
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }

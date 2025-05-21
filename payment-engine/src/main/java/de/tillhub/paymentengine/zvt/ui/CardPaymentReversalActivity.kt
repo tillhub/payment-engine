@@ -9,6 +9,7 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentReversalBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
@@ -64,7 +65,13 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
     override fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.reversal) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.ZVT.TYPE
+                )
+                putExtra(ExtraKeys.EXTRAS_RESULT, state.reversal)
+            }
         )
         finish()
     }
@@ -72,7 +79,14 @@ internal class CardPaymentReversalActivity : CardTerminalActivity() {
     override fun finishWithError(state: CardTerminalViewModel.State.Error) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.reversal) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.ZVT.TYPE
+                )
+
+                putExtra(ExtraKeys.EXTRAS_RESULT, state.reversal)
+            }
         )
         finish()
     }

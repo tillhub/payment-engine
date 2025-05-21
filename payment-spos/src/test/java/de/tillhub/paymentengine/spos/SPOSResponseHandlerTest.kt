@@ -3,7 +3,6 @@ package de.tillhub.paymentengine.spos
 import android.app.Activity
 import android.content.Intent
 import de.tillhub.paymentengine.R
-import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.spos.data.ReceiptDto
@@ -14,16 +13,13 @@ import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 
 class SPOSResponseHandlerTest : DescribeSpec({
 
     lateinit var intent: Intent
     lateinit var receiptDto: ReceiptDto
-    lateinit var analytics: PaymentAnalytics
     lateinit var receiptConverter: StringToReceiptDtoConverter
 
     beforeTest {
@@ -33,11 +29,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
         intent = mockk {
             every { extras } returns null
-        }
-
-        analytics = mockk {
-            every { logOperation(any()) } just Runs
-            every { logCommunication(any(), any()) } just Runs
         }
 
         receiptConverter = mockk {
@@ -106,7 +97,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_CANCELED,
                 intent,
-                analytics,
                 TerminalOperationStatus.Payment::class
             )
 
@@ -129,7 +119,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_CANCELED,
                     intent,
-                    analytics,
                     TerminalOperationStatus.Payment::class
                 )
 
@@ -148,7 +137,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
                     intent,
-                    analytics,
                     TerminalOperationStatus.Payment::class
                 )
 
@@ -209,7 +197,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
                 val result = SPOSResponseHandler.handleTransactionResult(
                     Activity.RESULT_OK,
                     intent,
-                    analytics,
                     TerminalOperationStatus.Payment::class,
                     receiptConverter
                 )
@@ -290,7 +277,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_OK,
                 intent,
-                analytics,
                 TerminalOperationStatus.Payment::class,
                 receiptConverter
             )
@@ -369,7 +355,6 @@ class SPOSResponseHandlerTest : DescribeSpec({
             val result = SPOSResponseHandler.handleTransactionResult(
                 Activity.RESULT_OK,
                 intent,
-                analytics,
                 TerminalOperationStatus.Payment::class,
                 receiptConverter
             )

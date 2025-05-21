@@ -3,17 +3,15 @@ package de.tillhub.paymentengine.spos
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import de.tillhub.paymentengine.analytics.PaymentAnalytics
-import de.tillhub.paymentengine.data.ResultCodeSets
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionData
-import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.spos.data.SPOSKey
+import de.tillhub.paymentengine.spos.data.SPOSResultCodes
 import de.tillhub.paymentengine.spos.data.SPOSResultState
 import de.tillhub.paymentengine.spos.data.SPOSTransactionResult
+import de.tillhub.paymentengine.spos.data.SPOSTerminal
 import de.tillhub.paymentengine.spos.data.StringToReceiptDtoConverter
 import java.time.Instant
 import kotlin.reflect.KClass
@@ -21,7 +19,6 @@ import kotlin.reflect.KClass
 @Suppress("TooManyFunctions")
 internal object SPOSResponseHandler {
 
-    private const val SPOS_PROTOCOL = "SPOS"
     private val RECOVERABLE_ERRORS = listOf("TERMINAL_CONNECTION_LOST", "RESPONSE_TIMEOUT")
 
     fun handleTerminalConnectResponse(
@@ -31,8 +28,8 @@ internal object SPOSResponseHandler {
         TerminalOperationStatus.Login.Connected(
             date = Instant.now(),
             rawData = "",
-            terminalType = Terminal.SPOS.TYPE,
-            terminalId = Terminal.SPOS.TYPE,
+            terminalType = SPOSTerminal.TYPE,
+            terminalId = SPOSTerminal.TYPE,
         )
     } else {
         val error = intent?.extras?.getString(SPOSKey.ResultExtra.ERROR)
@@ -42,7 +39,7 @@ internal object SPOSResponseHandler {
             TerminalOperationStatus.Login.Error(
                 date = Instant.now(),
                 rawData = "",
-                resultCode = ResultCodeSets.getSPOSCode(it),
+                resultCode = SPOSResultCodes.getSPOSCode(it),
             )
         } ?: TerminalOperationStatus.Login.Canceled
     }
@@ -82,17 +79,16 @@ internal object SPOSResponseHandler {
                 TerminalOperationStatus.TicketReprint.Error(
                     date = Instant.now(),
                     rawData = intent.extras?.toRawData().orEmpty(),
-                    resultCode = ResultCodeSets.getSPOSCode(error)
+                    resultCode = SPOSResultCodes.getSPOSCode(error)
                 )
             }
         } else {
             TerminalOperationStatus.TicketReprint.Canceled
         }
 
-    fun <T : TerminalOperationStatus>handleTransactionResult(
+    fun <T : TerminalOperationStatus> handleTransactionResult(
         resultCode: Int,
         intent: Intent?,
-        analytics: PaymentAnalytics?,
         kClass: KClass<T>,
         converter: StringToReceiptDtoConverter = StringToReceiptDtoConverter()
     ): TerminalOperationStatus {
@@ -111,52 +107,18 @@ internal object SPOSResponseHandler {
 
         val operationStatus = if (resultCode == Activity.RESULT_OK) {
             if (transactionResult == SPOSTransactionResult.ACCEPTED && resultState.isSuccessful()) {
-                ResponseHandler.wrapSuccess(
-                    createSuccess(intent, customerReceipt, merchantReceipt), kClass
-                )
+                wrapSuccess(createSuccess(intent, customerReceipt, merchantReceipt), kClass)
             } else {
-                ResponseHandler.wrapError(
-                    createError(intent, customerReceipt, merchantReceipt, error), kClass
-                )
+                wrapError(createError(intent, customerReceipt, merchantReceipt, error), kClass)
             }
         } else {
             error?.let {
-                ResponseHandler.wrapError(
-                    createError(intent, customerReceipt, merchantReceipt, error), kClass
-                )
-            } ?: ResponseHandler.getCanceledStatus(kClass)
+                wrapError(createError(intent, customerReceipt, merchantReceipt, error), kClass)
+            } ?: getCanceledStatus(kClass)
         }
 
-        return operationStatus.also {
-            if (ResponseHandler.isSuccess(it)) {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.createResultOk(intent?.extras)
-                )
-            } else {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.createResultCanceled(intent?.extras)
-                )
-            }
-        }
+        return operationStatus
     }
-
-    internal fun Bundle.toRawData(): String {
-        val builder = StringBuilder()
-        builder.appendLine("Extras {")
-
-        keySet().forEach {
-            builder.appendLine("$it = ${getString(it)}")
-        }
-
-        builder.append("}")
-        return builder.toString()
-    }
-
-    fun canResolveTransactionResult(intent: Intent?): Boolean =
-        intent?.extras?.containsKey(SPOSKey.ResultExtra.TRANSACTION_RESULT) == true ||
-                intent?.extras?.containsKey(SPOSKey.ResultExtra.ERROR) == true
 
     private fun createSuccess(intent: Intent?, customerReceipt: String?, merchantReceipt: String?) =
         TerminalOperationSuccess(
@@ -168,20 +130,25 @@ internal object SPOSResponseHandler {
             reprintRequired = customerReceipt.isNullOrEmpty() && merchantReceipt.isNullOrEmpty()
         )
 
-    private fun createError(intent: Intent?, customerReceipt: String?, merchantReceipt: String?, error: String?) =
+    private fun createError(
+        intent: Intent?,
+        customerReceipt: String?,
+        merchantReceipt: String?,
+        error: String?
+    ) =
         TerminalOperationError(
             date = Instant.now(),
             customerReceipt = customerReceipt.orEmpty(),
             merchantReceipt = merchantReceipt.orEmpty(),
             rawData = intent?.extras?.toRawData().orEmpty(),
             data = intent?.extras?.toTransactionData(),
-            resultCode = ResultCodeSets.getSPOSCode(error),
+            resultCode = SPOSResultCodes.getSPOSCode(error),
             isRecoverable = RECOVERABLE_ERRORS.contains(error)
         )
 
     private fun Bundle.toTransactionData(): TransactionData =
         TransactionData(
-            terminalType = Terminal.SPOS.TYPE,
+            terminalType = SPOSTerminal.TYPE,
             terminalId = getString(SPOSKey.ResultExtra.TERMINAL_ID).orEmpty(),
             transactionId = getString(SPOSKey.ResultExtra.TRANSACTION_DATA).orEmpty(),
             cardCircuit = getString(SPOSKey.ResultExtra.CARD_CIRCUIT).orEmpty(),
@@ -194,6 +161,106 @@ internal object SPOSResponseHandler {
             converter.convert(it).toReceiptString()
         }.orEmpty()
 
+    private fun Bundle.toRawData(): String {
+        val builder = StringBuilder()
+        builder.appendLine("Extras {")
+
+        keySet().forEach {
+            builder.appendLine("$it = ${getString(it)}")
+        }
+
+        builder.append("}")
+        return builder.toString()
+    }
+
     private fun SPOSResultState.isSuccessful(): Boolean =
         this == SPOSResultState.SUCCESS || this == SPOSResultState.PRINT_LAST_TICKET
+
+    private fun <T : TerminalOperationStatus> wrapSuccess(
+        success: TerminalOperationSuccess,
+        kClass: KClass<T>
+    ) = when (kClass) {
+        TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Success(success)
+        TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Success(success)
+        TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Success(success)
+        TerminalOperationStatus.Reconciliation::class -> TerminalOperationStatus.Reconciliation.Success(
+            success
+        )
+        TerminalOperationStatus.Recovery::class -> TerminalOperationStatus.Recovery.Success(success)
+        else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
+    }
+
+    private fun <T : TerminalOperationStatus> wrapError(
+        error: TerminalOperationError,
+        kClass: KClass<T>
+    ) = when (kClass) {
+        TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Error(error)
+        TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Error(error)
+        TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Error(error)
+        TerminalOperationStatus.Reconciliation::class -> TerminalOperationStatus.Reconciliation.Error(
+            error
+        )
+        TerminalOperationStatus.Recovery::class -> TerminalOperationStatus.Recovery.Error(error)
+        else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
+    }
+
+    private fun <T : TerminalOperationStatus> getCanceledStatus(kClass: KClass<T>) = when (kClass) {
+        TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Canceled
+        TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Canceled
+        TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Canceled
+        TerminalOperationStatus.Reconciliation::class -> TerminalOperationStatus.Reconciliation.Canceled
+        TerminalOperationStatus.Recovery::class -> TerminalOperationStatus.Recovery.Canceled
+        TerminalOperationStatus.Login::class -> TerminalOperationStatus.Login.Canceled
+        TerminalOperationStatus.TicketReprint::class -> TerminalOperationStatus.TicketReprint.Canceled
+        else -> throw IllegalArgumentException("Unknown status class: ${kClass.java.name}")
+    }
+
+    fun <T : TerminalOperationStatus> KClass<T>.getErrorAppNotFound() = when (this) {
+        TerminalOperationStatus.Payment::class -> TerminalOperationStatus.Payment.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Reversal::class -> TerminalOperationStatus.Reversal.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Refund::class -> TerminalOperationStatus.Refund.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Reconciliation::class -> TerminalOperationStatus.Reconciliation.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Recovery::class -> TerminalOperationStatus.Recovery.Error(
+            TerminalOperationError(
+                date = Instant.now(),
+                rawData = "",
+                resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+            )
+        )
+        TerminalOperationStatus.Login::class -> TerminalOperationStatus.Login.Error(
+            date = Instant.now(),
+            rawData = "",
+            resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+        )
+        TerminalOperationStatus.TicketReprint::class -> TerminalOperationStatus.TicketReprint.Error(
+            date = Instant.now(),
+            rawData = "",
+            resultCode = SPOSResultCodes.APP_NOT_FOUND_ERROR
+        )
+        else -> throw IllegalArgumentException("Unknown status class: ${this.java.name}")
+    }
 }

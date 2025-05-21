@@ -1,15 +1,13 @@
 package de.tillhub.paymentengine
 
-import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalReconciliationContract
-import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -63,28 +61,12 @@ class ReconciliationManagerTest : FunSpec({
     }
 
     test("startReconciliation with custom Terminal should and launch reconciliation contract") {
-        val customTerminal = Terminal.SPOS()
+        val customTerminal = TestExternalTerminal("external_terminal")
 
         target.startReconciliation(customTerminal)
 
         verify { reconciliationContract.launch(customTerminal) }
 
         terminalState.value shouldBe TerminalOperationStatus.Reconciliation.Pending
-    }
-
-    test("contract failing to launch request due to no activity") {
-        every { reconciliationContract.launch(any()) } answers {
-            throw ActivityNotFoundException()
-        }
-
-        val customTerminal = Terminal.SPOS()
-
-        target.startReconciliation(customTerminal)
-
-        verify { reconciliationContract.launch(customTerminal) }
-
-        terminalState.value.shouldBeInstanceOf<TerminalOperationStatus.Reconciliation.Error>()
-        (terminalState.value as TerminalOperationStatus.Reconciliation.Error).response
-            .resultCode shouldBe ResultCodeSets.APP_NOT_FOUND_ERROR
     }
 })

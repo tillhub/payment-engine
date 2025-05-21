@@ -1,6 +1,11 @@
 package de.tillhub.paymentengine.data
 
+import android.content.Context
+import android.content.Intent
 import android.os.Parcelable
+import de.tillhub.paymentengine.contract.PaymentRequest
+import de.tillhub.paymentengine.contract.RefundRequest
+import de.tillhub.paymentengine.contract.ReversalRequest
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
@@ -98,39 +103,54 @@ sealed class Terminal : Parcelable {
         }
     }
 
-    class SPOS(
-        override val id: String = DEFAULT_SPOS_ID,
+    @Suppress("TooManyFunctions")
+    open class External(
+        override val id: String = DEFAULT_EXTERNAL_ID,
         override val saleConfig: CardSaleConfig = CardSaleConfig(),
-        val appId: String = DEFAULT_APP_ID,
-        val connected: Boolean = DEFAULT_CONNECTION,
-        val currencyCode: String = DEFAULT_CURRENCY_CODE,
     ) : Terminal() {
-        override fun toString() = "Terminal.SPOS(" +
+        open fun connectIntent(context: Context, input: Terminal): Intent {
+            throw UnsupportedOperationException("Connect is not supported by this terminal")
+        }
+        open fun paymentIntent(context: Context, input: PaymentRequest): Intent {
+            throw UnsupportedOperationException("Payment is not supported by this terminal")
+        }
+        open fun refundIntent(context: Context, input: RefundRequest): Intent {
+            throw UnsupportedOperationException("Refund is not supported by this terminal")
+        }
+        open fun reversalIntent(context: Context, input: ReversalRequest): Intent {
+            throw UnsupportedOperationException(
+                "Payment reversal is not supported by this terminal"
+            )
+        }
+        open fun reconciliationIntent(context: Context, input: Terminal): Intent {
+            throw UnsupportedOperationException("Reconciliation is not supported by this terminal")
+        }
+        open fun ticketReprintIntent(context: Context, input: Terminal): Intent {
+            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
+        }
+        open fun recoveryIntent(context: Context, input: Terminal): Intent {
+            throw UnsupportedOperationException("Payment recovery is not supported by this terminal")
+        }
+        open fun disconnectIntent(context: Context, input: Terminal): Intent {
+            throw UnsupportedOperationException("Disconnect is not supported by this terminal")
+        }
+
+        override fun toString() = "Terminal.External(" +
                 "id=$id, " +
-                "appId=$appId, " +
-                "saleConfig=$saleConfig, " +
-                "currencyCode=$currencyCode" +
+                "saleConfig=$saleConfig" +
                 ")"
 
-        override fun equals(other: Any?) = other is SPOS &&
+        override fun equals(other: Any?) = other is External &&
                 id == other.id &&
-                appId == other.appId &&
-                saleConfig == other.saleConfig &&
-                currencyCode == other.currencyCode
+                saleConfig == other.saleConfig
 
         override fun hashCode() = Objects.hash(
             id,
-            appId,
             saleConfig,
-            currencyCode
         )
 
         companion object {
-            private const val DEFAULT_SPOS_ID = "Default:SPOS"
-            private const val DEFAULT_APP_ID = "TESTCLIENT"
-            private const val DEFAULT_CONNECTION = false
-            const val DEFAULT_CURRENCY_CODE = "EUR"
-            const val TYPE = "SPOS"
+            private const val DEFAULT_EXTERNAL_ID = "Default:External"
         }
     }
 }

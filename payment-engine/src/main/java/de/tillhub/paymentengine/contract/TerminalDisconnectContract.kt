@@ -8,41 +8,38 @@ import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
-import de.tillhub.paymentengine.spos.SPOSResponseHandler
+import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.helper.ResponseHandler
 
 class TerminalDisconnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.SPOS) {
-            SPOSIntentFactory.createDisconnectIntent(input)
+        return if (input is Terminal.External) {
+            input.disconnectIntent(context, input)
         } else {
-            throw UnsupportedOperationException("Disconnect only supported for S-POS terminals")
+            throw UnsupportedOperationException("Disconnect is not supported by this terminal")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createDisconnectOperation(input))
         }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus {
-        return SPOSResponseHandler.handleTerminalDisconnectResponse(resultCode).also {
-            if (resultCode == Activity.RESULT_OK) {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_OK
-                )
-            } else {
-                analytics?.logCommunication(
-                    protocol = SPOS_PROTOCOL,
-                    message = AnalyticsMessageFactory.RESPONSE_RESULT_CANCELED
-                )
-            }
+        return ResponseHandler.parseResult(
+            resultCode,
+            intent,
+            TerminalOperationStatus.Login::class
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = if (resultCode == Activity.RESULT_OK) {
+                    AnalyticsMessageFactory.createResultOk(intent?.extras)
+                } else {
+                    AnalyticsMessageFactory.createResultCanceled(intent?.extras)
+                }
+            )
         }
-    }
-
-    companion object {
-        private const val SPOS_PROTOCOL = "SPOS"
     }
 }

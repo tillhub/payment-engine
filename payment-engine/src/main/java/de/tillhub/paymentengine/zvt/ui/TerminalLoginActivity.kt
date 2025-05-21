@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 
@@ -44,7 +45,13 @@ internal class TerminalLoginActivity : CardTerminalActivity() {
     override fun finishWithError(state: CardTerminalViewModel.State.Error) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.connect) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.ZVT.TYPE
+                )
+                putExtra(ExtraKeys.EXTRAS_RESULT, state.connect)
+            }
         )
         finish()
     }
@@ -52,7 +59,13 @@ internal class TerminalLoginActivity : CardTerminalActivity() {
     override fun finishWithSuccess(state: CardTerminalViewModel.State.Success) {
         setResult(
             Activity.RESULT_OK,
-            Intent().apply { putExtra(ExtraKeys.EXTRAS_RESULT, state.connect) }
+            Intent().apply {
+                putExtra(
+                    ExtraKeys.EXTRAS_PROTOCOL,
+                    Terminal.ZVT.TYPE
+                )
+                putExtra(ExtraKeys.EXTRAS_RESULT, state.connect)
+            }
         )
         finish()
     }

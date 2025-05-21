@@ -1,5 +1,6 @@
 package de.tillhub.paymentengine.contract
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
@@ -10,8 +11,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
-import de.tillhub.paymentengine.spos.AnalyticsMessageFactory
-import de.tillhub.paymentengine.spos.SPOSIntentFactory
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
 class TerminalReconciliationContract(
@@ -28,7 +28,7 @@ class TerminalReconciliationContract(
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
 
-            is Terminal.SPOS -> SPOSIntentFactory.createReconciliationIntent()
+            is Terminal.External -> input.reconciliationIntent(context, input)
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReconciliationOperation(input))
         }
@@ -38,7 +38,15 @@ class TerminalReconciliationContract(
         ResponseHandler.parseResult(
             resultCode,
             intent,
-            analytics,
             TerminalOperationStatus.Reconciliation::class
-        )
+        ).also {
+            analytics?.logCommunication(
+                protocol = intent?.getStringExtra(ExtraKeys.EXTRAS_PROTOCOL).orEmpty(),
+                message = if (resultCode == Activity.RESULT_OK) {
+                    AnalyticsMessageFactory.createResultOk(intent?.extras)
+                } else {
+                    AnalyticsMessageFactory.createResultCanceled(intent?.extras)
+                }
+            )
+        }
 }

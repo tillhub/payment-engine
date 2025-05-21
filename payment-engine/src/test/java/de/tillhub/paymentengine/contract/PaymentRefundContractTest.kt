@@ -12,7 +12,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
-import de.tillhub.paymentengine.spos.data.SPOSKey
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -44,11 +44,11 @@ class PaymentRefundContractTest : FunSpec({
         target = PaymentRefundContract(analytics)
     }
 
-    test("createIntent SPOS") {
+    test("createIntent External") {
         val result = target.createIntent(
             context,
             RefundRequest(
-                SPOS,
+                TestExternalTerminal("external"),
                 "UUID",
                 500.toBigDecimal(),
                 ISOAlphaCurrency("EUR")
@@ -56,21 +56,15 @@ class PaymentRefundContractTest : FunSpec({
         )
 
         result.shouldBeInstanceOf<Intent>()
-        result.action shouldBe "de.spayment.akzeptanz.TRANSACTION"
-        result.extras?.getString(SPOSKey.Extra.TRANSACTION_TYPE) shouldBe "PaymentRefund"
-        result.extras?.getString(SPOSKey.Extra.CURRENCY_ISO) shouldBe "EUR"
-        result.extras?.getString(SPOSKey.Extra.AMOUNT) shouldBe "500"
-        result.extras?.getString(SPOSKey.Extra.TRANSACTION_ID) shouldBe "UUID"
-        result.extras?.getString(SPOSKey.Extra.TAX_AMOUNT) shouldBe "000"
+        result.action shouldBe "REFUND"
 
         verify {
             analytics.logOperation(
                 "Operation: PARTIAL_REFUND(" +
                         "amount: 500, " +
                         "currency: ISOAlphaCurrency(value=EUR))" +
-                        "\nTerminal.SPOS(" +
-                        "id=s-pos, " +
-                        "appId=TESTCLIENT, " +
+                        "\nTerminal.External(" +
+                        "id=external, " +
                         "saleConfig=CardSaleConfig(" +
                         "applicationName=Tillhub GO, " +
                         "operatorId=ah, " +
@@ -78,8 +72,7 @@ class PaymentRefundContractTest : FunSpec({
                         "pin=333333, " +
                         "poiId=66000001, " +
                         "poiSerialNumber=" +
-                        "), " +
-                        "currencyCode=EUR" +
+                        ")" +
                         ")"
             )
         }
@@ -191,54 +184,7 @@ class PaymentRefundContractTest : FunSpec({
         }
     }
 
-    test("parseResult SPOS: result OK") {
-        val intent = Intent().apply {
-            putExtra(SPOSKey.ResultExtra.RESULT_STATE, "Success")
-            putExtra(SPOSKey.ResultExtra.TRANSACTION_RESULT, "ACCEPTED")
-            putExtra(SPOSKey.ResultExtra.TERMINAL_ID, "terminal_id")
-            putExtra(SPOSKey.ResultExtra.TRANSACTION_DATA, "transaction_data")
-            putExtra(SPOSKey.ResultExtra.CARD_CIRCUIT, "card_circuit")
-            putExtra(SPOSKey.ResultExtra.CARD_PAN, "card_pan")
-        }
-
-        val result = target.parseResult(Activity.RESULT_OK, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Refund.Success>()
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT OK\nExtras {\n" +
-                        "${SPOSKey.ResultExtra.CARD_PAN} = card_pan\n" +
-                        "${SPOSKey.ResultExtra.CARD_CIRCUIT} = card_circuit\n" +
-                        "${SPOSKey.ResultExtra.TRANSACTION_DATA} = transaction_data\n" +
-                        "${SPOSKey.ResultExtra.TERMINAL_ID} = terminal_id\n" +
-                        "${SPOSKey.ResultExtra.TRANSACTION_RESULT} = ACCEPTED\n" +
-                        "${SPOSKey.ResultExtra.RESULT_STATE} = Success\n" +
-                        "}"
-            )
-        }
-    }
-
-    test("parseResult SPOS: result CANCELED") {
-        val intent = Intent().apply {
-            putExtra(SPOSKey.ResultExtra.ERROR, "CARD_PAYMENT_NOT_ONBOARDED")
-        }
-
-        val result = target.parseResult(Activity.RESULT_CANCELED, intent)
-
-        result.shouldBeInstanceOf<TerminalOperationStatus.Refund.Error>()
-
-        verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT CANCELED\nExtras {\n" +
-                        "ERROR = CARD_PAYMENT_NOT_ONBOARDED\n" +
-                        "}"
-            )
-        }
-    }
-
-    test("parseResult OPI + ZVT: result OK") {
+    test("parseResult: result OK") {
         val intent = Intent().apply {
             putExtra(
                 ExtraKeys.EXTRAS_RESULT,
@@ -257,14 +203,22 @@ class PaymentRefundContractTest : FunSpec({
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Refund.Success>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 
-    test("parseResult OPI + ZVT: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Refund.Canceled>()
+
+        verify {
+            analytics.logCommunication(any(), any())
+        }
     }
 }) {
     companion object {
@@ -278,9 +232,6 @@ class PaymentRefundContractTest : FunSpec({
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
-        )
-        val SPOS = Terminal.SPOS(
-            id = "s-pos",
         )
     }
 }

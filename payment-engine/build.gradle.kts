@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "de.tillhub.paymentengine"
-    compileSdk = 34
+    namespace = Configs.APPLICATION_ID
+    compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
-        minSdk = 24
+        minSdk = Configs.MIN_SDK
     }
 
     buildTypes {
@@ -31,12 +31,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = Configs.JAVA_VERSION
+        targetCompatibility = Configs.JAVA_VERSION
         isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = Configs.JVM_TARGET
     }
     buildFeatures {
         viewBinding = true
@@ -90,10 +90,10 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("payment-engine") {
-                groupId = "de.tillhub.paymentengine"
-                artifactId = "payment-engine"
-                version = "3.4.1"
+            create<MavenPublication>("release-core") {
+                groupId = Configs.APPLICATION_ID
+                artifactId = "core"
+                version = Configs.VERSION_CODE
 
                 from(components.getByName("release"))
             }

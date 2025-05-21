@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine
 
-import android.content.ActivityNotFoundException
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.PaymentRecoveryContract
@@ -56,15 +55,6 @@ internal class RecoveryManagerImpl(
                     TerminalOperationError(
                         date = Instant.now(),
                         resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
-                    )
-                )
-            )
-        } catch (_: ActivityNotFoundException) {
-            terminalState.tryEmit(
-                TerminalOperationStatus.Recovery.Error(
-                    TerminalOperationError(
-                        date = Instant.now(),
-                        resultCode = ResultCodeSets.APP_NOT_FOUND_ERROR
                     )
                 )
             )

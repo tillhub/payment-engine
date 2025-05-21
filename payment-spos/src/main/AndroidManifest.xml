@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <queries>
+        <package android:name="de.spayment.akzeptanz" />
+    </queries>
+
+    <application>
+        <activity
+            android:name=".ui.TerminalActivity"
+            android:theme="@style/Theme.Payment"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="de.tillhub.paymentengine.spos.ACTION_SPOS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

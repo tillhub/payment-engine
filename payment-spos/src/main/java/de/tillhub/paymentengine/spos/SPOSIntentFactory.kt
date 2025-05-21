@@ -4,18 +4,18 @@ import android.content.Intent
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.spos.data.SPOSTransactionType
+import de.tillhub.paymentengine.spos.data.SPOSTerminal
 
 internal object SPOSIntentFactory {
 
-    fun createConnectIntent(terminal: Terminal.SPOS) =
+    fun createConnectIntent(terminal: SPOSTerminal) =
         Intent(SPOSKey.Action.CONNECT_ACTION).apply {
             putExtra(SPOSKey.Extra.APP_ID, terminal.appId)
         }
 
-    fun createDisconnectIntent(terminal: Terminal.SPOS) =
+    fun createDisconnectIntent(terminal: SPOSTerminal) =
         Intent(SPOSKey.Action.DISCONNECT_ACTION).apply {
             putExtra(SPOSKey.Extra.APP_ID, terminal.appId)
         }

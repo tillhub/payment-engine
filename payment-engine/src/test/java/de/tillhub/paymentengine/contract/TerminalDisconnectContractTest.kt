@@ -6,9 +6,10 @@ import android.content.Intent
 import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.data.SPOSKey
+import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -40,34 +41,15 @@ class TerminalDisconnectContractTest : FunSpec({
         target = TerminalDisconnectContract(analytics)
     }
 
-    test("createIntent SPOS") {
-        val result = target.createIntent(
-            context,
-            SPOS
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.action shouldBe "de.spayment.akzeptanz.S_SWITCH_DISCONNECT"
-        result.extras?.getString(SPOSKey.Extra.APP_ID) shouldBe "TESTCLIENT"
+    test("createIntent External") {
+        val result = target.createIntent(context, TestExternalTerminal("external"))
 
         verify {
-            analytics.logOperation(
-                "Operation: TERMINAL_DISCONNECT" +
-                        "\nTerminal.SPOS(" +
-                        "id=s-pos, " +
-                        "appId=TESTCLIENT, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "currencyCode=EUR" +
-                        ")"
-            )
+            analytics.logOperation(any())
         }
+
+        result.shouldBeInstanceOf<Intent>()
+        result.action shouldBe "DISCONNECT"
     }
 
     test("createIntent OPI + ZVT") {
@@ -78,38 +60,41 @@ class TerminalDisconnectContractTest : FunSpec({
             )
         } catch (e: Exception) {
             e.shouldBeInstanceOf<UnsupportedOperationException>()
-            e.message shouldBe "Disconnect only supported for S-POS terminals"
+            e.message shouldBe "Disconnect is not supported by this terminal"
         }
         verify(inverse = true) {
             analytics.logOperation(any())
         }
     }
 
-    test("parseResult SPOS: result OK") {
-        val intent = Intent()
+    test("parseResult: result OK") {
+        val intent = Intent().apply {
+            putExtra(
+                ExtraKeys.EXTRAS_RESULT,
+                TerminalOperationStatus.Login.Disconnected(
+                    date = mockk(),
+                )
+            )
+        }
 
         val result = target.parseResult(Activity.RESULT_OK, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Disconnected>()
+
         verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT OK"
-            )
+            analytics.logCommunication(any(), any())
         }
     }
 
-    test("parseResult SPOS: result CANCELED") {
+    test("parseResult: result CANCELED") {
         val intent = Intent()
 
         val result = target.parseResult(Activity.RESULT_CANCELED, intent)
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Canceled>()
+
         verify {
-            analytics.logCommunication(
-                protocol = "SPOS",
-                message = "RESPONSE: RESULT CANCELED"
-            )
+            analytics.logCommunication(any(), any())
         }
     }
 }) {
@@ -119,9 +104,6 @@ class TerminalDisconnectContractTest : FunSpec({
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
-        )
-        val SPOS = Terminal.SPOS(
-            id = "s-pos",
         )
     }
 }
