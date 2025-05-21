@@ -6,7 +6,10 @@ import android.os.Bundle
 import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import de.lavego.sdk.Payment
+import de.lavego.ISO4217
+import de.lavego.zvt.api.Apdu
+import de.lavego.zvt.api.Bmp
+import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
@@ -59,7 +62,26 @@ internal class CardPaymentActivity : CardTerminalActivity() {
     }
 
     override fun startOperation() {
-        doPayment(Payment(amount, currency.value))
+        val payment = Apdu(Commons.Command.CMD_0601).apply {
+            val currencyAsTwoByteHex = ISO4217.ISOCurrency.byAlpha(currency.value).codeAsTwoByteHex()
+
+            add(Bmp(0x04.toByte(), Commons.NumberToBCD(amount.toLong(), AMOUNT_BYTE_COUNT)))
+            add(Bmp(0x49.toByte(), Commons.StringNumberToBCD(currencyAsTwoByteHex, CC_BYTE_COUNT)))
+            add(Bmp(0x19.toByte(), saleConfiguration().zvtFlags.paymentType().toInt()))
+
+            // Custom ID for terminal
+            add(Bmp(
+                0x06.toByte(), // TLV bmp
+                byteArrayOf(
+                    0x06.toByte(), // length of TLV data (TAG + TAG length + TAG data)
+                    0x1F.toByte(), 0x63.toByte(), // TAG
+                    0x03.toByte(), // length TAG data
+                    0x34.toByte(), 0x32.toByte(), 0x30.toByte() // TAG data
+                )
+            ))
+        }
+
+        doCustom(payment.apdu())
     }
 
     override fun setCancelVisibility(visible: Boolean) {
