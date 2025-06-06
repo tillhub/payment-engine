@@ -6,11 +6,11 @@ import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
+import de.tillhub.paymentengine.opi.data.OPITerminal
 
 internal class OPILoginActivity : OPITerminalActivity() {
 
@@ -54,14 +54,14 @@ internal class OPILoginActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.OPI.TYPE
+                    OPITerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
                     TerminalOperationStatus.Login.Connected(
                         date = state.data.date,
                         rawData = state.data.rawData,
-                        terminalType = Terminal.OPI.TYPE,
+                        terminalType = OPITerminal.TYPE,
                         terminalId = state.data.data?.terminalId.orEmpty()
                     )
                 )
@@ -76,7 +76,7 @@ internal class OPILoginActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.OPI.TYPE
+                    OPITerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,

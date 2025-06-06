@@ -2,11 +2,11 @@ package de.tillhub.paymentengine.opi
 
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
+import de.tillhub.paymentengine.opi.data.OPITerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.Ordering
@@ -26,7 +26,7 @@ import java.time.Instant
 
 @ExperimentalCoroutinesApi
 class OPIServiceTest : FunSpec({
-    lateinit var terminal: Terminal.OPI
+    lateinit var terminal: OPITerminal
     lateinit var instant: Instant
     lateinit var throwable: Throwable
 

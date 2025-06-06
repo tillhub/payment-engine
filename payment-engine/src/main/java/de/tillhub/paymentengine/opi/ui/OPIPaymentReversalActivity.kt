@@ -6,11 +6,11 @@ import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
+import de.tillhub.paymentengine.opi.data.OPITerminal
 
 internal class OPIPaymentReversalActivity : OPITerminalActivity() {
 
@@ -63,7 +63,7 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.OPI.TYPE
+                    OPITerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
@@ -80,7 +80,7 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.OPI.TYPE
+                    OPITerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,

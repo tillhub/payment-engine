@@ -2,6 +2,8 @@ package de.tillhub.paymentengine
 
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
@@ -28,7 +30,7 @@ class CardManagerTest : FunSpec({
     }
 
     test("putTerminalConfig should add terminal to the configs map") {
-        val terminal = Terminal.OPI()
+        val terminal = OPITerminal()
         target.putTerminalConfig(terminal)
         verify { configs[terminal.id] = terminal }
     }
@@ -40,6 +42,6 @@ class CardManagerTest : FunSpec({
 
     test("defaultConfig should return default Terminal configuration") {
         val defaultTerminal = target.defaultConfig
-        defaultTerminal shouldBe Terminal.ZVT()
+        defaultTerminal shouldBe ZVTTerminal()
     }
 })

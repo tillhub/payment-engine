@@ -12,6 +12,9 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIReconciliationActivity
 import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExternalTerminal
+import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import de.tillhub.paymentengine.zvt.ui.TerminalReconciliationActivity
 
 class TerminalReconciliationContract(
@@ -20,15 +23,15 @@ class TerminalReconciliationContract(
 
     override fun createIntent(context: Context, input: Terminal): Intent {
         return when (input) {
-            is Terminal.ZVT -> Intent(context, TerminalReconciliationActivity::class.java).apply {
+            is ZVTTerminal -> Intent(context, TerminalReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
-
-            is Terminal.OPI -> Intent(context, OPIReconciliationActivity::class.java).apply {
+            is OPITerminal -> Intent(context, OPIReconciliationActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input)
             }
+            is ExternalTerminal -> input.reconciliationIntent(context, input)
 
-            is Terminal.External -> input.reconciliationIntent(context, input)
+            else -> throw IllegalArgumentException("Unknown terminal type: $input")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReconciliationOperation(input))
         }

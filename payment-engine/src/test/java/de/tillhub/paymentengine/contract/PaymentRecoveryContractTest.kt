@@ -7,10 +7,11 @@ import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
+import de.tillhub.paymentengine.opi.data.OPITerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -56,7 +57,7 @@ class PaymentRecoveryContractTest : FunSpec({
 
     test("createIntent OPI") {
         val result = shouldThrow<UnsupportedOperationException> {
-            target.createIntent(context, Terminal.OPI())
+            target.createIntent(context, OPITerminal())
         }
 
         verify(inverse = true) {
@@ -68,7 +69,7 @@ class PaymentRecoveryContractTest : FunSpec({
 
     test("createIntent ZVT") {
         val result = shouldThrow<UnsupportedOperationException> {
-            target.createIntent(context, Terminal.ZVT())
+            target.createIntent(context, ZVTTerminal())
         }
 
         verify(inverse = true) {

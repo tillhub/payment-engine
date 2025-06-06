@@ -8,7 +8,6 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.cmds.CompletionForRegister
 import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.ResultCodeSets
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
@@ -19,6 +18,7 @@ import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -207,7 +207,7 @@ internal class CardTerminalViewModel(
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = Terminal.ZVT.TYPE,
+                        terminalType = ZVTTerminal.TYPE,
                         terminalId = it.tid,
                         transactionId = it.receiptNo.toString(),
                         cardCircuit = it.cardName,
@@ -248,7 +248,7 @@ internal class CardTerminalViewModel(
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = Terminal.ZVT.TYPE,
+                        terminalType = ZVTTerminal.TYPE,
                         terminalId = it.tid,
                         transactionId = it.receiptNo.toString(),
                         cardCircuit = it.cardName,
@@ -270,7 +270,7 @@ internal class CardTerminalViewModel(
                 TerminalOperationStatus.Login.Connected(
                     date = date,
                     rawData = rawData,
-                    terminalType = Terminal.ZVT.TYPE,
+                    terminalType = ZVTTerminal.TYPE,
                     terminalId = data?.tid.orEmpty()
                 )
             }

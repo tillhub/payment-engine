@@ -9,10 +9,11 @@ import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
+import de.tillhub.paymentengine.opi.data.OPITerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -94,7 +95,7 @@ class PaymentRefundContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            Terminal.OPI::class.java
+            OPITerminal::class.java
         ) shouldBe OPI
         BundleCompat.getSerializable(
             result.extras!!,
@@ -112,7 +113,7 @@ class PaymentRefundContractTest : FunSpec({
                 "Operation: PARTIAL_REFUND(" +
                         "amount: 500, " +
                         "currency: ISOAlphaCurrency(value=EUR))" +
-                        "\nTerminal.OPI(" +
+                        "\nOPITerminal(" +
                         "id=opi, " +
                         "ipAddress=127.0.0.1, " +
                         "port=20002, " +
@@ -147,7 +148,7 @@ class PaymentRefundContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            Terminal.ZVT::class.java
+            ZVTTerminal::class.java
         ) shouldBe ZVT
         BundleCompat.getSerializable(
             result.extras!!,
@@ -165,7 +166,7 @@ class PaymentRefundContractTest : FunSpec({
                 "Operation: PARTIAL_REFUND(" +
                         "amount: 500, " +
                         "currency: ISOAlphaCurrency(value=EUR))" +
-                        "\nTerminal.ZVT(" +
+                        "\nZVTTerminal(" +
                         "id=zvt, " +
                         "ipAddress=127.0.0.1, " +
                         "port=40007, " +
@@ -222,12 +223,12 @@ class PaymentRefundContractTest : FunSpec({
     }
 }) {
     companion object {
-        val ZVT = Terminal.ZVT(
+        val ZVT = ZVTTerminal(
             id = "zvt",
             ipAddress = "127.0.0.1",
             port = 40007,
         )
-        val OPI = Terminal.OPI(
+        val OPI = OPITerminal(
             id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,

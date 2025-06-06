@@ -8,9 +8,10 @@ import androidx.core.os.BundleCompat
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.opi.data.OPITerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -64,7 +65,7 @@ class TerminalConnectContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            Terminal.OPI::class.java
+            OPITerminal::class.java
         ) shouldBe PaymentContractTest.OPI
     }
 
@@ -79,7 +80,7 @@ class TerminalConnectContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            Terminal.ZVT::class.java
+            ZVTTerminal::class.java
         ) shouldBe ZVT
     }
 
@@ -90,7 +91,7 @@ class TerminalConnectContractTest : FunSpec({
                 TerminalOperationStatus.Login.Connected(
                     date = mockk(),
                     rawData = "rawData",
-                    terminalType = Terminal.OPI.TYPE,
+                    terminalType = OPITerminal.TYPE,
                     terminalId = "terminalId"
                 )
             )
@@ -118,13 +119,13 @@ class TerminalConnectContractTest : FunSpec({
     }
 }) {
     companion object {
-        val OPI = Terminal.OPI(
+        val OPI = OPITerminal(
             id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
         )
-        val ZVT = Terminal.ZVT(
+        val ZVT = ZVTTerminal(
             id = "zvt",
             ipAddress = "127.0.0.1",
             port = 20007,

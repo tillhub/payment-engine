@@ -5,6 +5,7 @@ import android.content.Intent
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
+import de.tillhub.paymentengine.data.ExternalTerminal
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import kotlinx.parcelize.Parcelize
@@ -17,7 +18,7 @@ class SPOSTerminal(
     val appId: String = DEFAULT_APP_ID,
     val connected: Boolean = DEFAULT_CONNECTION,
     val currencyCode: String = DEFAULT_CURRENCY_CODE,
-) : Terminal.External(id) {
+) : ExternalTerminal(id) {
     override fun connectIntent(context: Context, input: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_CONNECT)

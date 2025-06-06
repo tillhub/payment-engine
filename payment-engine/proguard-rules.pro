@@ -48,7 +48,7 @@
 -keep class de.tillhub.paymentengine.data.CardSaleConfig$* { *; }
 -keep class de.tillhub.paymentengine.data.ISOAlphaCurrency { *; }
 -keep class de.tillhub.paymentengine.data.Terminal { *; }
--keep class de.tillhub.paymentengine.data.Terminal$* { *; }
+-keep class de.tillhub.paymentengine.data.ExternalTerminal { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationStatus$* { *; }
 -keep class de.tillhub.paymentengine.data.TerminalOperationSuccess { *; }
@@ -56,6 +56,8 @@
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode$* { *; }
+-keep class de.tillhub.paymentengine.opi.data.OPITerminal { *; }
+-keep class de.tillhub.paymentengine.zvt.data.ZVTTerminal { *; }
 
 -keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);

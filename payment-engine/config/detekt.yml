@@ -775,6 +775,7 @@ libraries:
             - '**/main/java/de/tillhub/paymentengine/data/CardSaleConfig.kt'
             - '**/main/java/de/tillhub/paymentengine/data/ISOAlphaCurrency.kt'
             - '**/main/java/de/tillhub/paymentengine/data/Terminal.kt'
+            - '**/main/java/de/tillhub/paymentengine/data/ExternalTerminal.kt'
             - '**/main/java/de/tillhub/paymentengine/data/TerminalOperationStatus.kt'
             - '**/main/java/de/tillhub/paymentengine/data/TransactionData.kt'
             - '**/main/java/de/tillhub/paymentengine/data/TransactionResultCode.kt'
@@ -784,3 +785,5 @@ libraries:
             - '**/main/java/de/tillhub/paymentengine/analytics/PaymentAnalytics.kt'
             - '**/main/java/de/tillhub/paymentengine/softpay/SoftpayTerminal.kt'
             - '**/main/java/de/tillhub/paymentengine/spos/data/SPOSTerminal.kt'
+            - '**/main/java/de/tillhub/paymentengine/opi/data/OPITerminal.kt'
+            - '**/main/java/de/tillhub/paymentengine/zvt/data/ZVTTerminal.kt'

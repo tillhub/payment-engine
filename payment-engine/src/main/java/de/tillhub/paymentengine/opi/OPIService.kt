@@ -6,12 +6,12 @@ import android.os.IBinder
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.opi.common.modifyAmountForOpi
 import de.tillhub.paymentengine.opi.common.startAsForegroundService
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
+import de.tillhub.paymentengine.opi.data.OPITerminal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ internal class OPIService(
         this.bringToFront = bringToFront
     }
 
-    fun init(terminal: Terminal.OPI) {
+    fun init(terminal: OPITerminal) {
         opiController.init(terminal)
 
         lifecycleScope.launch {

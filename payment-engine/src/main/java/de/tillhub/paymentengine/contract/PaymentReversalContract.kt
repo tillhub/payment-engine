@@ -13,6 +13,9 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
 import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExternalTerminal
+import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.zvt.data.ZVTTerminal
 import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
@@ -23,17 +26,17 @@ class PaymentReversalContract(
 
     override fun createIntent(context: Context, input: ReversalRequest): Intent {
         return when (input.config) {
-            is Terminal.ZVT -> Intent(context, CardPaymentReversalActivity::class.java).apply {
+            is ZVTTerminal -> Intent(context, CardPaymentReversalActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
             }
-
-            is Terminal.OPI -> Intent(context, OPIPaymentReversalActivity::class.java).apply {
+            is OPITerminal -> Intent(context, OPIPaymentReversalActivity::class.java).apply {
                 putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
                 putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
             }
+            is ExternalTerminal -> input.config.reversalIntent(context, input)
 
-            is Terminal.External -> input.config.reversalIntent(context, input)
+            else -> throw IllegalArgumentException("Unknown terminal type: ${input.config}")
         }.also {
             analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
         }

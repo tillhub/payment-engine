@@ -10,6 +10,7 @@ import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
 import de.tillhub.paymentengine.AnalyticsMessageFactory
+import de.tillhub.paymentengine.data.ExternalTerminal
 import de.tillhub.paymentengine.data.ExtraKeys
 
 class PaymentRecoveryContract(
@@ -17,7 +18,7 @@ class PaymentRecoveryContract(
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.External) {
+        return if (input is ExternalTerminal) {
             input.recoveryIntent(context, input)
         } else {
             throw UnsupportedOperationException("Payment recovery is not supported by this terminal")

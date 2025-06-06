@@ -6,6 +6,7 @@ import de.tillhub.paymentengine.contract.PaymentRecoveryContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.opi.data.OPITerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -79,12 +80,12 @@ class RecoveryManagerTest : FunSpec({
             throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        target.startRecovery(Terminal.OPI())
+        target.startRecovery(OPITerminal())
 
         val result = terminalState.first()
 
         verify {
-            recoveryContract.launch(Terminal.OPI())
+            recoveryContract.launch(OPITerminal())
         }
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Error>()
