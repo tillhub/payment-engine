@@ -4,13 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.AnalyticsMessageFactory
-import de.tillhub.paymentengine.data.ExternalTerminal
-import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.helper.ResponseHandler
 
 class TerminalDisconnectContract(
@@ -18,11 +17,7 @@ class TerminalDisconnectContract(
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is ExternalTerminal) {
-            input.disconnectIntent(context, input)
-        } else {
-            throw UnsupportedOperationException("Disconnect is not supported by this terminal")
-        }.also {
+        return input.contract.disconnectIntent(context, input).also {
             analytics?.logOperation(AnalyticsMessageFactory.createDisconnectOperation(input))
         }
     }

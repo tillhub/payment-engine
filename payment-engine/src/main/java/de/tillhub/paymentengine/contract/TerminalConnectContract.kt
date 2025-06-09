@@ -7,32 +7,17 @@ import androidx.activity.result.contract.ActivityResultContract
 import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
-import de.tillhub.paymentengine.data.ExternalTerminal
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
-import de.tillhub.paymentengine.opi.data.OPITerminal
-import de.tillhub.paymentengine.opi.ui.OPILoginActivity
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
-import de.tillhub.paymentengine.zvt.ui.TerminalLoginActivity
 
 class TerminalConnectContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return when (input) {
-            is ZVTTerminal -> Intent(context, TerminalLoginActivity::class.java).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input)
-            }
-            is OPITerminal -> Intent(context, OPILoginActivity::class.java).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input)
-            }
-            is ExternalTerminal -> input.connectIntent(context, input)
-
-            else -> throw IllegalArgumentException("Unknown terminal type: $input")
-        }.also {
+        return input.contract.connectIntent(context, input).also {
             analytics?.logOperation(AnalyticsMessageFactory.createConnectOperation(input))
         }
     }

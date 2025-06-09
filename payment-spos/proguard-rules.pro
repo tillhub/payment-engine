@@ -21,3 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class de.tillhub.paymentengine.spos.data.SPOSTerminal { *; }
+-keep class de.tillhub.paymentengine.spos.data.SPOSTerminal$* { *; }

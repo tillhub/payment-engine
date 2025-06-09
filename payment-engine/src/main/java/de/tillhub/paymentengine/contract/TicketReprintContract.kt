@@ -7,7 +7,6 @@ import androidx.activity.result.contract.ActivityResultContract
 import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
-import de.tillhub.paymentengine.data.ExternalTerminal
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
@@ -18,11 +17,7 @@ class TicketReprintContract(
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is ExternalTerminal) {
-            input.ticketReprintIntent(context, input)
-        } else {
-            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
-        }.also {
+        return input.contract.ticketReprintIntent(context, input).also {
             analytics?.logOperation(AnalyticsMessageFactory.createTicketReprintOperation(input))
         }
     }

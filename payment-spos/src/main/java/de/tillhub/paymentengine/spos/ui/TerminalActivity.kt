@@ -11,7 +11,6 @@ import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.SPOSResponseHandler.getErrorAppNotFound
 import de.tillhub.paymentengine.spos.contracts.SPOSPaymentContract
@@ -36,7 +35,7 @@ internal class TerminalActivity : AppCompatActivity() {
         registerForActivityResult(SPOSPaymentContract(), ::handleResult)
     }
 
-    private val paymentRecoveryContract: ActivityResultLauncher<Terminal> by lazy {
+    private val paymentRecoveryContract: ActivityResultLauncher<SPOSTerminal> by lazy {
         registerForActivityResult(SPOSPaymentRecoveryContract(), ::handleResult)
     }
 
@@ -56,11 +55,11 @@ internal class TerminalActivity : AppCompatActivity() {
         registerForActivityResult(SPOSTerminalDisconnectContract(), ::handleResult)
     }
 
-    private val reprintContract: ActivityResultLauncher<Terminal> by lazy {
+    private val reprintContract: ActivityResultLauncher<SPOSTerminal> by lazy {
         registerForActivityResult(SPOSTicketReprintContract(), ::handleResult)
     }
 
-    private val reconciliationContract: ActivityResultLauncher<Terminal> by lazy {
+    private val reconciliationContract: ActivityResultLauncher<SPOSTerminal> by lazy {
         registerForActivityResult(SPOSTerminalReconciliationContract(), ::handleResult)
     }
 

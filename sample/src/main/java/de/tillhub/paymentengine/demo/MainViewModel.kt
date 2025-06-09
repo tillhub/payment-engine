@@ -10,7 +10,6 @@ import de.tillhub.paymentengine.RecoveryManager
 import de.tillhub.paymentengine.RefundManager
 import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.data.OPITerminal
 import de.tillhub.paymentengine.spos.data.SPOSTerminal
@@ -83,21 +82,21 @@ class MainViewModel : ViewModel() {
 
     private fun setupTerminalConfigs(cardManager: CardManager) {
         cardManager.putTerminalConfig(
-            ZVTTerminal(
+            ZVTTerminal.create(
                 id = "zvt-remote",
                 ipAddress = REMOTE_IP,
                 port = 20007
             )
         )
         cardManager.putTerminalConfig(
-            ZVTTerminal(
+            ZVTTerminal.create(
                 id = "zvt-local",
                 ipAddress = "127.0.0.1",
                 port = 40007
             )
         )
         cardManager.putTerminalConfig(
-            OPITerminal(
+            OPITerminal.create(
                 id = "opi",
                 ipAddress = REMOTE_IP,
                 port = 20002,
@@ -105,7 +104,7 @@ class MainViewModel : ViewModel() {
             )
         )
         cardManager.putTerminalConfig(
-            SPOSTerminal(
+            SPOSTerminal.create(
                 id = "s-pos",
             )
         )

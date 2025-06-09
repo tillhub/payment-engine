@@ -5,25 +5,77 @@ import android.content.Intent
 import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
-import de.tillhub.paymentengine.data.ExternalTerminal
+import de.tillhub.paymentengine.data.CardSaleConfig
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
+import de.tillhub.paymentengine.data.TerminalContract
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
-@Suppress("TooManyFunctions")
 @Parcelize
-class SPOSTerminal(
+class SPOSTerminal internal constructor(
     override val id: String = DEFAULT_SPOS_ID,
+    override val saleConfig: CardSaleConfig = CardSaleConfig(),
+    @IgnoredOnParcel
+    override val contract: TerminalContract = SPOSTerminalContract(),
     val appId: String = DEFAULT_APP_ID,
     val connected: Boolean = DEFAULT_CONNECTION,
     val currencyCode: String = DEFAULT_CURRENCY_CODE,
-) : ExternalTerminal(id) {
-    override fun connectIntent(context: Context, input: Terminal): Intent =
+) : Terminal {
+    override fun toString() = "SposTerminal(" +
+            "id=$id, " +
+            "appId=$appId, " +
+            "saleConfig=$saleConfig, " +
+            "connected=$connected, " +
+            "currencyCode=$currencyCode" +
+            ")"
+
+    override fun equals(other: Any?) = other is SPOSTerminal &&
+            id == other.id &&
+            appId == other.appId &&
+            saleConfig == other.saleConfig &&
+            connected == other.connected &&
+            currencyCode == other.currencyCode
+
+    override fun hashCode() = Objects.hash(
+        id,
+        appId,
+        saleConfig,
+        connected,
+        currencyCode
+    )
+
+    companion object {
+        private const val DEFAULT_SPOS_ID = "Default:SPOS"
+        private const val DEFAULT_APP_ID = "TESTCLIENT"
+        private const val DEFAULT_CONNECTION = false
+        const val DEFAULT_CURRENCY_CODE = "EUR"
+        const val TYPE = "SPOS"
+
+        fun create(
+            id: String = DEFAULT_SPOS_ID,
+            saleConfig: CardSaleConfig = CardSaleConfig(),
+            appId: String = DEFAULT_APP_ID,
+            connected: Boolean = DEFAULT_CONNECTION,
+            currencyCode: String = DEFAULT_CURRENCY_CODE,
+        ): SPOSTerminal = SPOSTerminal(
+            id = id,
+            saleConfig = saleConfig,
+            appId = appId,
+            connected = connected,
+            currencyCode = currencyCode
+        )
+    }
+}
+
+@Suppress("TooManyFunctions")
+internal class SPOSTerminalContract : TerminalContract {
+    override fun connectIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_CONNECT)
 
-            putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            putExtra(ExtraKeys.EXTRA_CONFIG, terminal)
 
             // This is needed for devices with API 34+
             `package` = context.packageName
@@ -68,72 +120,43 @@ class SPOSTerminal(
             `package` = context.packageName
         }
 
-    override fun reconciliationIntent(context: Context, input: Terminal): Intent =
+    override fun reconciliationIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_RECONCILIATION)
 
-            putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            putExtra(ExtraKeys.EXTRA_CONFIG, terminal)
 
             `package` = context.packageName
         }
 
-    override fun recoveryIntent(context: Context, input: Terminal): Intent =
+    override fun recoveryIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_RECOVERY)
 
-            putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            putExtra(ExtraKeys.EXTRA_CONFIG, terminal)
 
             `package` = context.packageName
         }
 
-    override fun disconnectIntent(context: Context, input: Terminal): Intent =
+    override fun disconnectIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_DISCONNECT)
 
-            putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            putExtra(ExtraKeys.EXTRA_CONFIG, terminal)
 
             `package` = context.packageName
         }
 
-    override fun ticketReprintIntent(context: Context, input: Terminal): Intent =
+    override fun ticketReprintIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_REPRINT)
 
-            putExtra(ExtraKeys.EXTRA_CONFIG, input)
+            putExtra(ExtraKeys.EXTRA_CONFIG, terminal)
 
             `package` = context.packageName
         }
 
-    override fun toString() = "SposTerminal(" +
-            "id=$id, " +
-            "appId=$appId, " +
-            "saleConfig=$saleConfig, " +
-            "connected=$connected, " +
-            "currencyCode=$currencyCode" +
-            ")"
-
-    override fun equals(other: Any?) = other is SPOSTerminal &&
-            id == other.id &&
-            appId == other.appId &&
-            saleConfig == other.saleConfig &&
-            connected == other.connected &&
-            currencyCode == other.currencyCode
-
-    override fun hashCode() = Objects.hash(
-        id,
-        appId,
-        saleConfig,
-        connected,
-        currencyCode
-    )
-
     companion object {
-        private const val DEFAULT_SPOS_ID = "Default:SPOS"
-        private const val DEFAULT_APP_ID = "TESTCLIENT"
-        private const val DEFAULT_CONNECTION = false
-        const val DEFAULT_CURRENCY_CODE = "EUR"
-        const val TYPE = "SPOS"
-
         private const val INTENT_ACTION_SPOS = "de.tillhub.paymentengine.spos.ACTION_SPOS"
     }
 }
