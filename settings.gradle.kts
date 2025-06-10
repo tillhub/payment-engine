@@ -30,8 +30,8 @@ dependencyResolutionManagement {
 rootProject.name = "Tillhub Payment Engine"
 include(":sample")
 include(":payment-engine")
-include(":payment-softpay")
-include(":payment-spos")
+include(":payment-plugins:softpay")
+include(":payment-plugins:spos")
 
 fun readNexusProperties() = Properties().apply {
     val propertiesFile = file("$rootDir/local.properties")
