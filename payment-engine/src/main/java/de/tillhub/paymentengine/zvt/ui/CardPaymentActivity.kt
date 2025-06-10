@@ -9,9 +9,9 @@ import androidx.core.view.isVisible
 import de.lavego.sdk.Payment
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import java.math.BigDecimal
 
 internal class CardPaymentActivity : CardTerminalActivity() {
@@ -72,7 +72,7 @@ internal class CardPaymentActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.ZVT.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.payment)
             }
@@ -86,7 +86,7 @@ internal class CardPaymentActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.ZVT.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.payment)
             }

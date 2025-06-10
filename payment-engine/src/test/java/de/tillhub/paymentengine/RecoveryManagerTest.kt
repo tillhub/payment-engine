@@ -6,7 +6,8 @@ import de.tillhub.paymentengine.contract.PaymentRecoveryContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -26,7 +27,7 @@ class RecoveryManagerTest : FunSpec({
     lateinit var target: RecoveryManager
 
     beforeTest {
-        configs = mutableMapOf("external_terminal" to TestExternalTerminal("external_terminal"))
+        configs = mutableMapOf("external_terminal" to TestTerminal("external_terminal"))
         terminalState = MutableStateFlow(TerminalOperationStatus.Waiting)
         resultCaller = mockk(relaxed = true)
         recoveryContract = mockk(relaxed = true)
@@ -47,28 +48,28 @@ class RecoveryManagerTest : FunSpec({
         target.startRecovery()
 
         verify {
-            recoveryContract.launch(TestExternalTerminal("external_terminal"))
+            recoveryContract.launch(TestTerminal("external_terminal"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
     test("startRecovery by config name") {
-        configs["external_terminal2"] = TestExternalTerminal("external_terminal2")
+        configs["external_terminal2"] = TestTerminal("external_terminal2")
         target.startRecovery("external_terminal2")
 
         verify {
-            recoveryContract.launch(TestExternalTerminal("external_terminal2"))
+            recoveryContract.launch(TestTerminal("external_terminal2"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
     }
 
     test("startRecovery by terminal") {
-        target.startRecovery(TestExternalTerminal("external_terminal"))
+        target.startRecovery(TestTerminal("external_terminal"))
 
         verify {
-            recoveryContract.launch(TestExternalTerminal("external_terminal"))
+            recoveryContract.launch(TestTerminal("external_terminal"))
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Recovery.Pending
@@ -79,12 +80,12 @@ class RecoveryManagerTest : FunSpec({
             throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        target.startRecovery(Terminal.OPI())
+        target.startRecovery(OpiTerminal.create())
 
         val result = terminalState.first()
 
         verify {
-            recoveryContract.launch(Terminal.OPI())
+            recoveryContract.launch(OpiTerminal.create())
         }
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Recovery.Error>()

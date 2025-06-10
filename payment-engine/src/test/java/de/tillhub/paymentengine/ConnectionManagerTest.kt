@@ -7,7 +7,9 @@ import de.tillhub.paymentengine.contract.TerminalDisconnectContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -59,14 +61,14 @@ class ConnectionManagerTest : FunSpec({
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
-            connectContract.launch(Terminal.ZVT())
+            connectContract.launch(ZvtTerminal.create())
         }
 
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startConnect by config name") {
-        val terminal = Terminal.OPI()
+        val terminal = OpiTerminal.create()
         configs["opi"] = terminal
         target.startConnect("opi")
 
@@ -79,7 +81,7 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startConnect by terminal") {
-        val terminal = TestExternalTerminal("external_terminal")
+        val terminal = TestTerminal("external_terminal")
         target.startConnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
@@ -95,13 +97,13 @@ class ConnectionManagerTest : FunSpec({
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
-            disconnectContract.launch(Terminal.ZVT())
+            disconnectContract.launch(ZvtTerminal.create())
         }
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
     test("startSPOSDisconnect by config name") {
-        val terminal = Terminal.OPI()
+        val terminal = OpiTerminal.create()
         configs["opi"] = terminal
         target.startSPOSDisconnect("opi")
 
@@ -114,7 +116,7 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startSPOSDisconnect by terminal") {
-        val terminal = TestExternalTerminal("external_terminal")
+        val terminal = TestTerminal("external_terminal")
         target.startSPOSDisconnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
@@ -130,12 +132,12 @@ class ConnectionManagerTest : FunSpec({
             throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        target.startSPOSDisconnect(Terminal.OPI())
+        target.startSPOSDisconnect(OpiTerminal.create())
 
         val result = terminalState.first()
 
         verify {
-            disconnectContract.launch(Terminal.OPI())
+            disconnectContract.launch(OpiTerminal.create())
         }
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()

@@ -1,7 +1,6 @@
 package de.tillhub.paymentengine.opi.data
 
 import de.tillhub.paymentengine.data.ResultCodeSets
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionData
@@ -57,7 +56,7 @@ internal sealed class OPIOperationStatus {
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = Terminal.OPI.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = it.terminal?.stan.orEmpty(),
                         cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
@@ -66,7 +65,7 @@ internal sealed class OPIOperationStatus {
                     )
                 } ?: serviceData?.let {
                     TransactionData(
-                        terminalType = Terminal.OPI.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = "",
                         cardCircuit = "",
@@ -96,7 +95,7 @@ internal sealed class OPIOperationStatus {
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = Terminal.OPI.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = it.terminal?.stan.orEmpty(),
                         cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
@@ -105,7 +104,7 @@ internal sealed class OPIOperationStatus {
                     )
                 } ?: serviceData?.let {
                     TransactionData(
-                        terminalType = Terminal.OPI.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = "",
                         cardCircuit = "",

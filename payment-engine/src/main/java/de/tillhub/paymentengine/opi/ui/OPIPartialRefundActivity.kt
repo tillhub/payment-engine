@@ -8,11 +8,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import java.math.BigDecimal
 
 internal class OPIPartialRefundActivity : OPITerminalActivity() {
@@ -74,7 +74,7 @@ internal class OPIPartialRefundActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.OPI.TYPE
+                    OpiTerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
@@ -91,7 +91,7 @@ internal class OPIPartialRefundActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.OPI.TYPE
+                    OpiTerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,

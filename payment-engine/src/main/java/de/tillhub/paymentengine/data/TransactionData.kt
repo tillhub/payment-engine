@@ -4,6 +4,23 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
+/**
+ * Represents the data associated with a payment transaction.
+ *
+ * This class encapsulates various details about a transaction,
+ * such as the terminal used, transaction identifiers, card information,
+ * and the payment provider involved.
+ *
+ * It implements [Parcelable] to allow instances of this class
+ * to be passed between Android components (e.g., Activities, Fragments).
+ *
+ * @property terminalType The type of the terminal used for the transaction (e.g., ZVT, OPI, ...)
+ * @property terminalId The unique identifier of the terminal.
+ * @property transactionId The unique identifier for this specific transaction.
+ * @property cardCircuit The card network or scheme (e.g., Visa, Mastercard).
+ * @property cardPan The Primary Account Number of the card used, masked for security.
+ * @property paymentProvider The entity that processed the payment.
+ */
 @Parcelize
 class TransactionData(
     val terminalType: String,

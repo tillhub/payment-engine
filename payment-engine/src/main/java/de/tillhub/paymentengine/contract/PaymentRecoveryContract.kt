@@ -4,24 +4,20 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
+import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
-import de.tillhub.paymentengine.AnalyticsMessageFactory
-import de.tillhub.paymentengine.data.ExtraKeys
 
 class PaymentRecoveryContract(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.External) {
-            input.recoveryIntent(context, input)
-        } else {
-            throw UnsupportedOperationException("Payment recovery is not supported by this terminal")
-        }.also {
+        return input.contract.recoveryIntent(context, input).also {
             analytics?.logOperation(AnalyticsMessageFactory.createRecoveryOperation(input))
         }
     }

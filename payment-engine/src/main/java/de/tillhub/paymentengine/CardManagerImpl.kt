@@ -2,6 +2,7 @@ package de.tillhub.paymentengine
 
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import kotlinx.coroutines.flow.MutableStateFlow
 
 internal abstract class CardManagerImpl(
@@ -12,7 +13,7 @@ internal abstract class CardManagerImpl(
 ) : CardManager {
 
     internal val defaultConfig: Terminal by lazy {
-        Terminal.ZVT()
+        ZvtTerminal.create()
     }
 
     override fun putTerminalConfig(config: Terminal) {

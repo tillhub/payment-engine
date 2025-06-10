@@ -53,7 +53,7 @@ android {
 
 dependencies {
     implementation(project(":payment-engine"))
-    implementation(project(":payment-spos"))
+    implementation(project(":payment-plugins:spos"))
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     implementation(libs.core.ktx)

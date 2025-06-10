@@ -13,9 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TimeoutManager
 import de.tillhub.paymentengine.opi.OPIService
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import kotlinx.coroutines.launch
 
 @Suppress("TooManyFunctions")
@@ -42,9 +42,9 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
         applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     }
 
-    protected val config: Terminal.OPI by lazy {
+    protected val config: OpiTerminal by lazy {
         intent.extras?.let {
-            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, Terminal.OPI::class.java)
+            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, OpiTerminal::class.java)
         } ?: throw IllegalArgumentException("OPITerminalActivity: Extras is null")
     }
 

@@ -3,7 +3,6 @@ package de.tillhub.paymentengine.opi
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.helper.TerminalConfig
 import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.helper.toISOString
@@ -21,6 +20,7 @@ import de.tillhub.paymentengine.opi.data.DeviceType
 import de.tillhub.paymentengine.opi.data.DtoToStringConverter
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
 import de.tillhub.paymentengine.opi.data.OPIResponse
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.opi.data.OriginalTransaction
 import de.tillhub.paymentengine.opi.data.Output
 import de.tillhub.paymentengine.opi.data.OverallResult
@@ -42,7 +42,7 @@ internal interface OPIChannelController {
 
     val operationState: StateFlow<OPIOperationStatus>
 
-    fun init(terminal: Terminal.OPI)
+    fun init(terminal: OpiTerminal)
     fun close()
 
     suspend fun login()
@@ -70,7 +70,7 @@ internal class OPIChannelControllerImpl(
     private val analytics: PaymentAnalytics? = PaymentEngine.getInstance().paymentAnalytics
 ) : OPIChannelController {
 
-    private lateinit var terminal: Terminal.OPI
+    private lateinit var terminal: OpiTerminal
     private lateinit var channel0: OPIChannel0
     private lateinit var channel1: OPIChannel1
 
@@ -85,7 +85,7 @@ internal class OPIChannelControllerImpl(
 
     private lateinit var loginResponse: ServiceResponse
 
-    override fun init(terminal: Terminal.OPI) {
+    override fun init(terminal: OpiTerminal) {
         this.terminal = terminal
 
         if (initialized) {

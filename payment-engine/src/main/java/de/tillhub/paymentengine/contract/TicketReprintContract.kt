@@ -17,11 +17,7 @@ class TicketReprintContract(
 ) : ActivityResultContract<Terminal, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: Terminal): Intent {
-        return if (input is Terminal.External) {
-            input.ticketReprintIntent(context, input)
-        } else {
-            throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
-        }.also {
+        return input.contract.ticketReprintIntent(context, input).also {
             analytics?.logOperation(AnalyticsMessageFactory.createTicketReprintOperation(input))
         }
     }

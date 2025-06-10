@@ -6,9 +6,9 @@ import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.databinding.ActivityTerminalReconciliationBinding
 import de.tillhub.paymentengine.helper.viewBinding
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 
 internal class TerminalReconciliationActivity : CardTerminalActivity() {
 
@@ -51,7 +51,7 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.ZVT.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.reconciliation)
             }
@@ -65,7 +65,7 @@ internal class TerminalReconciliationActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    Terminal.ZVT.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.reconciliation)
             }

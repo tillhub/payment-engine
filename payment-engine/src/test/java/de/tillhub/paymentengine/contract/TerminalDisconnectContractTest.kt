@@ -9,7 +9,7 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -31,6 +31,8 @@ class TerminalDisconnectContractTest : FunSpec({
 
     lateinit var target: TerminalDisconnectContract
 
+    val terminal: Terminal = TestTerminal("external")
+
     beforeTest {
         context = spyk(RuntimeEnvironment.getApplication())
         analytics = mockk {
@@ -41,30 +43,30 @@ class TerminalDisconnectContractTest : FunSpec({
         target = TerminalDisconnectContract(analytics)
     }
 
-    test("createIntent External") {
-        val result = target.createIntent(context, TestExternalTerminal("external"))
+    test("createIntent") {
+        every { terminal.contract.disconnectIntent(any(), any()) } returns Intent("DISCONNECT")
+        val result = target.createIntent(context, terminal)
 
         verify {
-            analytics.logOperation(any())
+            terminal.contract.disconnectIntent(context, terminal)
+            analytics.logOperation(
+                "Operation: TERMINAL_DISCONNECT\n" +
+                        "Terminal.External(" +
+                        "id=external, " +
+                        "saleConfig=CardSaleConfig(" +
+                        "applicationName=Tillhub GO, " +
+                        "operatorId=ah, " +
+                        "saleId=registerProvider, " +
+                        "pin=333333, " +
+                        "poiId=66000001, " +
+                        "poiSerialNumber=" +
+                        ")" +
+                        ")"
+            )
         }
 
         result.shouldBeInstanceOf<Intent>()
         result.action shouldBe "DISCONNECT"
-    }
-
-    test("createIntent OPI + ZVT") {
-        try {
-            target.createIntent(
-                context,
-                OPI
-            )
-        } catch (e: Exception) {
-            e.shouldBeInstanceOf<UnsupportedOperationException>()
-            e.message shouldBe "Disconnect is not supported by this terminal"
-        }
-        verify(inverse = true) {
-            analytics.logOperation(any())
-        }
     }
 
     test("parseResult: result OK") {
@@ -97,13 +99,4 @@ class TerminalDisconnectContractTest : FunSpec({
             analytics.logCommunication(any(), any())
         }
     }
-}) {
-    companion object {
-        val OPI = Terminal.OPI(
-            id = "opi",
-            ipAddress = "127.0.0.1",
-            port = 20002,
-            port2 = 20007
-        )
-    }
-}
+})

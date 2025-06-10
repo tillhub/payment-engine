@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import de.tillhub.paymentengine.AnalyticsMessageFactory
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
@@ -11,9 +12,6 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.helper.ResponseHandler
-import de.tillhub.paymentengine.opi.ui.OPIPaymentReversalActivity
-import de.tillhub.paymentengine.AnalyticsMessageFactory
-import de.tillhub.paymentengine.zvt.ui.CardPaymentReversalActivity
 import java.math.BigDecimal
 import java.util.Objects
 
@@ -22,19 +20,7 @@ class PaymentReversalContract(
 ) : ActivityResultContract<ReversalRequest, TerminalOperationStatus>() {
 
     override fun createIntent(context: Context, input: ReversalRequest): Intent {
-        return when (input.config) {
-            is Terminal.ZVT -> Intent(context, CardPaymentReversalActivity::class.java).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-                putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
-            }
-
-            is Terminal.OPI -> Intent(context, OPIPaymentReversalActivity::class.java).apply {
-                putExtra(ExtraKeys.EXTRA_CONFIG, input.config)
-                putExtra(ExtraKeys.EXTRA_RECEIPT_NO, input.receiptNo)
-            }
-
-            is Terminal.External -> input.config.reversalIntent(context, input)
-        }.also {
+        return input.config.contract.reversalIntent(context, input).also {
             analytics?.logOperation(AnalyticsMessageFactory.createReversalOperation(input))
         }
     }

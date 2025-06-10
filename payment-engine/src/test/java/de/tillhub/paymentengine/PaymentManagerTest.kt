@@ -7,7 +7,9 @@ import de.tillhub.paymentengine.contract.PaymentResultContract
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -61,7 +63,7 @@ class PaymentManagerTest : FunSpec({
                             it.amount == amount &&
                             it.tip == tip &&
                             it.currency == currency &&
-                            it.config == Terminal.ZVT()
+                            it.config == ZvtTerminal.create()
                 }
             )
         }
@@ -74,7 +76,7 @@ class PaymentManagerTest : FunSpec({
         val amount = BigDecimal(200)
         val tip = BigDecimal(20)
         val currency = ISOAlphaCurrency("EUR")
-        val terminal = Terminal.OPI()
+        val terminal = OpiTerminal.create()
         configs["opi"] = terminal
 
         target.startPaymentTransaction(transactionId, amount, tip, currency, "opi")
@@ -99,7 +101,7 @@ class PaymentManagerTest : FunSpec({
         val amount = BigDecimal(100)
         val tip = BigDecimal(10)
         val currency = ISOAlphaCurrency("EUR")
-        val terminal = TestExternalTerminal("external_terminal")
+        val terminal = TestTerminal("external_terminal")
 
         target.startPaymentTransaction(transactionId, amount, tip, currency, terminal)
 

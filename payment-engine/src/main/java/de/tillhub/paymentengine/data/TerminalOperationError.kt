@@ -5,6 +5,20 @@ import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.util.Objects
 
+/**
+ * Represents an error that occurred during a terminal operation.
+ *
+ * This class implements [Parcelable] to allow it to be passed between Android components (e.g., Activities).
+ *
+ * @property date The timestamp when the error occurred.
+ * @property customerReceipt The customer receipt text, if available.
+ * @property merchantReceipt The merchant receipt text, if available.
+ * @property rawData Raw data associated with the error, often from the terminal.
+ * @property data Parsed transaction data related to the error, if available.
+ * @property resultCode A [TransactionResultCode] indicating the specific type of error.
+ * @property isRecoverable A boolean flag indicating whether the tried transaction might be recoverable
+ *                         (e.g., by retrying the operation).
+ */
 @Suppress("LongParameterList")
 @Parcelize
 class TerminalOperationError(

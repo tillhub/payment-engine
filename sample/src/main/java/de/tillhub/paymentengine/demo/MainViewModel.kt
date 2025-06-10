@@ -10,9 +10,10 @@ import de.tillhub.paymentengine.RecoveryManager
 import de.tillhub.paymentengine.RefundManager
 import de.tillhub.paymentengine.ReversalManager
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
@@ -81,21 +82,21 @@ class MainViewModel : ViewModel() {
 
     private fun setupTerminalConfigs(cardManager: CardManager) {
         cardManager.putTerminalConfig(
-            Terminal.ZVT(
+            ZvtTerminal.create(
                 id = "zvt-remote",
                 ipAddress = REMOTE_IP,
                 port = 20007
             )
         )
         cardManager.putTerminalConfig(
-            Terminal.ZVT(
+            ZvtTerminal.create(
                 id = "zvt-local",
                 ipAddress = "127.0.0.1",
                 port = 40007
             )
         )
         cardManager.putTerminalConfig(
-            Terminal.OPI(
+            OpiTerminal.create(
                 id = "opi",
                 ipAddress = REMOTE_IP,
                 port = 20002,
@@ -103,7 +104,7 @@ class MainViewModel : ViewModel() {
             )
         )
         cardManager.putTerminalConfig(
-            SPOSTerminal(
+            SposTerminal.create(
                 id = "s-pos",
             )
         )
