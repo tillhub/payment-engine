@@ -19,6 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-dontwarn java.lang.invoke.StringConcatFactory
 
--keep class de.tillhub.paymentengine.spos.data.SPOSTerminal { *; }
--keep class de.tillhub.paymentengine.spos.data.SPOSTerminal$* { *; }
+-keep class de.tillhub.paymentengine.spos.data.SposTerminal { *; }
+-keep class de.tillhub.paymentengine.spos.data.SposTerminal$* { *; }
