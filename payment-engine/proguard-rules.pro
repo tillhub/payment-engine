@@ -56,10 +56,10 @@
 -keep class de.tillhub.paymentengine.data.TransactionData { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode { *; }
 -keep class de.tillhub.paymentengine.data.TransactionResultCode$* { *; }
--keep class de.tillhub.paymentengine.opi.data.OPITerminal { *; }
--keep class de.tillhub.paymentengine.opi.data.OPITerminal$* { *; }
--keep class de.tillhub.paymentengine.zvt.data.ZVTTerminal { *; }
--keep class de.tillhub.paymentengine.zvt.data.ZVTTerminal$* { *; }
+-keep class de.tillhub.paymentengine.opi.data.OpiTerminal { *; }
+-keep class de.tillhub.paymentengine.opi.data.OpiTerminal$* { *; }
+-keep class de.tillhub.paymentengine.zvt.data.ZvtTerminal { *; }
+-keep class de.tillhub.paymentengine.zvt.data.ZvtTerminal$* { *; }
 
 -keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);
