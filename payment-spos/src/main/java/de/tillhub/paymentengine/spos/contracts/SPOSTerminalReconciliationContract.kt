@@ -6,11 +6,11 @@ import androidx.activity.result.contract.ActivityResultContract
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.SPOSIntentFactory
 import de.tillhub.paymentengine.spos.SPOSResponseHandler
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 
-internal class SPOSTerminalReconciliationContract : ActivityResultContract<SPOSTerminal, TerminalOperationStatus>() {
+internal class SPOSTerminalReconciliationContract : ActivityResultContract<SposTerminal, TerminalOperationStatus>() {
 
-    override fun createIntent(context: Context, input: SPOSTerminal): Intent =
+    override fun createIntent(context: Context, input: SposTerminal): Intent =
         SPOSIntentFactory.createReconciliationIntent()
 
     override fun parseResult(resultCode: Int, intent: Intent?): TerminalOperationStatus =

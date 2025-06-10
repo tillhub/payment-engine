@@ -8,7 +8,7 @@ import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 
 internal class TerminalLoginActivity : CardTerminalActivity() {
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
@@ -48,7 +48,7 @@ internal class TerminalLoginActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    ZVTTerminal.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.connect)
             }
@@ -62,7 +62,7 @@ internal class TerminalLoginActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    ZVTTerminal.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.connect)
             }

@@ -8,9 +8,9 @@ import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -56,7 +56,7 @@ class TicketReprintContractTest : FunSpec({
 
     test("createIntent OPI") {
         val result = shouldThrow<UnsupportedOperationException> {
-            target.createIntent(context, OPITerminal())
+            target.createIntent(context, OpiTerminal.create())
         }
 
         verify(inverse = true) {
@@ -68,7 +68,7 @@ class TicketReprintContractTest : FunSpec({
 
     test("createIntent ZVT") {
         val result = shouldThrow<UnsupportedOperationException> {
-            target.createIntent(context, ZVTTerminal())
+            target.createIntent(context, ZvtTerminal.create())
         }
 
         verify(inverse = true) {

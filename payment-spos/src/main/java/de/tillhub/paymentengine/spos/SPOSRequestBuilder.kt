@@ -8,7 +8,7 @@ import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import java.math.BigDecimal
 
 internal object SPOSRequestBuilder {
@@ -36,8 +36,8 @@ internal object SPOSRequestBuilder {
         receiptNo = readReceiptNo(intent),
     )
 
-    private fun readConfig(intent: Intent): SPOSTerminal = intent.extras?.let {
-        BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, SPOSTerminal::class.java)
+    private fun readConfig(intent: Intent): SposTerminal = intent.extras?.let {
+        BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, SposTerminal::class.java)
             ?: throw IllegalArgumentException("TerminalActivity: Argument config is missing")
     } ?: throw IllegalArgumentException("TerminalActivity: Extras is null")
 

@@ -14,7 +14,7 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentPartialRefundBinding
 import de.tillhub.paymentengine.helper.viewBinding
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import java.math.BigDecimal
 
 internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
@@ -74,7 +74,7 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    ZVTTerminal.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.refund)
             }
@@ -88,7 +88,7 @@ internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    ZVTTerminal.TYPE
+                    ZvtTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, state.refund)
             }

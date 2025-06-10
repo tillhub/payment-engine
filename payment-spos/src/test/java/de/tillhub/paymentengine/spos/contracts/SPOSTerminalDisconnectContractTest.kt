@@ -7,7 +7,7 @@ import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.data.SPOSKey
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -32,7 +32,7 @@ class SPOSTerminalDisconnectContractTest : FunSpec({
     test("createIntent SPOS") {
         val result = target.createIntent(
             context,
-            SPOSTerminal()
+            SposTerminal.create()
         )
 
         result.shouldBeInstanceOf<Intent>()

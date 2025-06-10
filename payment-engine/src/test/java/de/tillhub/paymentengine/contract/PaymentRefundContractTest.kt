@@ -11,9 +11,9 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -95,7 +95,7 @@ class PaymentRefundContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            OPITerminal::class.java
+            OpiTerminal::class.java
         ) shouldBe OPI
         BundleCompat.getSerializable(
             result.extras!!,
@@ -148,7 +148,7 @@ class PaymentRefundContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            ZVTTerminal::class.java
+            ZvtTerminal::class.java
         ) shouldBe ZVT
         BundleCompat.getSerializable(
             result.extras!!,
@@ -223,12 +223,12 @@ class PaymentRefundContractTest : FunSpec({
     }
 }) {
     companion object {
-        val ZVT = ZVTTerminal(
+        val ZVT = ZvtTerminal.create(
             id = "zvt",
             ipAddress = "127.0.0.1",
             port = 40007,
         )
-        val OPI = OPITerminal(
+        val OPI = OpiTerminal.create(
             id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,

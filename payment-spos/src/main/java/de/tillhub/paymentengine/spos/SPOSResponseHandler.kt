@@ -11,7 +11,7 @@ import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.spos.data.SPOSResultCodes
 import de.tillhub.paymentengine.spos.data.SPOSResultState
 import de.tillhub.paymentengine.spos.data.SPOSTransactionResult
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import de.tillhub.paymentengine.spos.data.StringToReceiptDtoConverter
 import java.time.Instant
 import kotlin.reflect.KClass
@@ -28,8 +28,8 @@ internal object SPOSResponseHandler {
         TerminalOperationStatus.Login.Connected(
             date = Instant.now(),
             rawData = "",
-            terminalType = SPOSTerminal.TYPE,
-            terminalId = SPOSTerminal.TYPE,
+            terminalType = SposTerminal.TYPE,
+            terminalId = SposTerminal.TYPE,
         )
     } else {
         val error = intent?.extras?.getString(SPOSKey.ResultExtra.ERROR)
@@ -148,7 +148,7 @@ internal object SPOSResponseHandler {
 
     private fun Bundle.toTransactionData(): TransactionData =
         TransactionData(
-            terminalType = SPOSTerminal.TYPE,
+            terminalType = SposTerminal.TYPE,
             terminalId = getString(SPOSKey.ResultExtra.TERMINAL_ID).orEmpty(),
             transactionId = getString(SPOSKey.ResultExtra.TRANSACTION_DATA).orEmpty(),
             cardCircuit = getString(SPOSKey.ResultExtra.CARD_CIRCUIT).orEmpty(),

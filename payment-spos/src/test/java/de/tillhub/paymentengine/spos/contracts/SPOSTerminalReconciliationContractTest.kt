@@ -7,7 +7,7 @@ import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.data.SPOSKey
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -64,7 +64,7 @@ class SPOSTerminalReconciliationContractTest : FunSpec({
     }
 }) {
     companion object {
-        val SPOS = SPOSTerminal(
+        val SPOS = SposTerminal.create(
             id = "s-pos",
         )
     }

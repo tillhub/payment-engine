@@ -11,7 +11,7 @@ import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.opi.common.modifyAmountForOpi
 import de.tillhub.paymentengine.opi.common.startAsForegroundService
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ internal class OPIService(
         this.bringToFront = bringToFront
     }
 
-    fun init(terminal: OPITerminal) {
+    fun init(terminal: OpiTerminal) {
         opiController.init(terminal)
 
         lifecycleScope.launch {

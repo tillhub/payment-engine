@@ -18,18 +18,31 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
-@Suppress("LongParameterList")
+/**
+ * Represents a ZVT (Zahlungsverkehrs-Terminal) payment terminal.
+ * This class holds the configuration for a ZVT terminal, including its IP address, port,
+ * and other operational parameters.
+ *
+ * @property id The unique identifier for this terminal. Defaults to [DEFAULT_ZVT_ID].
+ * @property saleConfig Configuration for card sale transactions. Defaults to a new [CardSaleConfig] instance.
+ * @property ipAddress The IP address of the ZVT terminal. Defaults to [DEFAULT_IP_ADDRESS].
+ * @property port The port number for communication with the ZVT terminal. Defaults to [DEFAULT_PORT].
+ * @property terminalPrinterAvailable Indicates whether the terminal has a built-in printer.
+ *                                    Defaults to [DEFAULT_PRINTER_AVAILABLE].
+ * @property isoCurrencyNumber The ISO 4217 numeric currency code for transactions. Defaults to [DEFAULT_CURRENCY_CODE].
+ */
 @Parcelize
-class ZVTTerminal internal constructor(
+class ZvtTerminal private constructor(
     override val id: String = DEFAULT_ZVT_ID,
     override val saleConfig: CardSaleConfig = CardSaleConfig(),
-    @IgnoredOnParcel
-    override val contract: TerminalContract = ZVTTerminalContract(),
     val ipAddress: String = DEFAULT_IP_ADDRESS,
     val port: Int = DEFAULT_PORT,
     val terminalPrinterAvailable: Boolean = DEFAULT_PRINTER_AVAILABLE,
     val isoCurrencyNumber: String = DEFAULT_CURRENCY_CODE,
 ) : Terminal {
+    @IgnoredOnParcel
+    override val contract: TerminalContract = ZvtTerminalContract
+
     override fun toString() = "ZVTTerminal(" +
             "id=$id, " +
             "ipAddress=$ipAddress, " +
@@ -39,7 +52,7 @@ class ZVTTerminal internal constructor(
             "isoCurrencyNumber=$isoCurrencyNumber" +
             ")"
 
-    override fun equals(other: Any?) = other is ZVTTerminal &&
+    override fun equals(other: Any?) = other is ZvtTerminal &&
             id == other.id &&
             ipAddress == other.ipAddress &&
             port == other.port &&
@@ -64,6 +77,7 @@ class ZVTTerminal internal constructor(
         private const val DEFAULT_PRINTER_AVAILABLE = true
         const val TYPE = "ZVT"
 
+        @Suppress("LongParameterList")
         fun create(
             id: String = DEFAULT_ZVT_ID,
             saleConfig: CardSaleConfig = CardSaleConfig(),
@@ -71,7 +85,7 @@ class ZVTTerminal internal constructor(
             port: Int = DEFAULT_PORT,
             terminalPrinterAvailable: Boolean = DEFAULT_PRINTER_AVAILABLE,
             isoCurrencyNumber: String = DEFAULT_CURRENCY_CODE
-        ): ZVTTerminal = ZVTTerminal(
+        ): ZvtTerminal = ZvtTerminal(
             id = id,
             saleConfig = saleConfig,
             ipAddress = ipAddress,
@@ -82,7 +96,14 @@ class ZVTTerminal internal constructor(
     }
 }
 
-internal class ZVTTerminalContract : TerminalContract {
+/**
+ * Defines the contract for interacting with a ZVT terminal.
+ * This object provides methods to create intents for various terminal operations
+ * such as connecting, making payments, processing refunds, and more.
+ *
+ * It acts as a factory for intents that launch specific activities related to ZVT terminal interactions.
+ */
+internal object ZvtTerminalContract : TerminalContract {
     override fun connectIntent(context: Context, terminal: Terminal): Intent =
         Intent(context, TerminalLoginActivity::class.java).apply {
             putExtra(ExtraKeys.EXTRA_CONFIG, terminal)

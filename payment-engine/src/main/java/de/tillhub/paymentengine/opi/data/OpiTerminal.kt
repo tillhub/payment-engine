@@ -18,18 +18,29 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
-@Suppress("LongParameterList")
+/**
+ * Represents an OPI (Open Payment Initiative) terminal.
+ *
+ * @property id The unique identifier of the terminal.
+ * @property saleConfig Configuration for card sales.
+ * @property ipAddress The IP address of the terminal.
+ * @property port The port number for communication on channel 0.
+ * @property port2 The port number for communication on channel 1.
+ * @property currencyCode The currency code used for transactions (e.g., "EUR").
+ * @property contract The contract defining the terminal's capabilities.
+ */
 @Parcelize
-class OPITerminal internal constructor(
+class OpiTerminal private constructor(
     override val id: String = DEFAULT_OPI_ID,
     override val saleConfig: CardSaleConfig = CardSaleConfig(),
-    @IgnoredOnParcel
-    override val contract: TerminalContract = OPITerminalContract(),
     val ipAddress: String = DEFAULT_IP_ADDRESS,
     val port: Int = DEFAULT_PORT_1,
     val port2: Int = DEFAULT_PORT_2,
     val currencyCode: String = DEFAULT_CURRENCY_CODE,
 ) : Terminal {
+    @IgnoredOnParcel
+    override val contract: TerminalContract = OpiTerminalContract
+
     override fun toString() = "OPITerminal(" +
             "id=$id, " +
             "ipAddress=$ipAddress, " +
@@ -39,7 +50,7 @@ class OPITerminal internal constructor(
             "currencyCode=$currencyCode" +
             ")"
 
-    override fun equals(other: Any?) = other is OPITerminal &&
+    override fun equals(other: Any?) = other is OpiTerminal &&
             id == other.id &&
             ipAddress == other.ipAddress &&
             port == other.port &&
@@ -64,6 +75,7 @@ class OPITerminal internal constructor(
         const val DEFAULT_CURRENCY_CODE = "EUR"
         const val TYPE = "OPI"
 
+        @Suppress("LongParameterList")
         fun create(
             id: String = DEFAULT_OPI_ID,
             saleConfig: CardSaleConfig = CardSaleConfig(),
@@ -71,7 +83,7 @@ class OPITerminal internal constructor(
             port: Int = DEFAULT_PORT_1,
             port2: Int = DEFAULT_PORT_2,
             currencyCode: String = DEFAULT_CURRENCY_CODE,
-        ): OPITerminal = OPITerminal(
+        ): OpiTerminal = OpiTerminal(
             id = id,
             saleConfig = saleConfig,
             ipAddress = ipAddress,
@@ -82,7 +94,12 @@ class OPITerminal internal constructor(
     }
 }
 
-internal class OPITerminalContract : TerminalContract {
+/**
+ * Implementation of [TerminalContract] for OPI terminals.
+ * This object defines how to create Intents for various terminal operations
+ * specific to OPI terminals.
+ */
+internal object OpiTerminalContract : TerminalContract {
     override fun connectIntent(context: Context, terminal: Terminal): Intent =
         Intent(context, OPILoginActivity::class.java).apply {
             putExtra(ExtraKeys.EXTRA_CONFIG, terminal)

@@ -10,7 +10,7 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 
 internal class OPIPaymentReversalActivity : OPITerminalActivity() {
 
@@ -63,7 +63,7 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    OPITerminal.TYPE
+                    OpiTerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
@@ -80,7 +80,7 @@ internal class OPIPaymentReversalActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    OPITerminal.TYPE
+                    OpiTerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,

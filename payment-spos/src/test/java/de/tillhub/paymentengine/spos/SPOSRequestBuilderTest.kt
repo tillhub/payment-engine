@@ -9,7 +9,7 @@ import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -23,7 +23,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildPaymentRequest should return a PaymentRequest object") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
@@ -34,7 +34,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
         result.shouldBeInstanceOf<PaymentRequest>()
         result shouldBe PaymentRequest(
-            config = SPOSTerminal(),
+            config = SposTerminal.create(),
             transactionId = "transaction_id",
             amount = BigDecimal.valueOf(10.0),
             tip = BigDecimal.valueOf(1.0),
@@ -53,7 +53,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildRefundRequest should return a RefundRequest object") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
@@ -63,7 +63,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
         result.shouldBeInstanceOf<RefundRequest>()
         result shouldBe RefundRequest(
-            config = SPOSTerminal(),
+            config = SposTerminal.create(),
             transactionId = "transaction_id",
             amount = BigDecimal.valueOf(10.0),
             currency = ISOAlphaCurrency("EUR")
@@ -81,7 +81,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildReversalRequest should return a ReversalRequest object") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
@@ -93,7 +93,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
         result.shouldBeInstanceOf<ReversalRequest>()
         result shouldBe ReversalRequest(
-            config = SPOSTerminal(),
+            config = SposTerminal.create(),
             transactionId = "transaction_id",
             amount = BigDecimal.valueOf(10.0),
             tip = BigDecimal.valueOf(1.0),
@@ -130,7 +130,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildReversalRequest should throw an exception if argument tx id is missing") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
             putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
@@ -147,7 +147,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildReversalRequest should throw an exception if argument amount is missing") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
             putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
@@ -164,7 +164,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildReversalRequest should throw an exception if argument tip is missing") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency("EUR"))
@@ -181,7 +181,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildReversalRequest should throw an exception if argument currency is missing") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))
@@ -198,7 +198,7 @@ class SPOSRequestBuilderTest : FunSpec({
 
     test("buildReversalRequest should throw an exception if argument receipt no is missing") {
         val intent = Intent().apply {
-            putExtra(ExtraKeys.EXTRA_CONFIG, SPOSTerminal())
+            putExtra(ExtraKeys.EXTRA_CONFIG, SposTerminal.create())
             putExtra(SPOSExtraKeys.EXTRA_TX_ID, "transaction_id")
             putExtra(ExtraKeys.EXTRA_AMOUNT, BigDecimal.valueOf(10.0))
             putExtra(SPOSExtraKeys.EXTRA_TIP, BigDecimal.valueOf(1.0))

@@ -18,7 +18,7 @@ import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.helper.TimeoutManager
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 
 @Suppress("TooManyFunctions")
 internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
@@ -29,9 +29,9 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
         applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     }
 
-    protected val config: ZVTTerminal by lazy {
+    protected val config: ZvtTerminal by lazy {
         intent.extras?.let {
-            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, ZVTTerminal::class.java)
+            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, ZvtTerminal::class.java)
         } ?: throw IllegalArgumentException("CardTerminalActivity: Extras is null")
     }
 
@@ -91,7 +91,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
         val register = Apdu(Commons.Command.CMD_0600).apply {
             val password = config.saleConfig.pin
-            val currency = (config as? ZVTTerminal)?.isoCurrencyNumber
+            val currency = (config as? ZvtTerminal)?.isoCurrencyNumber
                 ?: throw IllegalArgumentException("Terminal currency is missing")
 
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))

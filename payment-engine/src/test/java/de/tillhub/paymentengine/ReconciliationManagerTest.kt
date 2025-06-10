@@ -5,9 +5,9 @@ import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalReconciliationContract
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -46,13 +46,13 @@ class ReconciliationManagerTest : FunSpec({
     test("startReconciliation should use default config when no configId provided") {
         target.startReconciliation()
 
-        verify { reconciliationContract.launch(ZVTTerminal()) }
+        verify { reconciliationContract.launch(ZvtTerminal.create()) }
 
         terminalState.value shouldBe TerminalOperationStatus.Reconciliation.Pending
     }
 
     test("startReconciliation with configId should and launch reconciliation contract") {
-        val terminal = OPITerminal()
+        val terminal = OpiTerminal.create()
         configs["opi"] = terminal
 
         target.startReconciliation(configId = "opi")

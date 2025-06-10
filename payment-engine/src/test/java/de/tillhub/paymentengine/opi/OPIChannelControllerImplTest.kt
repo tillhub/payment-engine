@@ -17,7 +17,7 @@ import de.tillhub.paymentengine.opi.data.DeviceResponse
 import de.tillhub.paymentengine.opi.data.DeviceType
 import de.tillhub.paymentengine.opi.data.DtoToStringConverter
 import de.tillhub.paymentengine.opi.data.OPIOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.opi.data.OriginalTransaction
 import de.tillhub.paymentengine.opi.data.Output
 import de.tillhub.paymentengine.opi.data.OverallResult
@@ -1097,7 +1097,7 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
     companion object {
         val NOW = "2024-02-09T09:36:36Z".toInstant()
 
-        val TERMINAL = OPITerminal(
+        val TERMINAL = OpiTerminal.create(
             id = "opi",
             ipAddress = "192.168.1.22",
             port = 20002,

@@ -8,7 +8,7 @@ import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -99,7 +99,7 @@ class TerminalDisconnectContractTest : FunSpec({
     }
 }) {
     companion object {
-        val OPI = OPITerminal(
+        val OPI = OpiTerminal.create(
             id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,

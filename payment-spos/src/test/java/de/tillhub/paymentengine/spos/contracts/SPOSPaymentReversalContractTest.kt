@@ -9,7 +9,7 @@ import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.spos.data.SPOSKey
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -80,7 +80,7 @@ class SPOSPaymentReversalContractTest : FunSpec({
     }
 }) {
     companion object {
-        val SPOS = SPOSTerminal(
+        val SPOS = SposTerminal.create(
             id = "s-pos",
         )
     }

@@ -7,8 +7,8 @@ import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -67,7 +67,7 @@ class ReversalManagerTest : FunSpec({
                     amount = amount,
                     currency = currency,
                     tip = tip,
-                    config = ZVTTerminal(),
+                    config = ZvtTerminal.create(),
                     receiptNo = receiptNo
                 )
             )
@@ -77,7 +77,7 @@ class ReversalManagerTest : FunSpec({
     }
 
     test("startReversalTransaction with configId should launch reversal contract") {
-        val terminal = OPITerminal()
+        val terminal = OpiTerminal.create()
         configs["opi"] = terminal
         val transactionId = "12345"
         val amount = BigDecimal(100)
@@ -122,7 +122,7 @@ class ReversalManagerTest : FunSpec({
             amount = amount,
             tip = tip,
             currency = currency,
-            config = OPITerminal(),
+            config = OpiTerminal.create(),
             receiptNo = receiptNo
         )
 
@@ -133,7 +133,7 @@ class ReversalManagerTest : FunSpec({
                     amount = amount,
                     currency = currency,
                     tip = tip,
-                    config = OPITerminal(),
+                    config = OpiTerminal.create(),
                     receiptNo = receiptNo
                 )
             )

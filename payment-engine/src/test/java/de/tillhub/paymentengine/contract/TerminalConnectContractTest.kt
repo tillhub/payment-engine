@@ -9,9 +9,9 @@ import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -65,7 +65,7 @@ class TerminalConnectContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            OPITerminal::class.java
+            OpiTerminal::class.java
         ) shouldBe PaymentContractTest.OPI
     }
 
@@ -80,7 +80,7 @@ class TerminalConnectContractTest : FunSpec({
         BundleCompat.getParcelable(
             result.extras!!,
             ExtraKeys.EXTRA_CONFIG,
-            ZVTTerminal::class.java
+            ZvtTerminal::class.java
         ) shouldBe ZVT
     }
 
@@ -91,7 +91,7 @@ class TerminalConnectContractTest : FunSpec({
                 TerminalOperationStatus.Login.Connected(
                     date = mockk(),
                     rawData = "rawData",
-                    terminalType = OPITerminal.TYPE,
+                    terminalType = OpiTerminal.TYPE,
                     terminalId = "terminalId"
                 )
             )
@@ -119,13 +119,13 @@ class TerminalConnectContractTest : FunSpec({
     }
 }) {
     companion object {
-        val OPI = OPITerminal(
+        val OPI = OpiTerminal.create(
             id = "opi",
             ipAddress = "127.0.0.1",
             port = 20002,
             port2 = 20007
         )
-        val ZVT = ZVTTerminal(
+        val ZVT = ZvtTerminal.create(
             id = "zvt",
             ipAddress = "127.0.0.1",
             port = 20007,

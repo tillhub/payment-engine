@@ -7,7 +7,7 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.spos.data.SPOSKey
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import de.tillhub.paymentengine.spos.data.SPOSTransactionType
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -114,6 +114,6 @@ class SPOSIntentFactoryTest : FunSpec({
     }
 }) {
     companion object {
-        private val TERMINAL = SPOSTerminal()
+        private val TERMINAL = SposTerminal.create()
     }
 }

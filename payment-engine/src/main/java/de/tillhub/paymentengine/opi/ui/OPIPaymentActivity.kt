@@ -12,7 +12,7 @@ import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import java.math.BigDecimal
 
 internal class OPIPaymentActivity : OPITerminalActivity() {
@@ -74,7 +74,7 @@ internal class OPIPaymentActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    OPITerminal.TYPE
+                    OpiTerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
@@ -91,7 +91,7 @@ internal class OPIPaymentActivity : OPITerminalActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    OPITerminal.TYPE
+                    OpiTerminal.TYPE
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,

@@ -7,12 +7,20 @@ import de.tillhub.paymentengine.contract.PaymentRequest
 import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 
+/**
+ * Interface that holds configuration information about a particular terminal.
+ * A specific implementation must be provided for each specific terminal.
+ */
 interface Terminal : Parcelable {
     val id: String
     val saleConfig: CardSaleConfig
     val contract: TerminalContract
 }
 
+/**
+ * Interface that generates intents to perform all necessary actions of a particular terminal.
+ * A specific implementation must be provided for each specific terminal.
+ */
 interface TerminalContract {
     fun connectIntent(context: Context, terminal: Terminal): Intent
     fun paymentIntent(context: Context, input: PaymentRequest): Intent

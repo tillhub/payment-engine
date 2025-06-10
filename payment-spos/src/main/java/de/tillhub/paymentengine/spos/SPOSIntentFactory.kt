@@ -6,16 +6,16 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.contract.ReversalRequest
 import de.tillhub.paymentengine.spos.data.SPOSKey
 import de.tillhub.paymentengine.spos.data.SPOSTransactionType
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 
 internal object SPOSIntentFactory {
 
-    fun createConnectIntent(terminal: SPOSTerminal) =
+    fun createConnectIntent(terminal: SposTerminal) =
         Intent(SPOSKey.Action.CONNECT_ACTION).apply {
             putExtra(SPOSKey.Extra.APP_ID, terminal.appId)
         }
 
-    fun createDisconnectIntent(terminal: SPOSTerminal) =
+    fun createDisconnectIntent(terminal: SposTerminal) =
         Intent(SPOSKey.Action.DISCONNECT_ACTION).apply {
             putExtra(SPOSKey.Extra.APP_ID, terminal.appId)
         }

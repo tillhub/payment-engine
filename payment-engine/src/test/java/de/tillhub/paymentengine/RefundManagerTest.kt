@@ -7,9 +7,9 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OPITerminal
+import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -46,7 +46,7 @@ class RefundManagerTest : FunSpec({
     }
 
     test("startRefundTransaction should use default config when no configId provided") {
-        val defaultTerminal = ZVTTerminal()
+        val defaultTerminal = ZvtTerminal.create()
         configs.clear()
         val transactionId = "12345"
         val amount = BigDecimal(100)
@@ -73,7 +73,7 @@ class RefundManagerTest : FunSpec({
     }
 
     test("startRefundTransaction with configId should launch refund contract") {
-        val terminal = OPITerminal()
+        val terminal = OpiTerminal.create()
         configs["opi"] = terminal
         val transactionId = "12345"
         val amount = BigDecimal(100)

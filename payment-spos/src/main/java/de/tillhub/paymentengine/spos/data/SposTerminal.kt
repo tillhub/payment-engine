@@ -13,16 +13,26 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Objects
 
+/**
+ * Represents a Software Point of Sale (SPOS) terminal.
+ *
+ * @property id The unique identifier of the SPOS terminal.
+ * @property saleConfig Configuration for card sales.
+ * @property appId The application ID for the SPOS terminal.
+ * @property connected Indicates whether the terminal is currently in a connected state.
+ * @property currencyCode The default currency code for transactions (e.g., "EUR").
+ */
 @Parcelize
-class SPOSTerminal internal constructor(
+class SposTerminal private constructor(
     override val id: String = DEFAULT_SPOS_ID,
     override val saleConfig: CardSaleConfig = CardSaleConfig(),
-    @IgnoredOnParcel
-    override val contract: TerminalContract = SPOSTerminalContract(),
     val appId: String = DEFAULT_APP_ID,
     val connected: Boolean = DEFAULT_CONNECTION,
     val currencyCode: String = DEFAULT_CURRENCY_CODE,
 ) : Terminal {
+    @IgnoredOnParcel
+    override val contract: TerminalContract = SposTerminalContract
+
     override fun toString() = "SposTerminal(" +
             "id=$id, " +
             "appId=$appId, " +
@@ -31,7 +41,7 @@ class SPOSTerminal internal constructor(
             "currencyCode=$currencyCode" +
             ")"
 
-    override fun equals(other: Any?) = other is SPOSTerminal &&
+    override fun equals(other: Any?) = other is SposTerminal &&
             id == other.id &&
             appId == other.appId &&
             saleConfig == other.saleConfig &&
@@ -59,7 +69,7 @@ class SPOSTerminal internal constructor(
             appId: String = DEFAULT_APP_ID,
             connected: Boolean = DEFAULT_CONNECTION,
             currencyCode: String = DEFAULT_CURRENCY_CODE,
-        ): SPOSTerminal = SPOSTerminal(
+        ): SposTerminal = SposTerminal(
             id = id,
             saleConfig = saleConfig,
             appId = appId,
@@ -69,8 +79,15 @@ class SPOSTerminal internal constructor(
     }
 }
 
+/**
+ * Contract for interacting with an SPOS terminal.
+ * This object defines the Intents used to communicate various actions
+ * (connect, payment, refund, etc.) to the SPOS terminal application.
+ *
+ * Note: `package = context.packageName` is set for compatibility with Android API 34+.
+ */
 @Suppress("TooManyFunctions")
-internal class SPOSTerminalContract : TerminalContract {
+internal object SposTerminalContract : TerminalContract {
     override fun connectIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {
             putExtra(SPOSExtraKeys.EXTRA_ACTION, SPOSExtraKeys.ACTION_CONNECT)
@@ -156,7 +173,5 @@ internal class SPOSTerminalContract : TerminalContract {
             `package` = context.packageName
         }
 
-    companion object {
-        private const val INTENT_ACTION_SPOS = "de.tillhub.paymentengine.spos.ACTION_SPOS"
-    }
+    private const val INTENT_ACTION_SPOS = "de.tillhub.paymentengine.spos.ACTION_SPOS"
 }

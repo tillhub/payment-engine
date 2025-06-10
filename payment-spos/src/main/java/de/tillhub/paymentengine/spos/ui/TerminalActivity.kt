@@ -23,7 +23,7 @@ import de.tillhub.paymentengine.spos.contracts.SPOSTerminalReconciliationContrac
 import de.tillhub.paymentengine.spos.contracts.SPOSTicketReprintContract
 import de.tillhub.paymentengine.spos.data.SPOSExtraKeys
 import de.tillhub.paymentengine.spos.SPOSRequestBuilder
-import de.tillhub.paymentengine.spos.data.SPOSTerminal
+import de.tillhub.paymentengine.spos.data.SposTerminal
 import de.tillhub.paymentengine.spos.databinding.ActivityTerminalBinding
 import kotlin.reflect.KClass
 
@@ -35,7 +35,7 @@ internal class TerminalActivity : AppCompatActivity() {
         registerForActivityResult(SPOSPaymentContract(), ::handleResult)
     }
 
-    private val paymentRecoveryContract: ActivityResultLauncher<SPOSTerminal> by lazy {
+    private val paymentRecoveryContract: ActivityResultLauncher<SposTerminal> by lazy {
         registerForActivityResult(SPOSPaymentRecoveryContract(), ::handleResult)
     }
 
@@ -47,19 +47,19 @@ internal class TerminalActivity : AppCompatActivity() {
         registerForActivityResult(SPOSPaymentReversalContract(), ::handleResult)
     }
 
-    private val connectContract: ActivityResultLauncher<SPOSTerminal> by lazy {
+    private val connectContract: ActivityResultLauncher<SposTerminal> by lazy {
         registerForActivityResult(SPOSTerminalConnectContract(), ::handleResult)
     }
 
-    private val disconnectContract: ActivityResultLauncher<SPOSTerminal> by lazy {
+    private val disconnectContract: ActivityResultLauncher<SposTerminal> by lazy {
         registerForActivityResult(SPOSTerminalDisconnectContract(), ::handleResult)
     }
 
-    private val reprintContract: ActivityResultLauncher<SPOSTerminal> by lazy {
+    private val reprintContract: ActivityResultLauncher<SposTerminal> by lazy {
         registerForActivityResult(SPOSTicketReprintContract(), ::handleResult)
     }
 
-    private val reconciliationContract: ActivityResultLauncher<SPOSTerminal> by lazy {
+    private val reconciliationContract: ActivityResultLauncher<SposTerminal> by lazy {
         registerForActivityResult(SPOSTerminalReconciliationContract(), ::handleResult)
     }
 
@@ -68,9 +68,9 @@ internal class TerminalActivity : AppCompatActivity() {
             ?: throw IllegalArgumentException("TerminalActivity: Argument action is null")
     }
 
-    private val config: SPOSTerminal by lazy {
+    private val config: SposTerminal by lazy {
         intent.extras?.let {
-            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, SPOSTerminal::class.java)
+            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CONFIG, SposTerminal::class.java)
                 ?: throw IllegalArgumentException("TerminalActivity: Argument config is missing")
         } ?: throw IllegalArgumentException("TerminalActivity: Extras is null")
     }
@@ -142,7 +142,7 @@ internal class TerminalActivity : AppCompatActivity() {
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
-                    SPOSTerminal.TYPE
+                    SposTerminal.TYPE
                 )
                 putExtra(ExtraKeys.EXTRAS_RESULT, result)
             }

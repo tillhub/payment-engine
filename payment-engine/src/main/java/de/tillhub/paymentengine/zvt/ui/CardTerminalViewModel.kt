@@ -18,7 +18,7 @@ import de.tillhub.paymentengine.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.zvt.data.LavegoReceiptBuilder
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionData
 import de.tillhub.paymentengine.zvt.data.LavegoTransactionDataConverter
-import de.tillhub.paymentengine.zvt.data.ZVTTerminal
+import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -207,7 +207,7 @@ internal class CardTerminalViewModel(
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = ZVTTerminal.TYPE,
+                        terminalType = ZvtTerminal.TYPE,
                         terminalId = it.tid,
                         transactionId = it.receiptNo.toString(),
                         cardCircuit = it.cardName,
@@ -248,7 +248,7 @@ internal class CardTerminalViewModel(
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = ZVTTerminal.TYPE,
+                        terminalType = ZvtTerminal.TYPE,
                         terminalId = it.tid,
                         transactionId = it.receiptNo.toString(),
                         cardCircuit = it.cardName,
@@ -270,7 +270,7 @@ internal class CardTerminalViewModel(
                 TerminalOperationStatus.Login.Connected(
                     date = date,
                     rawData = rawData,
-                    terminalType = ZVTTerminal.TYPE,
+                    terminalType = ZvtTerminal.TYPE,
                     terminalId = data?.tid.orEmpty()
                 )
             }

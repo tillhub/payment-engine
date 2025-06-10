@@ -56,7 +56,7 @@ internal sealed class OPIOperationStatus {
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = OPITerminal.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = it.terminal?.stan.orEmpty(),
                         cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
@@ -65,7 +65,7 @@ internal sealed class OPIOperationStatus {
                     )
                 } ?: serviceData?.let {
                     TransactionData(
-                        terminalType = OPITerminal.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = "",
                         cardCircuit = "",
@@ -95,7 +95,7 @@ internal sealed class OPIOperationStatus {
                 rawData = rawData,
                 data = data?.let {
                     TransactionData(
-                        terminalType = OPITerminal.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = it.terminal?.stan.orEmpty(),
                         cardCircuit = it.cardValue?.cardCircuit?.value.orEmpty(),
@@ -104,7 +104,7 @@ internal sealed class OPIOperationStatus {
                     )
                 } ?: serviceData?.let {
                     TransactionData(
-                        terminalType = OPITerminal.TYPE,
+                        terminalType = OpiTerminal.TYPE,
                         terminalId = it.terminal?.terminalId.orEmpty(),
                         transactionId = "",
                         cardCircuit = "",
