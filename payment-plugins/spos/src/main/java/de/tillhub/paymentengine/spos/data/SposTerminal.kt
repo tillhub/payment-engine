@@ -86,7 +86,6 @@ class SposTerminal private constructor(
  *
  * Note: `package = context.packageName` is set for compatibility with Android API 34+.
  */
-@Suppress("TooManyFunctions")
 internal object SposTerminalContract : TerminalContract {
     override fun connectIntent(context: Context, terminal: Terminal): Intent =
         Intent(INTENT_ACTION_SPOS).apply {

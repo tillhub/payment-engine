@@ -4,16 +4,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.core.os.BundleCompat
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
-import de.tillhub.paymentengine.opi.data.OpiTerminal
-import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -25,7 +23,6 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import java.math.BigDecimal
 
 @RobolectricTest
 @Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
@@ -35,6 +32,8 @@ class PaymentContractTest : FunSpec({
     lateinit var analytics: PaymentAnalytics
 
     lateinit var target: PaymentResultContract
+
+    val terminal: Terminal = TestTerminal("external")
 
     beforeTest {
         context = spyk(RuntimeEnvironment.getApplication())
@@ -46,22 +45,24 @@ class PaymentContractTest : FunSpec({
         target = PaymentResultContract(analytics)
     }
 
-    test("createIntent External") {
-        val result = target.createIntent(
-            context,
-            PaymentRequest(
-                TestExternalTerminal("external"),
-                "UUID",
-                500.toBigDecimal(),
-                100.toBigDecimal(),
-                ISOAlphaCurrency("EUR")
-            )
+    test("createIntent") {
+        every { terminal.contract.paymentIntent(any(), any()) } returns Intent("PAYMENT")
+
+        val request = PaymentRequest(
+            terminal,
+            "UUID",
+            500.toBigDecimal(),
+            100.toBigDecimal(),
+            ISOAlphaCurrency("EUR")
         )
+
+        val result = target.createIntent(context, request)
 
         result.shouldBeInstanceOf<Intent>()
         result.action shouldBe "PAYMENT"
 
         verify {
+            terminal.contract.paymentIntent(context, request)
             analytics.logOperation(
                 "Operation: CARD_PAYMENT(" +
                         "amount: 500, " +
@@ -77,116 +78,6 @@ class PaymentContractTest : FunSpec({
                         "poiId=66000001, " +
                         "poiSerialNumber=" +
                         ")" +
-                        ")"
-            )
-        }
-    }
-
-    test("createIntent OPI") {
-        val result = target.createIntent(
-            context,
-            PaymentRequest(
-                OPI,
-                "UUID",
-                500.toBigDecimal(),
-                100.toBigDecimal(),
-                ISOAlphaCurrency("EUR")
-            )
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.component?.className shouldBe "de.tillhub.paymentengine.opi.ui.OPIPaymentActivity"
-        BundleCompat.getParcelable(
-            result.extras!!,
-            ExtraKeys.EXTRA_CONFIG,
-            OpiTerminal::class.java
-        ) shouldBe OPI
-        BundleCompat.getSerializable(
-            result.extras!!,
-            ExtraKeys.EXTRA_AMOUNT,
-            BigDecimal::class.java
-        ) shouldBe 600.toBigDecimal()
-        BundleCompat.getParcelable(
-            result.extras!!,
-            ExtraKeys.EXTRA_CURRENCY,
-            ISOAlphaCurrency::class.java
-        ) shouldBe ISOAlphaCurrency("EUR")
-
-        verify {
-            analytics.logOperation(
-                "Operation: CARD_PAYMENT(" +
-                        "amount: 500, " +
-                        "tip: 100, " +
-                        "currency: ISOAlphaCurrency(value=EUR))" +
-                        "\nOPITerminal(" +
-                        "id=opi, " +
-                        "ipAddress=127.0.0.1, " +
-                        "port=20002, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "port2=20007, " +
-                        "currencyCode=EUR" +
-                        ")"
-            )
-        }
-    }
-
-    test("createIntent ZVT") {
-        val result = target.createIntent(
-            context,
-            PaymentRequest(
-                ZVT,
-                "UUID",
-                500.toBigDecimal(),
-                100.toBigDecimal(),
-                ISOAlphaCurrency("EUR")
-            )
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.component?.className shouldBe "de.tillhub.paymentengine.zvt.ui.CardPaymentActivity"
-        BundleCompat.getParcelable(
-            result.extras!!,
-            ExtraKeys.EXTRA_CONFIG,
-            ZvtTerminal::class.java
-        ) shouldBe ZVT
-        BundleCompat.getSerializable(
-            result.extras!!,
-            ExtraKeys.EXTRA_AMOUNT,
-            BigDecimal::class.java
-        ) shouldBe 600.toBigDecimal()
-        BundleCompat.getParcelable(
-            result.extras!!,
-            ExtraKeys.EXTRA_CURRENCY,
-            ISOAlphaCurrency::class.java
-        ) shouldBe ISOAlphaCurrency("EUR")
-
-        verify {
-            analytics.logOperation(
-                "Operation: CARD_PAYMENT(" +
-                        "amount: 500, " +
-                        "tip: 100, " +
-                        "currency: ISOAlphaCurrency(value=EUR))" +
-                        "\nZVTTerminal(" +
-                        "id=zvt, " +
-                        "ipAddress=127.0.0.1, " +
-                        "port=40007, " +
-                        "saleConfig=CardSaleConfig(" +
-                        "applicationName=Tillhub GO, " +
-                        "operatorId=ah, " +
-                        "saleId=registerProvider, " +
-                        "pin=333333, " +
-                        "poiId=66000001, " +
-                        "poiSerialNumber=" +
-                        "), " +
-                        "terminalPrinterAvailable=true, " +
-                        "isoCurrencyNumber=0978" +
                         ")"
             )
         }
@@ -228,18 +119,4 @@ class PaymentContractTest : FunSpec({
             analytics.logCommunication(any(), any())
         }
     }
-}) {
-    companion object {
-        val ZVT = ZvtTerminal.create(
-            id = "zvt",
-            ipAddress = "127.0.0.1",
-            port = 40007,
-        )
-        val OPI = OpiTerminal.create(
-            id = "opi",
-            ipAddress = "127.0.0.1",
-            port = 20002,
-            port2 = 20007
-        )
-    }
-}
+})

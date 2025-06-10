@@ -4,14 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.core.os.BundleCompat
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.data.OpiTerminal
-import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -33,6 +32,8 @@ class TerminalConnectContractTest : FunSpec({
 
     lateinit var target: TerminalConnectContract
 
+    val terminal: Terminal = TestTerminal("external")
+
     beforeTest {
         context = spyk(RuntimeEnvironment.getApplication())
         analytics = mockk {
@@ -43,45 +44,30 @@ class TerminalConnectContractTest : FunSpec({
         target = TerminalConnectContract(analytics)
     }
 
-    test("createIntent External") {
-        val result = target.createIntent(context, TestExternalTerminal("external"))
+    test("createIntent") {
+        every { terminal.contract.connectIntent(any(), any()) } returns Intent("CONNECT")
+        val result = target.createIntent(context, terminal)
 
         verify {
-            analytics.logOperation(any())
+            terminal.contract.connectIntent(context, terminal)
+            analytics.logOperation(
+                "Operation: TERMINAL_CONNECT\n" +
+                    "Terminal.External(" +
+                    "id=external, " +
+                    "saleConfig=CardSaleConfig(" +
+                    "applicationName=Tillhub GO, " +
+                    "operatorId=ah, " +
+                    "saleId=registerProvider, " +
+                    "pin=333333, " +
+                    "poiId=66000001, " +
+                    "poiSerialNumber=" +
+                    ")" +
+                    ")"
+            )
         }
 
         result.shouldBeInstanceOf<Intent>()
         result.action shouldBe "CONNECT"
-    }
-
-    test("createIntent OPI") {
-        val result = target.createIntent(
-            context,
-            OPI
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.component?.className shouldBe "de.tillhub.paymentengine.opi.ui.OPILoginActivity"
-        BundleCompat.getParcelable(
-            result.extras!!,
-            ExtraKeys.EXTRA_CONFIG,
-            OpiTerminal::class.java
-        ) shouldBe PaymentContractTest.OPI
-    }
-
-    test("createIntent ZVT") {
-        val result = target.createIntent(
-            context,
-            ZVT
-        )
-
-        result.shouldBeInstanceOf<Intent>()
-        result.component?.className shouldBe "de.tillhub.paymentengine.zvt.ui.TerminalLoginActivity"
-        BundleCompat.getParcelable(
-            result.extras!!,
-            ExtraKeys.EXTRA_CONFIG,
-            ZvtTerminal::class.java
-        ) shouldBe ZVT
     }
 
     test("parseResult: result OK") {
@@ -117,18 +103,4 @@ class TerminalConnectContractTest : FunSpec({
             analytics.logCommunication(any(), any())
         }
     }
-}) {
-    companion object {
-        val OPI = OpiTerminal.create(
-            id = "opi",
-            ipAddress = "127.0.0.1",
-            port = 20002,
-            port2 = 20007
-        )
-        val ZVT = ZvtTerminal.create(
-            id = "zvt",
-            ipAddress = "127.0.0.1",
-            port = 20007,
-        )
-    }
-}
+})

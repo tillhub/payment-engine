@@ -8,7 +8,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.data.OpiTerminal
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -101,7 +101,7 @@ class RefundManagerTest : FunSpec({
     }
 
     test("startRefundTransaction with custom Terminal should launch refund contract") {
-        val customTerminal = TestExternalTerminal("external_terminal")
+        val customTerminal = TestTerminal("external_terminal")
         val transactionId = "12345"
         val amount = BigDecimal(100)
         val currency = ISOAlphaCurrency("EUR")

@@ -7,12 +7,10 @@ import android.os.Build
 import br.com.colman.kotest.android.extensions.robolectric.RobolectricTest
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
-import de.tillhub.paymentengine.opi.data.OpiTerminal
-import de.tillhub.paymentengine.testing.TestExternalTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
-import io.kotest.assertions.throwables.shouldThrow
+import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -34,6 +32,8 @@ class PaymentRecoveryContractTest : FunSpec({
 
     lateinit var target: PaymentRecoveryContract
 
+    val terminal: Terminal = TestTerminal("external")
+
     beforeTest {
         context = spyk(RuntimeEnvironment.getApplication())
         analytics = mockk {
@@ -45,38 +45,29 @@ class PaymentRecoveryContractTest : FunSpec({
     }
 
     test("createIntent External") {
-        val result = target.createIntent(context, TestExternalTerminal("external"))
+        every { terminal.contract.recoveryIntent(any(), any()) } returns Intent("RECOVERY")
+        val result = target.createIntent(context, terminal)
 
         verify {
-            analytics.logOperation(any())
+            terminal.contract.recoveryIntent(context, terminal)
+            analytics.logOperation(
+                "Operation: TERMINAL_RECOVERY\n" +
+                    "Terminal.External(" +
+                    "id=external, " +
+                    "saleConfig=CardSaleConfig(" +
+                    "applicationName=Tillhub GO, " +
+                    "operatorId=ah, " +
+                    "saleId=registerProvider, " +
+                    "pin=333333, " +
+                    "poiId=66000001, " +
+                    "poiSerialNumber=" +
+                    ")" +
+                    ")"
+            )
         }
 
         result.shouldBeInstanceOf<Intent>()
         result.action shouldBe "RECOVERY"
-    }
-
-    test("createIntent OPI") {
-        val result = shouldThrow<UnsupportedOperationException> {
-            target.createIntent(context, OpiTerminal.create())
-        }
-
-        verify(inverse = true) {
-            analytics.logOperation(any())
-        }
-
-        result.message shouldBe "Payment recovery is not supported by this terminal"
-    }
-
-    test("createIntent ZVT") {
-        val result = shouldThrow<UnsupportedOperationException> {
-            target.createIntent(context, ZvtTerminal.create())
-        }
-
-        verify(inverse = true) {
-            analytics.logOperation(any())
-        }
-
-        result.message shouldBe "Payment recovery is not supported by this terminal"
     }
 
     test("parseResult: result OK") {

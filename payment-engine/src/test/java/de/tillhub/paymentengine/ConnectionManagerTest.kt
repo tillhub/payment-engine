@@ -8,7 +8,7 @@ import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.data.OpiTerminal
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -81,7 +81,7 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startConnect by terminal") {
-        val terminal = TestExternalTerminal("external_terminal")
+        val terminal = TestTerminal("external_terminal")
         target.startConnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {
@@ -116,7 +116,7 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startSPOSDisconnect by terminal") {
-        val terminal = TestExternalTerminal("external_terminal")
+        val terminal = TestTerminal("external_terminal")
         target.startSPOSDisconnect(terminal)
 
         verify(ordering = Ordering.ORDERED) {

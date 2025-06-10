@@ -6,7 +6,7 @@ import de.tillhub.paymentengine.contract.TerminalReconciliationContract
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.opi.data.OpiTerminal
-import de.tillhub.paymentengine.testing.TestExternalTerminal
+import de.tillhub.paymentengine.testing.TestTerminal
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -63,7 +63,7 @@ class ReconciliationManagerTest : FunSpec({
     }
 
     test("startReconciliation with custom Terminal should and launch reconciliation contract") {
-        val customTerminal = TestExternalTerminal("external_terminal")
+        val customTerminal = TestTerminal("external_terminal")
 
         target.startReconciliation(customTerminal)
 
