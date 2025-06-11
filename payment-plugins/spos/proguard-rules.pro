@@ -21,5 +21,7 @@
 #-renamesourcefileattribute SourceFile
 -dontwarn java.lang.invoke.StringConcatFactory
 
+-keeppackagenames de.tillhub.paymentengine.spos.**
+
 -keep class de.tillhub.paymentengine.spos.data.SposTerminal { *; }
 -keep class de.tillhub.paymentengine.spos.data.SposTerminal$* { *; }
