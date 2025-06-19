@@ -16,14 +16,14 @@ dependencyResolutionManagement {
         maven {
             url = URI.create("https://jitpack.io")
         }
-        maven {
-            val nexusProperties = readNexusProperties()
-            url = URI.create("https://nexus.softpay.io/repository/softpay-external-sdk/")
-            credentials {
-                username = nexusProperties["nexus_username"].toString()
-                password = nexusProperties["nexus_password"].toString()
-            }
-        }
+//        maven {
+//            val nexusProperties = readNexusProperties()
+//            url = URI.create("https://nexus.softpay.io/repository/softpay-external-sdk/")
+//            credentials {
+//                username = nexusProperties["nexus_username"].toString()
+//                password = nexusProperties["nexus_password"].toString()
+//            }
+//        }
     }
 }
 
