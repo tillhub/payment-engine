@@ -84,14 +84,14 @@ afterEvaluate {
                 from(components.getByName("release"))
             }
         }
-        repositories {
-            maven {
-                url = uri("https://nexus.infra.unzer.io/repository/tillhub-payment-engine-hosted/")
-                credentials {
-                    username = System.getenv("NEXUS_USERNAME")
-                    password = System.getenv("NEXUS_PASSWORD")
-                }
-            }
-        }
+//        repositories {
+//            maven {
+//                url = uri("https://nexus.infra.unzer.io/repository/tillhub-payment-engine-hosted/")
+//                credentials {
+//                    username = System.getenv("NEXUS_USERNAME")
+//                    password = System.getenv("NEXUS_PASSWORD")
+//                }
+//            }
+//        }
     }
 }
