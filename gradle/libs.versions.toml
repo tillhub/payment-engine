@@ -12,8 +12,8 @@ timber = "5.0.1"
 androidDesugarJdkLibs = "2.0.4"
 detekt = "1.23.6"
 
-lavegoSdk = "1.0.1"
-lavegoUtils = "1.0.1"
+lavegoSdk = "8b2d5939bd"
+lavegoUtils = "8b2d5939bd"
 commonsCodec = "1.15"
 simpleXml = "2.7.1"
 
@@ -65,8 +65,8 @@ androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-s
 lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 
 # Lavego
-lavego-sale-sdk = { group = "com.github.lavego.sales-sdk", name = "saleSdk", version.ref = "lavegoSdk" }
-lavego-sale-utils = { group = "com.github.lavego.sales-sdk", name = "utils", version.ref = "lavegoUtils" }
+lavego-sale-sdk = { group = "com.github.SloInfinity.sales-sdk", name = "saleSdk", version.ref = "lavegoSdk" }
+lavego-sale-utils = { group = "com.github.SloInfinity.sales-sdk", name = "utils", version.ref = "lavegoUtils" }
 common-codec = { group = "commons-codec", name = "commons-codec", version.ref = "commonsCodec" }
 simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref = "simpleXml" }
 
