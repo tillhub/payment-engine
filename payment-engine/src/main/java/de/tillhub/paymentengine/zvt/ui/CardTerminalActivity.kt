@@ -1,7 +1,6 @@
 package de.tillhub.paymentengine.zvt.ui
 
 import android.app.ActivityManager
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -17,6 +16,7 @@ import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.Manufacturer
 import de.tillhub.paymentengine.helper.TimeoutManager
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 
@@ -26,7 +26,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     protected val viewModel by viewModels<CardTerminalViewModel>()
 
     private val activityManager: ActivityManager by lazy {
-        applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
     }
 
     protected val config: ZvtTerminal by lazy {
@@ -50,7 +50,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
                     timeoutManager.processStarted()
                     showLoader()
                 }
-                CardTerminalViewModel.State.Setup -> doSetup()
+                CardTerminalViewModel.State.Setup -> doZVTSetup()
                 CardTerminalViewModel.State.Operation -> {
                     showInstructions()
                     startOperation()
@@ -91,8 +91,7 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
 
         val register = Apdu(Commons.Command.CMD_0600).apply {
             val password = config.saleConfig.pin
-            val currency = (config as? ZvtTerminal)?.isoCurrencyNumber
-                ?: throw IllegalArgumentException("Terminal currency is missing")
+            val currency = config.isoCurrencyNumber
 
             add(Commons.StringNumberToBCD(password, PASSWORD_BYTE_COUNT))
             add(TERMINAL_CONFIG_BYTE)
@@ -103,10 +102,6 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
         doCustom(register.apdu())
     }
 
-    private fun doSetup() {
-        doZVTSetup()
-    }
-
     abstract fun showLoader()
     abstract fun showInstructions()
     abstract fun showIntermediateStatus(status: String)
@@ -114,6 +109,12 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     abstract fun setCancelVisibility(visible: Boolean)
     abstract fun finishWithError(state: CardTerminalViewModel.State.Error)
     abstract fun finishWithSuccess(state: CardTerminalViewModel.State.Success)
+
+    // Part of Nexo. Not supported yet
+    override fun launchSelf(delay: Int) = Unit
+    override fun onPaymentResult(transactionData: TransactionData) = Unit
+    override fun onResponse(response: String, type: Int) = Unit
+    // End of Nexo
 
     override fun transportConfiguration(): TransportConfiguration {
         return TransportConfiguration().apply {
@@ -143,18 +144,6 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
                 )
             }
         }
-    }
-
-    override fun launchSelf(delay: Int) {
-        // Part of Nexo. Not supported yet
-    }
-
-    override fun onPaymentResult(transactionData: TransactionData) {
-        // Part of Nexo. Not supported yet
-    }
-
-    override fun onResponse(response: String, type: Int) {
-        // Part of Nexo. Not supported yet
     }
 
     override fun onStatus(status: String) {
@@ -191,7 +180,10 @@ internal abstract class CardTerminalActivity : PaymentTerminalActivity() {
     }
 
     protected fun moveAppToFront() {
-        activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
+        // Only move the app to the front if the manufacturer is not PAX
+        if (!Manufacturer.matches(Manufacturer.PAX)) {
+            activityManager.moveTaskToFront(taskId, ActivityManager.MOVE_TASK_WITH_HOME)
+        }
     }
 
     /**
