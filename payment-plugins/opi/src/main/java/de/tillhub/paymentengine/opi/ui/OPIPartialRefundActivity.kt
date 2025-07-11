@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.opi.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.BundleCompat
@@ -10,7 +9,7 @@ import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
-import de.tillhub.paymentengine.helper.viewBinding
+import de.tillhub.paymentengine.opi.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
 import de.tillhub.paymentengine.opi.data.OpiTerminal
 import java.math.BigDecimal
@@ -70,7 +69,7 @@ internal class OPIPartialRefundActivity : OPITerminalActivity() {
 
     override fun finishWithSuccess(state: OPIService.State.ResultSuccess) {
         setResult(
-            Activity.RESULT_OK,
+            RESULT_OK,
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
@@ -87,7 +86,7 @@ internal class OPIPartialRefundActivity : OPITerminalActivity() {
 
     override fun finishWithError(state: OPIService.State.ResultError) {
         setResult(
-            Activity.RESULT_OK,
+            RESULT_OK,
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,

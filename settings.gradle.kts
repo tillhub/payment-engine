@@ -1,6 +1,9 @@
 import java.net.URI
 import java.util.Properties
 
+include(":payment-plugins:opi")
+
+
 pluginManagement {
     repositories {
         google()

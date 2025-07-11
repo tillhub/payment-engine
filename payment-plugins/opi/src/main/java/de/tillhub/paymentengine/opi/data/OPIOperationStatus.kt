@@ -1,6 +1,5 @@
 package de.tillhub.paymentengine.opi.data
 
-import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.TerminalOperationError
 import de.tillhub.paymentengine.data.TerminalOperationSuccess
 import de.tillhub.paymentengine.data.TransactionData
@@ -73,7 +72,7 @@ internal sealed class OPIOperationStatus {
                         paymentProvider = it.authorisation?.acquirerID.orEmpty()
                     )
                 },
-                resultCode = ResultCodeSets.getOPICode(
+                resultCode = OpiResultCodes.getOPICode(
                     resultCode = data?.tender?.authorisation?.actionCode?.toIntOrNull()
                         ?: serviceData?.privateData?.errorCode?.value?.toIntOrNull()
                 )

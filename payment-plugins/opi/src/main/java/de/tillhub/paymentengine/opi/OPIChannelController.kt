@@ -3,9 +3,9 @@ package de.tillhub.paymentengine.opi
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.helper.TerminalConfig
-import de.tillhub.paymentengine.helper.TerminalConfigImpl
-import de.tillhub.paymentengine.helper.toISOString
+import de.tillhub.paymentengine.opi.helper.toISOString
+import de.tillhub.paymentengine.opi.helper.TerminalConfig
+import de.tillhub.paymentengine.opi.helper.TerminalConfigImpl
 import de.tillhub.paymentengine.opi.common.withOPIContext
 import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1

@@ -95,7 +95,7 @@ class OpiTerminal private constructor(
 }
 
 /**
- * Implementation of [TerminalContract] for OPI terminals.
+ * Implementation of [de.tillhub.paymentengine.data.TerminalContract] for OPI terminals.
  * This object defines how to create Intents for various terminal operations
  * specific to OPI terminals.
  */

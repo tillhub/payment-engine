@@ -2,7 +2,6 @@ package de.tillhub.paymentengine.opi.ui
 
 import android.app.ActivityManager
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
@@ -13,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.helper.TimeoutManager
+import de.tillhub.paymentengine.opi.helper.TimeoutManager
 import de.tillhub.paymentengine.opi.OPIService
 import de.tillhub.paymentengine.opi.data.OpiTerminal
 import kotlinx.coroutines.launch
@@ -39,7 +38,7 @@ internal abstract class OPITerminalActivity : AppCompatActivity() {
     private lateinit var timeoutManager: TimeoutManager
 
     private val activityManager: ActivityManager by lazy {
-        applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
     }
 
     protected val config: OpiTerminal by lazy {

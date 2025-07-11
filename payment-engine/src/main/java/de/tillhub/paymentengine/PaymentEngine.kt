@@ -12,7 +12,7 @@ class PaymentEngine private constructor() {
 
     private val configs = mutableMapOf<String, Terminal>()
     private val terminalState = MutableStateFlow<TerminalOperationStatus>(TerminalOperationStatus.Waiting)
-    internal var paymentAnalytics: PaymentAnalytics? = null
+    var paymentAnalytics: PaymentAnalytics? = null
         private set
 
     fun setAnalytics(paymentAnalytics: PaymentAnalytics): PaymentEngine {

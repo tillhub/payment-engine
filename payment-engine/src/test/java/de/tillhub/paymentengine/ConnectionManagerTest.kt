@@ -7,7 +7,6 @@ import de.tillhub.paymentengine.contract.TerminalDisconnectContract
 import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestTerminal
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
@@ -68,9 +67,9 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startConnect by config name") {
-        val terminal = OpiTerminal.create()
-        configs["opi"] = terminal
-        target.startConnect("opi")
+        val terminal = TestTerminal("test")
+        configs["test"] = terminal
+        target.startConnect("test")
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
@@ -103,9 +102,9 @@ class ConnectionManagerTest : FunSpec({
     }
 
     test("startSPOSDisconnect by config name") {
-        val terminal = OpiTerminal.create()
-        configs["opi"] = terminal
-        target.startSPOSDisconnect("opi")
+        val terminal = TestTerminal("test")
+        configs["test"] = terminal
+        target.startSPOSDisconnect("test")
 
         verify(ordering = Ordering.ORDERED) {
             terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
@@ -127,17 +126,19 @@ class ConnectionManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
-    test("startSPOSDisconnect by OPI terminal should throw error") {
+    test("startSPOSDisconnect by test terminal should throw error") {
         every { disconnectContract.launch(any()) } answers {
             throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        target.startSPOSDisconnect(OpiTerminal.create())
+        val terminal = TestTerminal("test")
+
+        target.startSPOSDisconnect(terminal)
 
         val result = terminalState.first()
 
         verify {
-            disconnectContract.launch(OpiTerminal.create())
+            disconnectContract.launch(terminal)
         }
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()

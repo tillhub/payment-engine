@@ -9,7 +9,6 @@ import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -77,7 +76,7 @@ class TerminalConnectContractTest : FunSpec({
                 TerminalOperationStatus.Login.Connected(
                     date = mockk(),
                     rawData = "rawData",
-                    terminalType = OpiTerminal.TYPE,
+                    terminalType = "ZVT",
                     terminalId = "terminalId"
                 )
             )

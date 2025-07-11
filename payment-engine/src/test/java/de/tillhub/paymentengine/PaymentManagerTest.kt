@@ -7,7 +7,6 @@ import de.tillhub.paymentengine.contract.PaymentResultContract
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestTerminal
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 import io.kotest.core.spec.style.FunSpec
@@ -76,10 +75,10 @@ class PaymentManagerTest : FunSpec({
         val amount = BigDecimal(200)
         val tip = BigDecimal(20)
         val currency = ISOAlphaCurrency("EUR")
-        val terminal = OpiTerminal.create()
-        configs["opi"] = terminal
+        val terminal = TestTerminal("test")
+        configs["test"] = terminal
 
-        target.startPaymentTransaction(transactionId, amount, tip, currency, "opi")
+        target.startPaymentTransaction(transactionId, amount, tip, currency, "test")
 
         verify {
             paymentResultContract.launch(
