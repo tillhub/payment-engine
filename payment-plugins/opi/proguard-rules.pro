@@ -21,6 +21,7 @@
 #-renamesourcefileattribute SourceFile
 -keep class org.simpleframework.** { *; }
 
+-keeppackagenames de.tillhub.paymentengine.**
 -keeppackagenames de.tillhub.paymentengine.opi.**
 
 -keep class de.tillhub.paymentengine.opi.data.OpiTerminal { *; }
@@ -33,3 +34,4 @@
 # Breaking changes with AGP 8.0
 # R8 upgrade documentation
 -dontwarn java.lang.invoke.StringConcatFactory
+-dontwarn de.tillhub.paymentengine.databinding.**
