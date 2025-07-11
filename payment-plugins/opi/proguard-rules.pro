@@ -19,7 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
 -keep class org.simpleframework.** { *; }
 
 -keeppackagenames de.tillhub.paymentengine.opi.**
@@ -30,3 +29,7 @@
 -keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);
 }
+
+# Breaking changes with AGP 8.0
+# R8 upgrade documentation
+-dontwarn java.lang.invoke.StringConcatFactory
