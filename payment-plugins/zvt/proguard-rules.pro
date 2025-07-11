@@ -21,7 +21,8 @@
 #-renamesourcefileattribute SourceFile
 -keep class de.lavego.** { *; }
 
--keeppackagenames de.tillhub.paymentengine.zvt**
+-keeppackagenames de.tillhub.paymentengine.**
+-keeppackagenames de.tillhub.paymentengine.zvt.**
 
 -keep class de.tillhub.paymentengine.zvt.data.ZvtTerminal { *; }
 -keep class de.tillhub.paymentengine.zvt.data.ZvtTerminal$* { *; }
@@ -33,3 +34,4 @@
 # Breaking changes with AGP 8.0
 # R8 upgrade documentation
 -dontwarn java.lang.invoke.StringConcatFactory
+-dontwarn de.tillhub.paymentengine.databinding.**
