@@ -1,7 +1,7 @@
 package de.tillhub.paymentengine.spos.data
 
-import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.TransactionResultCode
+import de.tillhub.paymentengine.spos.R
 
 internal object SPOSResultCodes {
     private val resultCodeSet = mapOf(
@@ -139,12 +139,11 @@ internal object SPOSResultCodes {
             defaultValue = TransactionResultCode.Unknown(
                 resultCode = UNKNOWN_RESULT_CODE,
                 resultCodeString = resultCode,
-                errorMessage = R.string.zvt_error_code_unknown
+                errorMessage = de.tillhub.paymentengine.R.string.error_code_unknown
             )
         )
     }
 
     private const val UNKNOWN_RESULT_CODE = -1
     val APP_NOT_FOUND_ERROR = TransactionResultCode.Known(R.string.spos_error_app_not_found)
-    val ACTION_NOT_SUPPORTED = TransactionResultCode.Known(R.string.operation_not_supported_error)
 }

@@ -8,7 +8,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.testing.TestTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -47,27 +47,17 @@ class PaymentManagerTest : FunSpec({
         )
     }
 
-    test("startPaymentTransaction should use default config when no configId provided") {
+    test("startPaymentTransaction should should throw when no configId provided and no terminal configured") {
         val transactionId = "tx789"
         val amount = BigDecimal(300)
         val tip = BigDecimal(30)
         val currency = ISOAlphaCurrency("EUR")
 
-        target.startPaymentTransaction(transactionId, amount, tip, currency)
-
-        verify {
-            paymentResultContract.launch(
-                match {
-                    it.transactionId == transactionId &&
-                            it.amount == amount &&
-                            it.tip == tip &&
-                            it.currency == currency &&
-                            it.config == ZvtTerminal.create()
-                }
-            )
+        val result = shouldThrow<IllegalArgumentException> {
+            target.startPaymentTransaction(transactionId, amount, tip, currency)
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Payment.Pending(amount, currency)
+        result.message shouldBe "Terminal config not found for id: "
     }
 
     test("startPaymentTransaction with configId should launch payment result contract") {

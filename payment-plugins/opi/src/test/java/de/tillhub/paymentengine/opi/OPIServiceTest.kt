@@ -131,7 +131,7 @@ class OPIServiceTest : FunSpec({
                 data = null,
                 resultCode = TransactionResultCode.Unknown(
                     resultCode = -1,
-                    errorMessage = R.string.zvt_error_code_unknown
+                    errorMessage = R.string.error_code_unknown
                 )
             )
         )

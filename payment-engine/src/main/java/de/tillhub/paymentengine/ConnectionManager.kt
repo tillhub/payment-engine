@@ -4,9 +4,9 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
-import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionResultCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -50,7 +50,8 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startConnect(configId: String) {
-        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
+        val terminalConfig = configs[configId]
+        requireNotNull(terminalConfig) { "Terminal config not found for id: $configId" }
         startConnect(terminalConfig)
     }
 
@@ -65,7 +66,8 @@ internal class ConnectionManagerImpl(
     }
 
     override fun startSPOSDisconnect(configId: String) {
-        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
+        val terminalConfig = configs[configId]
+        requireNotNull(terminalConfig) { "Terminal config not found for id: $configId" }
         startSPOSDisconnect(terminalConfig)
     }
 
@@ -78,7 +80,7 @@ internal class ConnectionManagerImpl(
                 TerminalOperationStatus.Login.Error(
                     date = Instant.now(),
                     rawData = "",
-                    resultCode = ResultCodeSets.ACTION_NOT_SUPPORTED
+                    resultCode = TransactionResultCode.ACTION_NOT_SUPPORTED
                 )
             )
         }

@@ -4,11 +4,11 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TerminalConnectContract
 import de.tillhub.paymentengine.contract.TerminalDisconnectContract
-import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
+import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.testing.TestTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -55,15 +55,12 @@ class ConnectionManagerTest : FunSpec({
         )
     }
 
-    test("startConnect by default terminal ") {
-        target.startConnect()
-
-        verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
-            connectContract.launch(ZvtTerminal.create())
+    test("startConnect should throw when no configId provided and no terminal configured") {
+        val result = shouldThrow<IllegalArgumentException> {
+            target.startConnect()
         }
 
-        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
+        result.message shouldBe "Terminal config not found for id: "
     }
 
     test("startConnect by config name") {
@@ -91,14 +88,12 @@ class ConnectionManagerTest : FunSpec({
         terminalState.value shouldBe TerminalOperationStatus.Login.Pending
     }
 
-    test("startSPOSDisconnect by default terminal ") {
-        target.startSPOSDisconnect()
-
-        verify(ordering = Ordering.ORDERED) {
-            terminalState.tryEmit(TerminalOperationStatus.Login.Pending)
-            disconnectContract.launch(ZvtTerminal.create())
+    test("startSPOSDisconnect should throw when no configId provided and no terminal configured") {
+        val result = shouldThrow<IllegalArgumentException> {
+            target.startSPOSDisconnect()
         }
-        terminalState.value shouldBe TerminalOperationStatus.Login.Pending
+
+        result.message shouldBe "Terminal config not found for id: "
     }
 
     test("startSPOSDisconnect by config name") {
@@ -142,6 +137,6 @@ class ConnectionManagerTest : FunSpec({
         }
 
         result.shouldBeInstanceOf<TerminalOperationStatus.Login.Error>()
-        result.resultCode shouldBe ResultCodeSets.ACTION_NOT_SUPPORTED
+        result.resultCode shouldBe TransactionResultCode.ACTION_NOT_SUPPORTED
     }
 })

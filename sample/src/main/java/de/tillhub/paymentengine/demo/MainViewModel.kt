@@ -157,7 +157,7 @@ class MainViewModel : ViewModel() {
     }
 
     companion object {
-        private const val CONFIG_IN_USE = "s-pos"
+        private const val CONFIG_IN_USE = "zvt-local"
         private const val REMOTE_IP = "192.168.100.39"
     }
 }

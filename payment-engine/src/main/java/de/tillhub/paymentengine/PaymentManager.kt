@@ -73,7 +73,8 @@ internal class PaymentManagerImpl(
         currency: ISOAlphaCurrency,
         configId: String
     ) {
-        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
+        val terminalConfig = configs[configId]
+        requireNotNull(terminalConfig) { "Terminal config not found for id: $configId" }
         startPaymentTransaction(transactionId, amount, tip, currency, terminalConfig)
     }
 
