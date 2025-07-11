@@ -6,7 +6,7 @@ import android.content.Context
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import de.tillhub.paymentengine.R
+import de.tillhub.paymentengine.opi.R
 
 internal object NotificationsHelper {
 
@@ -32,7 +32,7 @@ internal object NotificationsHelper {
             .setContentTitle(context.getString(R.string.opi_foreground_service_title))
             .setContentText(context.getString(R.string.opi_foreground_service_message))
             .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_card)
+            .setSmallIcon(de.tillhub.paymentengine.R.drawable.ic_card)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }

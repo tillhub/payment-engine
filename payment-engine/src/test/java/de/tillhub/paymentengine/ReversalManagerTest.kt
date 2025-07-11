@@ -8,7 +8,7 @@ import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.testing.TestTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -45,35 +45,24 @@ class ReversalManagerTest : FunSpec({
         )
     }
 
-    test("startReversalTransaction should use default config when no configId provided") {
+    test("startReversalTransaction should throw when no configId provided and no terminal configured") {
         val transactionId = "12345"
         val amount = BigDecimal(100)
         val currency = ISOAlphaCurrency("EUR")
         val receiptNo = "R12345"
         val tip = BigDecimal.ZERO
 
-        target.startReversalTransaction(
-            transactionId = transactionId,
-            amount = amount,
-            tip = tip,
-            currency = currency,
-            receiptNo = receiptNo
-        )
-
-        verify {
-            reversalContract.launch(
-                ReversalRequest(
-                    transactionId = transactionId,
-                    amount = amount,
-                    currency = currency,
-                    tip = tip,
-                    config = ZvtTerminal.create(),
-                    receiptNo = receiptNo
-                )
+        val result = shouldThrow<IllegalArgumentException> {
+            target.startReversalTransaction(
+                transactionId = transactionId,
+                amount = amount,
+                tip = tip,
+                currency = currency,
+                receiptNo = receiptNo
             )
         }
 
-        transactionState.value shouldBe TerminalOperationStatus.Reversal.Pending(receiptNo)
+        result.message shouldBe "Terminal config not found for id: "
     }
 
     test("startReversalTransaction with configId should launch reversal contract") {

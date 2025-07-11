@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Payment" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.Payment" parent="Theme.AppCompat.Light.NoActionBar">
 
         <!-- Colors -->
         <item name="colorPrimary">#279FF6</item>
-        <item name="colorPrimaryVariant">#228AD6</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorError">#FF3B30</item>
 
         <item name="badgeTextColor">#232E3D</item>

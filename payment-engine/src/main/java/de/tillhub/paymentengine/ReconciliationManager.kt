@@ -39,7 +39,8 @@ internal class ReconciliationManagerImpl(
     }
 
     override fun startReconciliation(configId: String) {
-        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
+        val terminalConfig = configs[configId]
+        requireNotNull(terminalConfig) { "Terminal config not found for id: $configId" }
         startReconciliation(terminalConfig)
     }
 

@@ -1,6 +1,6 @@
 package de.tillhub.paymentengine.opi.data
 
-import de.tillhub.paymentengine.R
+import de.tillhub.paymentengine.opi.R
 import de.tillhub.paymentengine.data.TransactionResultCode
 
 internal object OpiResultCodes {
@@ -181,7 +181,7 @@ internal object OpiResultCodes {
             key = resultCode,
             defaultValue = TransactionResultCode.Unknown(
                 resultCode = resultCode ?: UNKNOWN_RESULT_CODE,
-                errorMessage = R.string.zvt_error_code_unknown
+                errorMessage = de.tillhub.paymentengine.R.string.error_code_unknown
             )
         )
     }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+
+    <application
+        android:networkSecurityConfig="@xml/network_security_config">
+        <service
+            android:name="de.lavego.zvt.ZvtPOIService"
+            android:exported="false"
+            tools:node="merge" />
+
+        <activity
+            android:name=".ui.CardPaymentActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.CardPaymentReversalActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.CardPaymentPartialRefundActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.TerminalReconciliationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false"/>
+
+        <activity
+            android:name=".ui.TerminalLoginActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false"/>
+
+    </application>
+</manifest>
