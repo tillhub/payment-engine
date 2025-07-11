@@ -1,34 +1,49 @@
 package de.tillhub.paymentengine.opi.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
+import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
-import de.tillhub.paymentengine.helper.viewBinding
+import de.tillhub.paymentengine.opi.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
 import de.tillhub.paymentengine.opi.data.OpiTerminal
+import java.math.BigDecimal
 
-internal class OPIReconciliationActivity : OPITerminalActivity() {
+internal class OPIPaymentActivity : OPITerminalActivity() {
 
     private val binding by viewBinding(ActivityCardPaymentBinding::inflate)
+
+    private val amount: BigDecimal by lazy {
+        intent.extras?.let {
+            BundleCompat.getSerializable(it, ExtraKeys.EXTRA_AMOUNT, BigDecimal::class.java)
+                ?: throw IllegalArgumentException("$TAG: Argument amount is missing")
+        } ?: throw IllegalArgumentException("$TAG: Extras are missing")
+    }
+    private val currency: ISOAlphaCurrency by lazy {
+        intent.extras?.let {
+            BundleCompat.getParcelable(it, ExtraKeys.EXTRA_CURRENCY, ISOAlphaCurrency::class.java)
+                ?: throw IllegalArgumentException("$TAG: Argument currency is missing")
+        } ?: throw IllegalArgumentException("$TAG: Extras are missing")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-    }
-
-    override fun showLoader() {
-        binding.loader.isVisible = true
-        binding.instructions.isGone = true
 
         binding.buttonCancel.setOnClickListener {
             opiService.abortRequest()
             finish()
         }
+    }
+
+    override fun showLoader() {
+        binding.loader.isVisible = true
+        binding.instructions.isGone = true
     }
 
     override fun showInstructions() {
@@ -44,17 +59,17 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
         binding.message.text = status
     }
 
+    override fun startOperation() {
+        opiService.startPayment(amount, currency)
+    }
+
     override fun showCancel() {
         binding.buttonCancel.isVisible = true
     }
 
-    override fun startOperation() {
-        opiService.startReconciliation()
-    }
-
     override fun finishWithSuccess(state: OPIService.State.ResultSuccess) {
         setResult(
-            Activity.RESULT_OK,
+            RESULT_OK,
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
@@ -62,7 +77,7 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
-                    TerminalOperationStatus.Reconciliation.Success(state.data)
+                    TerminalOperationStatus.Payment.Success(state.data)
                 )
             }
         )
@@ -71,7 +86,7 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
 
     override fun finishWithError(state: OPIService.State.ResultError) {
         setResult(
-            Activity.RESULT_OK,
+            RESULT_OK,
             Intent().apply {
                 putExtra(
                     ExtraKeys.EXTRAS_PROTOCOL,
@@ -79,10 +94,14 @@ internal class OPIReconciliationActivity : OPITerminalActivity() {
                 )
                 putExtra(
                     ExtraKeys.EXTRAS_RESULT,
-                    TerminalOperationStatus.Reconciliation.Error(state.data)
+                    TerminalOperationStatus.Payment.Error(state.data)
                 )
             }
         )
         finish()
+    }
+
+    companion object {
+        private const val TAG = "OPIPaymentActivity"
     }
 }

@@ -2,8 +2,6 @@ package de.tillhub.paymentengine.opi
 
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.helper.TerminalConfig
-import de.tillhub.paymentengine.helper.toInstant
 import de.tillhub.paymentengine.opi.communication.OPIChannel0
 import de.tillhub.paymentengine.opi.communication.OPIChannel1
 import de.tillhub.paymentengine.opi.communication.OPIChannelFactory
@@ -29,6 +27,8 @@ import de.tillhub.paymentengine.opi.data.ServiceResponse
 import de.tillhub.paymentengine.opi.data.StringToDtoConverter
 import de.tillhub.paymentengine.opi.data.TextLine
 import de.tillhub.paymentengine.opi.data.TotalAmount
+import de.tillhub.paymentengine.opi.helper.TerminalConfig
+import de.tillhub.paymentengine.opi.helper.toInstant
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.Ordering
@@ -1075,9 +1075,13 @@ internal class OPIChannelControllerImplTest : DescribeSpec({
         }
 
         it("channel 0 errors") {
-            every { converterFactory.newStringToDtoConverter(CardServiceResponse::class.java) } returns cardServiceResponseConverter
+            every {
+                converterFactory.newStringToDtoConverter(CardServiceResponse::class.java)
+            } returns cardServiceResponseConverter
             every { converterFactory.newDtoToStringConverter<DeviceResponse>() } answers {
-                every { converterFactory.newDtoToStringConverter<CardServiceRequest>() } returns cardServiceRequestConverter
+                every {
+                    converterFactory.newDtoToStringConverter<CardServiceRequest>()
+                } returns cardServiceRequestConverter
 
                 deviceResponseConverter
             }
