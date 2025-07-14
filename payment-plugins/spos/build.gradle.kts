@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "de.tillhub.paymentengine.spos"
+    namespace = Configs.APPLICATION_ID + ".spos"
     compileSdk = Configs.COMPILE_SDK
 
     defaultConfig {
@@ -46,7 +46,6 @@ detekt {
 }
 
 dependencies {
-
     implementation(project(":payment-engine"))
 
     // Core Dependencies

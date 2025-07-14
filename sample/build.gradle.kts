@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "de.tillhub.paymentengine.demo"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -54,6 +54,8 @@ android {
 dependencies {
     implementation(project(":payment-engine"))
     implementation(project(":payment-plugins:spos"))
+    implementation(project(":payment-plugins:opi"))
+    implementation(project(":payment-plugins:zvt"))
     coreLibraryDesugaring(libs.android.desugarJdkLibs)
 
     implementation(libs.core.ktx)

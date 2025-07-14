@@ -7,9 +7,8 @@ import de.tillhub.paymentengine.contract.RefundRequest
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OpiTerminal
 import de.tillhub.paymentengine.testing.TestTerminal
-import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -45,36 +44,25 @@ class RefundManagerTest : FunSpec({
         )
     }
 
-    test("startRefundTransaction should use default config when no configId provided") {
-        val defaultTerminal = ZvtTerminal.create()
+    test("startRefundTransaction should should throw when no configId provided and no terminal configured") {
         configs.clear()
         val transactionId = "12345"
         val amount = BigDecimal(100)
         val currency = ISOAlphaCurrency("EUR")
 
-        target.startRefundTransaction(
-            transactionId = transactionId,
-            amount = amount,
-            currency = currency
-        )
-
-        verify {
-            refundContract.launch(
-                RefundRequest(
-                    config = defaultTerminal,
-                    transactionId = transactionId,
-                    amount = amount,
-                    currency = currency
-                )
+        val result = shouldThrow<IllegalArgumentException> {
+            target.startRefundTransaction(
+                transactionId = transactionId,
+                amount = amount,
+                currency = currency
             )
         }
-
-        terminalState.value shouldBe TerminalOperationStatus.Refund.Pending(amount, currency)
+        result.message shouldBe "Terminal config not found for id: "
     }
 
     test("startRefundTransaction with configId should launch refund contract") {
-        val terminal = OpiTerminal.create()
-        configs["opi"] = terminal
+        val terminal = TestTerminal("test")
+        configs["test"] = terminal
         val transactionId = "12345"
         val amount = BigDecimal(100)
         val currency = ISOAlphaCurrency("EUR")
@@ -83,7 +71,7 @@ class RefundManagerTest : FunSpec({
             transactionId = transactionId,
             amount = amount,
             currency = currency,
-            configId = "opi"
+            configId = "test"
         )
 
         verify {

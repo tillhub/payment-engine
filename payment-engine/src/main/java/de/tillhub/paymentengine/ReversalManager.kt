@@ -86,7 +86,8 @@ internal class ReversalManagerImpl(
         receiptNo: String,
         configId: String
     ) {
-        val terminalConfig = configs.getOrDefault(configId, defaultConfig)
+        val terminalConfig = configs[configId]
+        requireNotNull(terminalConfig) { "Terminal config not found for id: $configId" }
         startReversalTransaction(
             transactionId = transactionId,
             amount = amount,

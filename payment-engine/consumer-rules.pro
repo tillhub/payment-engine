@@ -1,2 +1,0 @@
--keep class de.lavego.** { *; }
--keep class org.simpleframework.** { *; }

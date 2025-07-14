@@ -4,4 +4,5 @@
     <attr name="widgetGutter" format="dimension" />
     <attr name="widgetGutterLarge" format="dimension" />
     <attr name="textAppearanceH1" format="reference" />
+    <attr name="badgeTextColor" format="color" />
 </resources>

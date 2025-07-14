@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+
+    <application>
+
+        <service
+            android:name="de.tillhub.paymentengine.opi.OPIService"
+            android:exported="false"
+            android:foregroundServiceType="shortService"
+            tools:node="merge" />
+
+        <activity
+            android:name=".ui.OPIPaymentActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.OPIPaymentReversalActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.OPIPartialRefundActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.OPIReconciliationActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.OPILoginActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Payment"
+            android:exported="false" />
+
+    </application>
+
+</manifest>

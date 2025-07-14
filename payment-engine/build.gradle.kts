@@ -72,16 +72,6 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
     detektPlugins(libs.detekt.libraries)
 
-    // Lavego
-    implementation(libs.bundles.lavego)
-
-    // OPI
-    implementation(libs.retrofit.simplexml) {
-        exclude(module = "stax")
-        exclude(module = "stax-api")
-        exclude(module = "xpp3")
-    }
-
     // Unit tests
     testImplementation(libs.bundles.testing)
     testImplementation(libs.bundles.robolectric)

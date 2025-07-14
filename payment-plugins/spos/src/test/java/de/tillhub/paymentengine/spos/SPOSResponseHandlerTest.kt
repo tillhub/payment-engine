@@ -2,7 +2,6 @@ package de.tillhub.paymentengine.spos
 
 import android.app.Activity
 import android.content.Intent
-import de.tillhub.paymentengine.R
 import de.tillhub.paymentengine.data.TerminalOperationStatus
 import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.spos.data.ReceiptDto
@@ -142,7 +141,7 @@ class SPOSResponseHandlerTest : DescribeSpec({
 
                 result.shouldBeInstanceOf<TerminalOperationStatus.Payment.Error>()
                 result.response.resultCode.shouldBeInstanceOf<TransactionResultCode.Unknown>()
-                result.response.resultCode.errorMessage shouldBe R.string.zvt_error_code_unknown
+                result.response.resultCode.errorMessage shouldBe de.tillhub.paymentengine.R.string.error_code_unknown
             }
 
             it("tx error") {

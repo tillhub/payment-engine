@@ -3,10 +3,9 @@ package de.tillhub.paymentengine
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import de.tillhub.paymentengine.contract.TicketReprintContract
-import de.tillhub.paymentengine.data.ResultCodeSets
 import de.tillhub.paymentengine.data.Terminal
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.data.TransactionResultCode
 import de.tillhub.paymentengine.testing.TestTerminal
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -80,15 +79,17 @@ class TicketReprintManagerTest : FunSpec({
             throw UnsupportedOperationException("Ticket reprint is not supported by this terminal")
         }
 
-        target.startTicketReprint(OpiTerminal.create())
+        val terminal = TestTerminal("test")
+
+        target.startTicketReprint(terminal)
 
         val result = terminalState.first()
 
         verify {
-            ticketReprintContract.launch(OpiTerminal.create())
+            ticketReprintContract.launch(terminal)
         }
 
         result.shouldBeInstanceOf<TerminalOperationStatus.TicketReprint.Error>()
-        result.resultCode shouldBe ResultCodeSets.ACTION_NOT_SUPPORTED
+        result.resultCode shouldBe TransactionResultCode.ACTION_NOT_SUPPORTED
     }
 })
