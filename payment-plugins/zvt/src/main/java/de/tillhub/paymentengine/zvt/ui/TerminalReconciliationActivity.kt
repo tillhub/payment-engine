@@ -5,9 +5,9 @@ import android.os.Bundle
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.databinding.ActivityTerminalReconciliationBinding
 import de.tillhub.paymentengine.zvt.helper.viewBinding
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import de.tillhub.paymentengine.zvt.databinding.ActivityTerminalReconciliationBinding
 
 internal class TerminalReconciliationActivity : CardTerminalActivity() {
 

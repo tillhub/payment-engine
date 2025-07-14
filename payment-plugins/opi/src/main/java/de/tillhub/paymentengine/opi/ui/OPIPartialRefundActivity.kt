@@ -8,10 +8,10 @@ import androidx.core.view.isVisible
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
 import de.tillhub.paymentengine.data.TerminalOperationStatus
-import de.tillhub.paymentengine.databinding.ActivityCardPaymentBinding
 import de.tillhub.paymentengine.opi.helper.viewBinding
 import de.tillhub.paymentengine.opi.OPIService
 import de.tillhub.paymentengine.opi.data.OpiTerminal
+import de.tillhub.paymentengine.opi.databinding.ActivityCardPaymentBinding
 import java.math.BigDecimal
 
 internal class OPIPartialRefundActivity : OPITerminalActivity() {

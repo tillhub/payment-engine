@@ -8,9 +8,9 @@ import de.lavego.zvt.api.Apdu
 import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.databinding.ActivityCardPaymentReversalBinding
 import de.tillhub.paymentengine.zvt.helper.viewBinding
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import de.tillhub.paymentengine.zvt.databinding.ActivityCardPaymentReversalBinding
 
 internal class CardPaymentReversalActivity : CardTerminalActivity() {
 

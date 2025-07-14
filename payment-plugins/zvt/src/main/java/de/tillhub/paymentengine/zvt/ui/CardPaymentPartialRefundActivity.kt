@@ -11,9 +11,9 @@ import de.lavego.zvt.api.Bmp
 import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.data.ExtraKeys
 import de.tillhub.paymentengine.data.ISOAlphaCurrency
-import de.tillhub.paymentengine.databinding.ActivityCardPaymentPartialRefundBinding
 import de.tillhub.paymentengine.zvt.helper.viewBinding
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
+import de.tillhub.paymentengine.zvt.databinding.ActivityCardPaymentPartialRefundBinding
 import java.math.BigDecimal
 
 internal class CardPaymentPartialRefundActivity : CardTerminalActivity() {
