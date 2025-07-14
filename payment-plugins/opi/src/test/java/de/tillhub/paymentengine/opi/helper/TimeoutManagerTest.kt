@@ -1,4 +1,4 @@
-package de.tillhub.paymentengine.helper
+package de.tillhub.paymentengine.opi.helper
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner

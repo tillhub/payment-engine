@@ -1,4 +1,6 @@
-package de.tillhub.paymentengine.data
+package de.tillhub.paymentengine.zvt.data
+
+import android.os.Build
 
 internal enum class Manufacturer(open val value: String) {
     PAX("PAX"),
@@ -7,7 +9,7 @@ internal enum class Manufacturer(open val value: String) {
     companion object {
         fun get(): Manufacturer =
             entries.firstOrNull {
-                it.value == android.os.Build.MANUFACTURER
+                it.value == Build.MANUFACTURER
             } ?: OTHER
         fun matches(value: Manufacturer): Boolean = get() == value
     }

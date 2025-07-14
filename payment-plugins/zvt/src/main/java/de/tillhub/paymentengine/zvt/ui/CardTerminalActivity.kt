@@ -16,7 +16,7 @@ import de.lavego.zvt.api.Commons
 import de.tillhub.paymentengine.PaymentEngine
 import de.tillhub.paymentengine.analytics.PaymentAnalytics
 import de.tillhub.paymentengine.data.ExtraKeys
-import de.tillhub.paymentengine.data.Manufacturer
+import de.tillhub.paymentengine.zvt.data.Manufacturer
 import de.tillhub.paymentengine.zvt.helper.TimeoutManager
 import de.tillhub.paymentengine.zvt.data.ZvtTerminal
 
